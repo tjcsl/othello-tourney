@@ -1,0 +1,11 @@
+venv/
+venv
+*.log
+.vagrant/
+__pycache__/
+*.py[co]
+.idea/
+.vscode/
+*.sqlite3
+*.ini
+secret.py
