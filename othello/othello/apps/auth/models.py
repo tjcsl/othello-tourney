@@ -41,7 +41,7 @@ class User(AbstractUser):
     def short_name(self):
         return self.username
 
-    def api_request(self, url, params={}, refresh=True):
+    def api_request(self, url, params=dict, refresh=True):
         s = self.get_social_auth()
         params.update({"format": "json"})
         params.update({"access_token": s.access_token})

@@ -2,8 +2,6 @@ from django.shortcuts import render
 from django.contrib.auth.views import LogoutView
 from django.contrib.auth.decorators import login_required
 
-from django.http import HttpResponse
-
 from .forms import UploadFileForm
 
 
