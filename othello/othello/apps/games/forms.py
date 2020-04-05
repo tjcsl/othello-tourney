@@ -1,5 +1,9 @@
 from django import forms
 
+from .models import Submission
 
-class UploadFileForm(forms.Form):
-    code = forms.FileField(required=True)
+
+class SubmissionForm(forms.ModelForm):
+    class Meta:
+        model = Submission
+        fields = ('code', )
