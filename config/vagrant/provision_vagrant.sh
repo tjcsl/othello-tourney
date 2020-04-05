@@ -29,5 +29,4 @@ cd othello
 virtualenv -p "$(command -v python3)" --always-copy venv
 source ./venv/bin/activate
 pip3 install -r requirements.txt
-cd othello
-python3 manage.py collectstatic --noinput
+>&2 echo "Make sure to copy secret.sample.py to secret.py and populate the values"
