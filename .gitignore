@@ -9,3 +9,4 @@ __pycache__/
 *.sqlite3
 *.ini
 secret.py
+submissions/
