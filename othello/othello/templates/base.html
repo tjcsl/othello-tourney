@@ -15,7 +15,7 @@
   <body>
     <div class="top" id="top">
       <div class="header" id="header">
-        <p>{% block header %}{% endblock %}</p>
+        <p id="home">Othello</p>
         <div id="expandbutton">
             <img src="{% static 'img/menu.svg' %}" alt="menu" />
         </div>
@@ -23,7 +23,7 @@
       <div class="linkbar-container">
         <nav class="linkbar" id="linkbar">
           <a href="{% url 'auth:index' %}">Home</a>
-          <a href="{% url 'auth:index' %}">About</a>
+          <a href="{% url 'games:about' %}">About</a>
           <a href="{% url 'auth:upload' %}">Upload</a>
           <a href="{% url 'auth:index' %}">Play</a>
           <a href="{% url 'auth:index' %}">Watch</a>

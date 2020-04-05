@@ -9,3 +9,8 @@ if (expandbutton) {
     }
   });
 }
+
+$("#home")
+  .click(() => {
+    window.location.href = "/";
+  });

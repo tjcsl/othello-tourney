@@ -19,6 +19,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "social_django",
     "othello.apps.auth.apps.AuthConfig",
+    "othello.apps.games.apps.GamesConfig",
 ]
 
 MIDDLEWARE = [
