@@ -19,22 +19,14 @@ class User(AbstractUser):
 
     @property
     def has_view_permission(self) -> bool:
-        """Whether the user can view workstation information."""
         return self.access_type == "view" or self.has_edit_permission
 
     @property
     def has_edit_permission(self) -> bool:
-        """Whether the user can perform basic workstation management (such as resetting the healthy
-        flag and scheduling/cancelling maintenance periods).
-
-        Note: Editors can only cancel maintenance periods they have scheduled."""
         return self.access_type == "edit" or self.has_management_permission
 
     @property
     def has_management_permission(self) -> bool:
-        """Whether the user can perform advanced workstation management (such as creating and
-        deleting workstations, cancelling maintenance periods scheduled by other users, or sending
-        Wake-on-LAN packets)."""
         return self.is_staff and self.is_superuser
 
     @property
@@ -59,3 +51,6 @@ class User(AbstractUser):
 
     def get_social_auth(self):
         return self.social_auth.get(provider="ion")
+
+    def __str__(self):
+        return f"User {self.short_name}"
