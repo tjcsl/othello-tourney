@@ -1,10 +1,11 @@
 {% extends "base.html" %}
-{% load static %}
 {% block title %}Othello: Login{% endblock %}
 
 {% block main %}
-    <div class="center">
-        <a href="{% url 'social:begin' 'ion' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}" class="btn btn-ion">Log in with Ion</a>
-    </div>
+  <div class="centered">
+    <form action="{% url 'social:begin' 'ion' %}{% if request.GET.next %}?next={{ request.GET.next|urlencode }}{% endif %}" method="POST">
+      {% csrf_token %}
+      <input type="submit" value="Login with Ion" />
+    </form>
+  </div>
 {% endblock %}
-
