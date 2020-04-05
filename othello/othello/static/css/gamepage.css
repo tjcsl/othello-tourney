@@ -1,0 +1,68 @@
+.gameContainer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.gameContainer-left {
+
+}
+
+.gameContainer-right {
+  margin-left: 10px;
+}
+
+.canvasContainer {
+  margin-bottom: 10px;
+}
+
+/* For non-large devices */
+@media (max-width: 1199.98px) {
+  .gameContainer {
+    flex-direction: column;
+  }
+
+  .gameContainer-right {
+    margin-left: 0px;
+  }
+}
+/* Canvas styling */
+
+#canvas{
+  cursor: pointer;
+  /* is a square
+   * multiplied by .75 to not touch screen edges 
+   * fairly sure this works by pure magic */
+  width: 75vw;
+  height: 75vw;
+  max-height: 75vh;
+  max-width: 75vh;
+}
+
+/* Styling for the score box */
+div#player-score-box {
+  background-color: #805229;
+}
+p.player-score {
+  font-size: 20px;
+}
+p#player-white {
+  color: #ffffff;
+}
+p#player-black {
+  color: #000000;
+}
+
+/* Styling for the logs */
+.log pre {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-word;
+  white-space: pre-line;
+}
+
+#err_log {
+  color: #ff2600;
+}

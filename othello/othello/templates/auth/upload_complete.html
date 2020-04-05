@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Upload{% endblock %}
+{% block header %}Upload Complete{% endblock %}
+
+{% block content %}
+  <p>You have uploaded your AI successfully! </p>
+  <p>
+      To edit your file, simply reupload another Python file (it will automatically be renamed strategy.py).
+      For more information see <a href="{% url 'auth:about' %}">About Uploading</a>.
+  </p>
+{% endblock %}

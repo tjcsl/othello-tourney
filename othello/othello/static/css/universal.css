@@ -1,0 +1,168 @@
+@charset "UTF-8";
+
+@import url('https://fonts.googleapis.com/css?family=Roboto+Mono');
+
+/* Styling for basic elements */
+
+body {
+  font-family: 'Roboto Mono', monospace;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+input {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 16px;
+  color: #805229;
+  border: #a06633 2px solid;
+  padding: 4px;
+}
+
+button {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 16px;
+  color: #805229;
+  border: #a06633 2px solid;
+  padding: 4px;
+}
+
+select {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 16px;
+  color: #805229;
+  border: #a06633 2px solid;
+  padding: 4px;
+}
+
+option {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 16px;
+  color: #805229;
+  border: #a06633 2px solid;
+  padding: 4px;
+}
+
+code {
+  font-family: 'Roboto Mono', monospace;
+  font-size: 16px;
+  color: #805229;
+}
+
+a{
+  color: #a06633;
+}
+
+a:visited{
+  color: #a06633;
+}
+
+a:hover{
+  color: #fffff0;
+  background-color: #805229;
+}
+
+.title{
+  color: #ffffff;
+  text-align: center;
+  overflow: hidden;
+}
+
+.centered{
+  display: flex;
+  justify-content: center;
+}
+
+/* Styling for layout, template elements */
+
+.main {
+  font-size: 16px;
+  color: #229011;
+  width: 70%;
+  padding: 2% 15%;
+}
+
+.top {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+
+  background-color: #33a122;
+  font-size: 20px;
+  color: #fffff0;
+}
+
+.header {
+  margin-left: 10px;
+  flex-grow: 1;
+}
+
+.header p {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+#expandbutton {
+  display: none;
+  position: absolute;
+  top: 7px;
+  right: 5px;
+}
+
+.linkbar-container {
+  align-self: stretch;
+}
+
+.linkbar {
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: center;
+  align-items: center;
+
+  background-color: #805229;
+  font-size: 20px;
+  width: 80%;
+  color: #33a122;
+  padding-left: 10%;
+  padding-right: 10%;
+  text-align: center;
+}
+
+/* For mobile devices */
+@media (max-width: 575.98px) {
+  #expandbutton {
+    display: block;
+    color: #805229;
+  }
+
+  .top {
+    flex-direction: column;
+  }
+
+  .linkbar {
+    flex-direction: column;
+  }
+}
+
+.linkbar a {
+  flex-grow: 1;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.linkbar a:link{
+  color: #fffff0;
+}
+
+.linkbar a:visited{
+  color: #fffff0;
+}
+
+.linkbar a:hover{
+  color: #a06633;
+  background-color: #fffff0;
+}

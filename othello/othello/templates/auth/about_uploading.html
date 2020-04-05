@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}About Uploading{% endblock %}
+{% block header %}About Uploading{% endblock %}
+{% block main %}
+  <h3>
+    File specification
+  </h3>
+   <p>
+    A valid Othello AI consists of file called <code>strategy.py</code> with a class called <code>Strategy</code> containing a method called <code>best_strategy</code> taking the arguments <code>board, player, best_move, still_running</code> in that order. <code>best_move</code> and <code>still_running</code> are <code>multiprocessing.Value</code> objects, and can be changed using <code>best_move.value=34</code> for example. <code>still_running</code> is another <code>multiprocessing.Value</code> flag, initially set to 1, then set to 0 by the server when the time limit for the AI is almost up.
+  </p>
+  <p>
+  The board will be a length-100 string of characters from the set <code>{'?', '.', '@', 'o'}</code>. This represents an 8x8 board of blanks <code>'.'</code> surrounded by a border <code>'?'</code>. The player strings are <code>'@'</code> for black and <code>'o'</code> for white. A move is an integer representing the index in the board string where the current player will place a piece. 
+  </p>
+  <h3>
+    Example code
+  </h3>
+  <p>
+    To get you started, here is the most basic form of AI, random choice:
+    <pre><code>
+import random
+import time
+
+class Strategy():
+    # implement all the required methods on your own
+    def best_strategy(self, board, player, best_move, running):
+        time.sleep(1)
+        if running.value:
+            best_move.value = random.choice(self.legal_moves(board, player))
+    </code></pre>
+  </p>
+  <h3>
+    Multiple files
+  </h3>
+  <p>
+    As of now, you can only upload 1 file, <code>strategy.py</code>. You should try putting all your code in that file if possible. Any files created by your code will persist between runs and games. If you do in fact need other files for you code to work, and it is infeasible to include it in one file, contact <a href="mailto:othello@tjhsst.edu">othello@tjhsst.edu</a> or your AI teacher about your situation.
+  </p>
+  <h3>
+    Other Info
+  </h3>
+  <p>
+    If you code fails to return a move, returns an invalid move, or errors for whatever reason, it will be treated as a forfeit. As such, make sure you code works on your computer before using this website to test against other AIs. Just as a reminder, if your code is caught cheating during the tournament in any way, you <b>will</b> be caught and given an integrity violation, so just don't do it.
+  </p>
+{% endblock %}
