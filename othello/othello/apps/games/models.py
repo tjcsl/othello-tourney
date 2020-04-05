@@ -6,7 +6,7 @@ from ..auth.models import User
 
 class Submission(models.Model):
 
-    def upload_path(self, name):
+    def upload_path(self):
         return os.path.join(self.user.short_name, "strategy.py")
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
