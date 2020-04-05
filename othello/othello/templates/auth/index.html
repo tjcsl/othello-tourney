@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% block title %}Othello: Home{% endblock %}
+{% block header %} Home {% endblock %}
 {% block main %}
       <p>
         Welcome to the TJ AI othello tournament home page! Click on any of the links above to navigate.
+      </p>
+      <p>
+      For more information, see <a href="{% url 'auth:index' %}">About</a>, <a href="https://en.wikipedia.org/wiki/Reversi">General Othello Information</a> or <a href="https://en.wikipedia.org/wiki/Computer_Othello">Computer Othello</a>.
       </p>
 {% endblock %}

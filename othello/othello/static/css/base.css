@@ -166,3 +166,7 @@ a:hover{
   color: #a06633;
   background-color: #fffff0;
 }
+
+.logout {
+  font-size: 1em;
+}

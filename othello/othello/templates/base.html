@@ -1,41 +1,40 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html>
   <head>
     <title id="title">{% block title %}{% endblock %}</title>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css" href="{% static 'vendor/bootstrap/css/bootstrap.min.css' %}">
-    <script type="text/javascript" src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'vendor/popper/popper.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'vendor/bootstrap/js/bootstrap.min.js' %}"></script>
-
-    <link rel="stylesheet" type="text/css" href="{% static 'css/universal.css' %}">
-    {% block extra_head %}{% endblock %}
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/vnd.microsoft.icon" href="{% static 'favicon.ico' %}">
+    <script type="text/javascript" src="{% static 'vendor/jquery/jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vendor/bootstrap/js/bootstrap.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'vendor/popper/popper.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
+    {% block head %}{% endblock %}
   </head>
   <body>
     <div class="top" id="top">
       <div class="header" id="header">
         <p>{% block header %}{% endblock %}</p>
         <div id="expandbutton">
-            <img src="{% static 'images/menu.svg' %}" />
+            <img src="{% static 'img/menu.svg' %}" alt="menu" />
         </div>
       </div>
       <div class="linkbar-container">
         <nav class="linkbar" id="linkbar">
           <a href="{% url 'auth:index' %}">Home</a>
-{#          <a href="{% url 'about' %}">About</a>#}
+          <a href="{% url 'auth:index' %}">About</a>
           <a href="{% url 'auth:upload' %}">Upload</a>
-{#          <a href="{% url 'play' %}">Play</a>#}
-{#          <a href="{% url 'watch' %}">Watch</a>#}
-{#          <a href="{% url 'tournament list' %}">Tournaments</a>#}
+          <a href="{% url 'auth:index' %}">Play</a>
+          <a href="{% url 'auth:index' %}">Watch</a>
+          <a href="{% url 'auth:index' %}">Tournaments</a>
         </nav>
       </div>
     </div>
     <div class="main" id="text">
       {% block main %}{% endblock %}
       {% if user.is_authenticated %}
-        <p style="font-size: 1em;">{{ user.username }} <a style="font-size: 1em;" href="{% url 'auth:logout' %}">Logout</a></p>
+        <p class="logout">{{ user.username }} <a class="logout" href="{% url 'auth:logout' %}">Logout</a></p>
       {% endif %}
     </div>
     <script src="{% static 'js/menuexpand.js' %}"></script>
