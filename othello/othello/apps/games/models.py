@@ -12,7 +12,7 @@ class Submission(models.Model):
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="user")
     submitted_time = models.DateTimeField(auto_now=True)
-    code = models.FileField(upload_to=upload_path, storage=OverwriteStorage())
+    code = models.FileField(upload_to=upload_path, storage=OverwriteStorage(), default=None)
 
     def __str__(self):
         return self.user.short_name

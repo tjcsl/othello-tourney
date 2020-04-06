@@ -10,7 +10,7 @@ class SubmissionForm(forms.ModelForm):
 
 
 class GameForm(forms.Form):
-    choices = Submission.objects.order_by('user', '-submitted_time').distinct('user')
-    black = forms.ModelChoiceField(queryset=choices, empty_label="Player 1")
-    white = forms.ModelChoiceField(queryset=choices, empty_label="Player 2")
-    time_limit = forms.IntegerField(initial=5, min_value=1)
+    choices = [(submission.id, submission.user) for submission in Submission.objects.order_by('user', '-submitted_time').distinct('user')]
+    black = forms.ChoiceField(label="Black:", choices=choices, initial="Yourself")
+    white = forms.ChoiceField(label="White:", choices=choices, initial="Yourself")
+    time_limit = forms.IntegerField(label="Time Limit (secs):", initial=5, min_value=1)

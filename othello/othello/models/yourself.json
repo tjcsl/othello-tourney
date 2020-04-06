@@ -1,0 +1,29 @@
+[
+  {
+    "model": "authentication.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$180000$sGz7hrFosCwN$k/LmNU2PyT6j6UprTB31BKDlZmmNnMeDaX/rrYv61to=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "Yourself",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2020-04-06T23:17:58.471Z",
+      "access_type": "none",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+    {
+    "model": "games.submission",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "submitted_time": "2020-04-06T23:21:57.977Z"
+    }
+  }
+]

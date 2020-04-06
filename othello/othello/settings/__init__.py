@@ -129,3 +129,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, "serve")
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "submissions")
+
+
+FIXTURE_DIRS = [os.path.join(BASE_DIR, "models")]
