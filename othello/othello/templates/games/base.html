@@ -1,49 +1,11 @@
 {% extends "base.html" %}
 {% load static %}
-{% block title %}Othello{% endblock %}
+
+{% block title %}Othello: Play{% endblock %}
+
 {% block head %}
-{% block extra_head %}{% endblock %}
-<link rel="stylesheet" href="{% static 'css/gamepage.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/gamepage.css' %}"/>
 {% endblock %}
-{% block content %}
-      <div class="gameContainer" id="gameContainer" style="display:none">
-        <div class="gameContainer-left">
-          <div class="canvasContainer">
-            <canvas id="canvas" onclick=""></canvas>
-            <div id="player-score-box" class="centered">
-              <p id="player-black" class="player-score">Player 1</p>
-              <p style="visibility: hidden">WWW</p>
-              <p id="player-white" class="player-score">Player 2</p>
-            </div>
-          </div>
-          <div class="historyDownload">
-            <button onclick="historyDownload();">Download Game</button>
-            <p>
-              Download Format:
-              <input type="radio" name="downloadFormat" id="downloadFormat-pretty" value="pretty" checked="true" />
-              <label for="downloadFormat-pretty">Pretty</label>
-              <input type="radio" name="downloadFormat" id="downloadFormat-parseable" value="parseable" />
-              <label for="downloadFormat-parseable">Parseable</label>
-            </p>
-          </div>
-        </div>
-        <div class="gameContainer-right gameOutput">
-          <code class="log"><pre id="game_log"></pre></code>
-          <code class="log"><pre id="err_log"></pre></code>
-        </div>
-      </div>
-      <div class="centered">
-        <p id="player-selection-text">
-          Loading port list...
-        </p>
-      </div>
-{% endblock %}
-{% block extra_js %}
-<script type="text/javascript">
-  var me = "{{ current_user.name }}";
-</script>
-{% block extra_extra_js %}{% endblock %}      
-<script src="{% static 'js/get_config.js' %}"></script>
-<script src="{% static 'js/resize.js' %}"></script>
-<script src="{% static 'js/reversi.js' %}" onload="ajaxConfig('{% block request_url %}{% endblock %}', {% block request_callback %}{% endblock %});"></script>
+
+{% block main %}
 {% endblock %}

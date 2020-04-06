@@ -27,20 +27,20 @@ LASTMOVE_CO  = '#ff9900';
 
 // Pre-load all images
 WHITE_IMG = new Image();
-WHITE_IMG.src = './static/images/white.png';
+WHITE_IMG.src = '/static/img/white.png';
 BLACK_IMG = new Image();
-BLACK_IMG.src = './static/images/black.png';
+BLACK_IMG.src = '/static/img/black.png';
 
 BORDER_IMG = new Image();
-BORDER_IMG.src = './static/images/board.png';
+BORDER_IMG.src = '/static/img/board.png';
 
 TILE_IMG = new Image();
-TILE_IMG.src = './static/images/tile.png';
+TILE_IMG.src = '/static/img/tile.png';
 
 STONE_IMAGES = [];
 for (var i = 0; i < 20; i++) {
   STONE_IMAGES[i] = new Image();
-  STONE_IMAGES[i].src = './static/images/stones/'+i+'.png';
+  STONE_IMAGES[i].src = '/static/img/stones/'+i+'.png';
 }
 
 // Create lookup dictionaries for easy conversion later one

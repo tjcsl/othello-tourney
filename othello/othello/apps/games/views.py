@@ -1,7 +1,11 @@
 from django.shortcuts import render
 from django.views.generic.edit import FormView
 
-from .forms import SubmissionForm
+from .forms import SubmissionForm, GameForm
+
+
+def play(request):
+    return render(request, "games/play.html", {'form': GameForm()})
 
 
 def about(request):

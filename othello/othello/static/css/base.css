@@ -2,172 +2,69 @@
 
 @import url('https://fonts.googleapis.com/css?family=Roboto+Mono');
 
-/* Styling for basic elements */
-
 body {
   font-family: 'Roboto Mono', monospace;
 }
 
 html, body {
-  margin: 0;
-  padding: 0;
-}
-
-input {
-  font-family: 'Roboto Mono', monospace;
-  font-size: 16px;
-  color: #805229;
-  border: #a06633 2px solid;
-  padding: 4px;
-}
-
-button {
-  font-family: 'Roboto Mono', monospace;
-  font-size: 16px;
-  color: #805229;
-  border: #a06633 2px solid;
-  padding: 4px;
-}
-
-select {
-  font-family: 'Roboto Mono', monospace;
-  font-size: 16px;
-  color: #805229;
-  border: #a06633 2px solid;
-  padding: 4px;
-}
-
-option {
-  font-family: 'Roboto Mono', monospace;
-  font-size: 16px;
-  color: #805229;
-  border: #a06633 2px solid;
-  padding: 4px;
-}
-
-code {
-  font-family: 'Roboto Mono', monospace;
-  font-size: 16px;
-  color: #805229;
-}
-
-a{
-  color: #a06633;
-}
-
-a:visited{
-  color: #a06633;
-}
-
-a:hover{
-  color: #fffff0;
-  background-color: #805229;
-}
-
-.title{
-  color: #ffffff;
-  text-align: center;
-  overflow: hidden;
-}
-
-.centered{
-  display: flex;
-  justify-content: center;
-}
-
-/* Styling for layout, template elements */
-
-.main {
-  font-size: 16px;
-  color: #229011;
-  width: 70%;
-  padding: 2% 15%;
-}
-
-.top {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-
-  background-color: #33a122;
-  font-size: 20px;
-  color: #fffff0;
+    line-height: inherit;
+    margin: 0;
+    padding: 0;
 }
 
 .header {
-  margin-left: 10px;
-  flex-grow: 1;
+    margin-left: 10px;
+    flex-grow: 1;
 }
 
-.header p {
-  margin-top: 10px;
-  margin-bottom: 10px;
-  float: left
+.navbar-container{
+    padding: 0;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    display: flex;
 }
 
-#expandbutton {
-  display: none;
-  position: absolute;
-  top: 7px;
-  right: 5px;
+.navbar {
+    height: 100%;
+    width: 100%;
+
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex-grow: initial;
+
+    background-color: #33a122;
+    font-size: 20px;
+    color: #fffff0;
 }
 
-.linkbar-container {
-  align-self: stretch;
+.navbar a{
+    color: white
 }
 
-.linkbar {
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: center;
-  align-items: center;
-
-  background-color: #805229;
-  font-size: 20px;
-  width: 80%;
-  color: #33a122;
-  padding-left: 10%;
-  padding-right: 10%;
-  text-align: center;
+.navbar-collapse {
+    background-color: #a06633;
+    flex-grow: 0;
+    height: 100%;
 }
 
-/* For mobile devices */
-@media (max-width: 575.98px) {
-  #expandbutton {
-    display: block;
-    color: #805229;
-  }
-
-  .top {
-    flex-direction: column;
-  }
-
-  .linkbar {
-    flex-direction: column;
-  }
+.navbar a:hover {
+    text-decoration: underline;
+    color: #a06633;
+    background-color: #fffff0;
 }
 
-.linkbar a {
-  flex-grow: 1;
-  margin-left: 10px;
-  margin-right: 10px;
+.header a:hover{
+    text-decoration: underline;
+    color: white;
+    background-color: #33a122;
 }
 
-.linkbar a:link{
-  color: #fffff0;
-}
-
-.linkbar a:visited{
-  color: #fffff0;
-}
-
-.linkbar a:hover{
-  color: #a06633;
-  background-color: #fffff0;
-}
-
-.logout {
-  font-size: 1em;
+.navbar-toggler {
+    padding-bottom: 3px;
+    background-color: #33a122;
+    color: white;
+    border: 1px solid white;
+    background-image: url("/static/img/menu.svg");
+    background-position: center;
 }
