@@ -45,4 +45,4 @@ class User(AbstractUser):
         return self.social_auth.get(provider="ion")
 
     def __str__(self):
-        return f"User {self.short_name}"
+        return self.short_name

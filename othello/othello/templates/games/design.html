@@ -1,0 +1,17 @@
+{% extends "games/base.html" %}
+{% load static %}
+
+{% block main %}
+    <div class="container-fluid align-content-center">
+        <div class="playform align-content-center">
+            <form action="{% url "games:play" %}" method="post">
+                {% csrf_token %}
+                <table>
+                    {{ form.as_table }}
+                </table>
+                <input type="submit" value="Start Match!"/>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

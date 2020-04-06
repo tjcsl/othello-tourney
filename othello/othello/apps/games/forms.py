@@ -9,11 +9,8 @@ class SubmissionForm(forms.ModelForm):
         fields = ('code', )
 
 
-class GameForm(forms.ModelForm):
-    class Meta:
-        model = Game
-        fields = ('black', 'white', 'time_limit')
-        widgets = {
-            'black': forms.Select(attrs={'placeholder': 'Player 1'}),
-            'white': forms.Select(attrs={'placeholder': 'Player 2'}),
-        }
+class GameForm(forms.Form):
+    choices = Submission.objects.order_by('user', '-submitted_time').distinct('user')
+    black = forms.ModelChoiceField(queryset=choices, empty_label="Player 1")
+    white = forms.ModelChoiceField(queryset=choices, empty_label="Player 2")
+    time_limit = forms.IntegerField(initial=5, min_value=1)

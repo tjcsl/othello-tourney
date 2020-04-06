@@ -14,8 +14,11 @@ class Submission(models.Model):
     submitted_time = models.DateTimeField(auto_now=True)
     code = models.FileField(upload_to=upload_path, storage=OverwriteStorage())
 
+    def __str__(self):
+        return self.user.short_name
+
 
 class Game(models.Model):
     black = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="black")
     white = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="white")
-    time_limit = models.IntegerField(default=5, )
+    time_limit = models.IntegerField(default=5,)

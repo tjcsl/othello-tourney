@@ -1,19 +1,16 @@
 from django.shortcuts import render
+from django.http import HttpResponse
 from django.views.generic.edit import FormView
 
 from .forms import SubmissionForm, GameForm
 
 
 def play(request):
-    return render(request, "games/play.html", {'form': GameForm()})
-
-
-def about(request):
-    return render(request, "games/about.html")
-
-
-def help(request):
-    return render(request, "games/help.html")
+    if request.method == "POST":
+        form = GameForm(request.POST)
+        if form.is_valid():
+            return HttpResponse("got form")
+    return render(request, "games/design.html", {'form': GameForm()})
 
 
 class UploadView(FormView):
