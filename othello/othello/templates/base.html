@@ -38,7 +38,7 @@
         <p class="logout">{{ user.username }} <a class="logout" href="{% url 'auth:logout' %}">Logout</a></p>
       {% endif %}
     </div>
-    <script src="{% static 'js/menuexpand.js' %}"></script>
+    <script src="{% static 'js/base.js' %}"></script>
     {% block extra_js %}{% endblock %}
   </body>
 </html>

@@ -1,5 +1,3 @@
-import os
-from django.conf import settings
 from django.shortcuts import render
 from django.views.generic.edit import FormView
 
@@ -22,7 +20,8 @@ class UploadView(FormView):
             submission = form.save(commit=False)
             submission.user = self.request.user
             submission.save()
+            success = True
         except BaseException as e:
             print(e)
-            return render(self.request, 'games/upload_error.html', self.get_context_data())
-        return render(self.request, 'games/upload_complete.html', self.get_context_data())
+            success = False
+        return render(self.request, 'games/upload_complete.html', {'success': success})

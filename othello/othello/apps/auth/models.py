@@ -18,16 +18,8 @@ class User(AbstractUser):
     access_type = models.CharField(max_length=10, choices=ACCESS_TYPES, default="none")
 
     @property
-    def has_view_permission(self) -> bool:
-        return self.access_type == "view" or self.has_edit_permission
-
-    @property
-    def has_edit_permission(self) -> bool:
-        return self.access_type == "edit" or self.has_management_permission
-
-    @property
     def has_management_permission(self) -> bool:
-        return self.is_staff and self.is_superuser
+        return self.access_type == "edit" or self.is_staff or self.is_superuser
 
     @property
     def short_name(self):

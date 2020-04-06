@@ -116,7 +116,7 @@ USE_TZ = True
 
 
 LOGIN_URL = "auth:login"
-LOGIN_REDIRECT_URL = "auth:index"
+LOGIN_REDIRECT_URL = "games:upload"
 LOGOUT_REDIRECT_URL = "auth:index"
 
 SESSION_SAVE_EVERY_REQUEST = True

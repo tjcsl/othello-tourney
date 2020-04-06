@@ -2,14 +2,14 @@
 {% load static %}
 {% block header %}Play Othello{% endblock %}
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/selectize.min.css' %}"/>
-<style>
-div.selectize-input, div.selectize-dropdown {
-  color:#805229;
-  border:#a06633 2px solid;
-  font-size: 16px;
-}
-</style>
+    <link rel="stylesheet" href="{% static 'vendor/selectize/css/selectize.min.css' %}"/>
+    <style>
+        div.selectize-input, div.selectize-dropdown {
+          color:#805229;
+          border:#a06633 2px solid;
+          font-size: 16px;
+        }
+    </style>
 {% endblock %}
 
 {% block extra_extra_js %}

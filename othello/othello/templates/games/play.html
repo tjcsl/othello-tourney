@@ -2,7 +2,7 @@
 {% load static %}
 {% block header %}Play Othello{% endblock %}
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/selectize.min.css' %}"/>
+<link rel="stylesheet" href="{% static 'vendor/selectize/css/selectize.min.css' %}"/>
 <style>
 div.selectize-input, div.selectize-dropdown {
   color:#805229;
@@ -13,7 +13,7 @@ div.selectize-input, div.selectize-dropdown {
 {% endblock %}
 
 {% block extra_extra_js %}
-<script src="{% static 'js/selectize.min.js' %}"></script>
+<script src="{% static 'vendor/selectize/js/selectize.min.js' %}"></script>
 {% endblock %}
 {% block request_url %}{% url 'ai_list' %}{% endblock %}
 {% block request_callback %}putConfigToPage{% endblock %} 

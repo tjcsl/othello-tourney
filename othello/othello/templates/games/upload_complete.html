@@ -3,9 +3,17 @@
 {% block header %}Upload Complete{% endblock %}
 
 {% block main %}
-  <p>You have uploaded your AI successfully! </p>
-  <p>
-      To edit your file, simply reupload another Python file (it will automatically be renamed strategy.py).
-      For more information see <a href="{% url 'games:help' %}">About Uploading</a>.
-  </p>
+    {% if success %}
+      <h3>You have uploaded your AI successfully! </h3>
+      <p>
+          To edit your file, simply reupload another Python file (it will automatically be renamed strategy.py).
+          For more information see <a href="{% url 'games:help' %}">About Uploading</a>.
+      </p>
+    {% else %}
+      <h3>Upload Failed!</h3>
+      <p>
+          Your AI was unable to be uploaded, please try again.
+          For more information see <a href="{% url 'games:help' %}">About Uploading</a>.
+      </p>
+    {% endif %}
 {% endblock %}
