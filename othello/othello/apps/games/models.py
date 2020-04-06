@@ -1,16 +1,8 @@
 import os
 from django.db import models
 from django.conf import settings
-from django.core.files.storage import FileSystemStorage
 
-
-class OverwriteStorage(FileSystemStorage):
-
-    def get_available_name(self, name, **kwargs):
-        if self.exists(name):
-            os.remove(os.path.join(settings.MEDIA_ROOT, name))
-        return name
-
+from .storage import OverwriteStorage
 
 class Submission(models.Model):
 
