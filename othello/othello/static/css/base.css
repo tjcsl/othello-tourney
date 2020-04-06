@@ -80,6 +80,10 @@ html, body {
     background-color: #805229;
 }
 
+.centered {
+    display: flex;
+    justify-content: center;
+}
 
 .logout {
     font-size: 1em;
