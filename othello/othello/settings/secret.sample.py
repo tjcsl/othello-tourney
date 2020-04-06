@@ -1,3 +1,5 @@
+DEBUG = True
+
 DB_NAME = 'othello'
 DB_USER = 'othello'
 DB_PASSWORD = 'pwd'

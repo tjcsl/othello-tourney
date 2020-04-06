@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Othello: URL Not Found{% endblock %}
+{% block header %} Home {% endblock %}
+{% block main %}
+    <h1>Internal Server Error</h1>
+    <h4>Something Unexpected Occurred</h4>
+    <a href="{% url 'auth:index' %}">Go Home</a>
+{% endblock %}
