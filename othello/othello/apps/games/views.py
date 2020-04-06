@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.contrib import messages
 from django.http import HttpResponse
 from django.views.generic.edit import FormView
 
@@ -10,6 +11,8 @@ def play(request):
         form = GameForm(request.POST)
         if form.is_valid():
             return HttpResponse("got form")
+        else:
+            messages.error(request, "Unable to start game, try again later", extra_tags="danger")
     return render(request, "games/design.html", {'form': GameForm()})
 
 

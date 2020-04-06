@@ -81,6 +81,11 @@ html, body {
 }
 
 
+.logout {
+    font-size: 1em;
+}
+
+
 pre, code {
     font-family: 'Roboto Mono', monospace;
     font-size: 16px;
