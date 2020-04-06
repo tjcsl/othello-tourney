@@ -25,58 +25,36 @@
                 <div class="collapse navbar-collapse" id="collapsibleNavbar">
                     <ul class="navbar-nav">
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Home</a>
+                            <a class="nav-link" href="{% url 'auth:index' %}">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">About</a>
+                            <a class="nav-link" href="{% url 'games:about' %}">About</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Help</a>
+                            <a class="nav-link" href="{% url 'games:help' %}">Help</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Upload</a>
+                            <a class="nav-link" href="{% url 'games:upload' %}">Upload</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Play</a>
+                            <a class="nav-link" href="{% url 'games:play' %}">Play</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Watch</a>
+                            <a class="nav-link" href="{% url 'auth:index' %}">Watch</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Tournaments</a>
+                            <a class="nav-link" href="{% url 'auth:index' %}">Tournaments</a>
                         </li>
                     </ul>
                 </div>
             </nav>
         </div>
+    <div class="main" id="main">
+        {% block main %}{% endblock %}
+        <br>
+        {% if user.is_authenticated %}
+            <p style="font-size: 1em;">{{ user.username }} <a style="font-size: 1em;" href="/logout/">Logout</a></p>
+        {% endif %}
+    </div>
   </body>
-{#  <body>#}
-{#    <div class="top" id="top">#}
-{#      <div class="header" id="header">#}
-{#        <p id="home">Othello</p>#}
-{#        <div id="expandbutton">#}
-{#            <img src="{% static 'img/menu.svg' %}" alt="menu" />#}
-{#        </div>#}
-{#      </div>#}
-{#      <div class="linkbar-container">#}
-{#        <nav class="linkbar" id="linkbar">#}
-{#          <a href="{% url 'auth:index' %}">Home</a>#}
-{#          <a href="{% url 'games:about' %}">About</a>#}
-{#          <a href="{% url 'games:help' %}">Help</a>#}
-{#          <a href="{% url 'games:upload' %}">Upload</a>#}
-{#          <a href="{% url 'games:play' %}">Play</a>#}
-{#          <a href="{% url 'auth:index' %}">Watch</a>#}
-{#          <a href="{% url 'auth:index' %}">Tournaments</a>#}
-{#        </nav>#}
-{#      </div>#}
-{#    </div>#}
-{#    <div class="main" id="text">#}
-{#      {% block main %}{% endblock %}#}
-{#      {% if user.is_authenticated %}#}
-{#        <p class="logout">{{ user.username }} <a class="logout" href="{% url 'auth:logout' %}">Logout</a></p>#}
-{#      {% endif %}#}
-{#    </div>#}
-{#    <script src="{% static 'js/base.js' %}"></script>#}
-{#    {% block extra_js %}{% endblock %}#}
-{#  </body>#}
 </html>
