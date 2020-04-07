@@ -1,0 +1,51 @@
+.gameContainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.gameContainer-left {
+    margin-right: 10px;
+}
+
+.gameContainer-right {
+    margin-left: 10px;
+}
+
+.canvasContainer {
+    margin-bottom: 20px;
+}
+
+div#player-score-box {
+    background-color: #805229;
+    height: 60px;
+    padding-top: 15px;
+}
+
+p.player-score {
+    font-size: 20px;
+}
+
+p#player-black {
+    color: #000000;
+}
+
+
+p#player-white {
+    color: #ffffff;
+}
+
+#canvas {
+    cursor: pointer;
+    width: 75vw;
+    height: 75vw;
+    max-height: 75vh;
+    max-width: 75vh;
+}
+
+.btn {
+    background-color: #24b411;
+    color: white;
+}
