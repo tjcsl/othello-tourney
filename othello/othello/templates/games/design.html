@@ -1,6 +1,10 @@
 {% extends "games/base.html" %}
 {% load static %}
 
+{% block extra_head %}
+    <script type="text/javascript" src="{% static 'js/games/play/design.js' %}"></script>
+{% endblock %}
+
 {% block main %}
     <div class="container-fluid centered">
         <div class="playform align-content-center">

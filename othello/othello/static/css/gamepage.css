@@ -1,4 +1,17 @@
-.playform {
-    width: auto;
-    margin: 0 auto;
+input{
+    font-family: 'Roboto Mono', monospace;
+    font-size: 16px;
+    color: #805229;
+    border: #a06633 2px solid;
+    padding: 4px;
+}
+
+.selectize-input {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 16px;
+    background-color: transparent;
+    color: #805229;
+    border: #a06633 2px solid;
+    padding: 2%;
+    width: 100%;
 }

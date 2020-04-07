@@ -101,21 +101,3 @@ h1,h2,h3,h4,h5,h6 {
     display: block;
     font-weight: bold;
 }
-
-input{
-    font-family: 'Roboto Mono', monospace;
-    font-size: 16px;
-    color: #805229;
-    border: #a06633 2px solid;
-    padding: 4px;
-}
-
-select {
-    font-family: 'Roboto Mono', monospace;
-    font-size: 16px;
-    background-color: transparent;
-    color: #805229;
-    border: #a06633 2px solid;
-    padding: 2%;
-    width: 100%;
-}

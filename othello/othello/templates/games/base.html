@@ -5,7 +5,5 @@
 
 {% block head %}
     <link rel="stylesheet" href="{% static 'css/gamepage.css' %}"/>
-{% endblock %}
-
-{% block main %}
+    {% block extra_head %}{% endblock %}
 {% endblock %}
