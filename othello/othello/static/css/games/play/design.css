@@ -7,3 +7,9 @@
     padding: 2%;
     width: 100%;
 }
+
+.selectize-dropdown {
+    color: #805229;
+    border: #a06633 2px solid;
+    font-size: 16px;
+}
