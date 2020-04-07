@@ -39,8 +39,6 @@ html, body {
 
 .navbar-nav a:hover {
     text-decoration: underline;
-    color: #a06633;
-    background-color: #fffff0;
 }
 
 .navbar-brand:hover {
