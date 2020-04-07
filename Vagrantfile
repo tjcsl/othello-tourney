@@ -20,6 +20,8 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder ".", "/home/vagrant/othello"
 
   config.vm.provision "shell", path: "config/vagrant/provision_vagrant.sh"
+  config.vm.provision "shell", path: "config/vagrant/install_pyenv.sh", privileged: false
+  config.vm.provision "shell", path: "config/vagrant/setup_project.sh", privileged: false
   config.ssh.username = "vagrant"
 
 end

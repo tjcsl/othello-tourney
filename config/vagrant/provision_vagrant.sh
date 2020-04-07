@@ -7,10 +7,9 @@ apt -y upgrade
 
 timedatectl set-timezone America/New_York
 
-# Install Python
-apt -y install python3
-apt -y install python3-pip
-pip3 install -U virtualenv virtualenvwrapper
+# Install pyenv
+apt install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev libncursesw5-dev \
+xz-utils tk-dev libffi-dev liblzma-dev python-openssl git
 
 # PostsgreSQL
 apt -y install postgresql
@@ -25,8 +24,3 @@ sqlcmd "CREATE USER othello PASSWORD 'pwd';" || echo Database user already exist
 sed -Ei "s/(^local +all +all +)peer$/\1md5/g" /etc/postgresql/10/main/pg_hba.conf
 service postgresql restart
 
-cd othello
-virtualenv -p "$(command -v python3)" --always-copy venv
-source ./venv/bin/activate
-pip3 install -r requirements.txt
->&2 echo "Make sure to copy secret.sample.py to secret.py and populate the values"
