@@ -1,4 +1,5 @@
 {% load static %}
+{% load users %}
 <!DOCTYPE html>
 <html>
   <head>
@@ -48,6 +49,12 @@
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'auth:index' %}">Tournaments</a>
                         </li>
+                        {% if user|has_management_permissions %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+                            </li>
+                        {% endif %}
+
                     </ul>
                 </div>
             </nav>

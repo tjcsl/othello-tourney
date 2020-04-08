@@ -20,8 +20,14 @@
 
 div#player-score-box {
     background-color: #805229;
-    height: 60px;
-    padding-top: 15px;
+}
+
+p {
+    display: block;
+    margin-block-start: 1em;
+    margin-block-end: 1em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
 }
 
 p.player-score {
@@ -46,6 +52,48 @@ p#player-white {
 }
 
 .btn {
-    background-color: #24b411;
+    background-color: #805229;
     color: white;
+}
+.modal-dialog, .modal-content {
+    /* 80% of window height */
+    height: 80%;
+}
+
+.modal-body {
+    /* 100% = dialog height, 120px = header + footer */
+    overflow-y: auto;
+}
+.column {
+    float: left;
+    width: 50%;
+    padding: 10px;
+    height: 100%;
+}
+
+/* Clear floats after the columns */
+.row{
+    display: flex;
+    height: 100%;
+}
+
+/* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 600px) {
+    .column {
+        width: 100%;
+    }
+    #input_parseable {
+        margin-top: 50px;
+    }
+
+}
+
+textarea {
+    width: 100%;
+    height: 100%;
+}
+
+
+.modal-xl {
+    max-width: 1300px;
 }

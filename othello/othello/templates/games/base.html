@@ -5,6 +5,7 @@
 
 {% block head %}
     <link rel="stylesheet" href="{% static 'css/games/base.css' %}">
+    <script type="text/javascript" href="{% static 'js/games/base.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/play/canvas.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/play/othello.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/play/board.js' %}"></script>
@@ -37,14 +38,29 @@
         </div>
     </div>
     <div class="modal fade" id="downloadModal">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-xl modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
                     <h4>Download Game</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    Download Format...
+                    <div class="row">
+                        <div class="column" id="input_pretty">
+                            <h4>
+                                <label for="pretty">Pretty</label>
+                                <button id="pretty_download" class="download_history">Download</button>
+                            </h4>
+                                <textarea disabled></textarea>
+                        </div>
+                        <div class="column" id="input_parseable">
+                            <h4>
+                                <label for="parseable">Parseable</label>
+                                <button id="parseable_download" class="download_history">Download</button>
+                            </h4>
+                                <textarea disabled></textarea>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn" data-dismiss="modal">Close</button>
