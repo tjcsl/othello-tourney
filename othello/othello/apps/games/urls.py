@@ -14,7 +14,7 @@ def default(request):
 
 urlpatterns = [
     path("play/", views.play, name="play"),
-    # path("watch/", views.watch, name="watch"),
+    path("watch/", views.watch, name="watch"),
     path("upload/", login_required(views.UploadView.as_view()), name="upload"),
     path("about/", default, name="about"),
     path("help/", default, name="help")

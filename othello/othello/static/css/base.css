@@ -107,3 +107,17 @@ input, button{
     border: #a06633 2px solid;
     padding: 4px;
 }
+
+@media (max-width: 576px) {
+
+    .main{
+        width: 75%;
+        padding: 2% 15%;
+        overflow-x: hidden;
+        max-width: 100%;
+
+    }
+    input{
+        width: 100%;
+    }
+}

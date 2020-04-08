@@ -9,7 +9,17 @@ ALLOWED_HOSTS = [
     "0.0.0.0",
 ]
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
+
 INSTALLED_APPS = [
+    "channels",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -52,6 +62,7 @@ TEMPLATES = [
     }
 ]
 
+ASGI_APPLICATION = 'othello.routing.application'
 WSGI_APPLICATION = "othello.wsgi.application"
 
 DATABASES = {

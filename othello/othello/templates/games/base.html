@@ -1,14 +1,13 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Othello: Play{% endblock %}
-
 {% block head %}
     <link rel="stylesheet" href="{% static 'css/games/base.css' %}">
-    <script type="text/javascript" href="{% static 'js/games/base.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/games/base.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/play/canvas.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/play/othello.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/play/board.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/games/play/socket.js' %}"></script>
     {% block extra_head %}{% endblock %}
 {% endblock %}
 
@@ -16,7 +15,6 @@
 {% block main %}
     <div class="gameContainer" id="gameContainer">
         <div class="gameContainer-left">
-            <code class="log"></code>
         </div>
         <div class="gameContainer-center">
             <div class="canvasContainer">
@@ -34,7 +32,7 @@
             </div>
         </div>
         <div class="gameContainer-right">
-            <code class="log"></code>
+            <code class="log"><pre id="err_log"></pre></code>
         </div>
     </div>
     <div class="modal fade" id="downloadModal">

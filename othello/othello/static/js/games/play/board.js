@@ -60,6 +60,8 @@ function init(black, white, timelimit, watching) {
     let rCanvas = RCANVAS = new RCanvas(canvas, gwidth, gheight);
     rCanvas.resize();
 
+    rCanvas.tomove = BLACK_NM;
+
 
     rCanvas.fullbg = new RImg(0, 0, rCanvas.rWidth, rCanvas.rHeight, BORDER_IMG);
     rCanvas.black = document.getElementById("player-black");
@@ -70,16 +72,16 @@ function init(black, white, timelimit, watching) {
 
     rCanvas.board = [];
     rCanvas.imgBoard = [];
-    let animArray = [];
+    rCanvas.animArray = [];
     for (let i=0; i<DIMENSION*DIMENSION; i++) {
         rCanvas.board[i] = 0;
-        animArray[i] = 0;
+        rCanvas.animArray[i] = 0;
     }
     rCanvas.lBSize = 0;
 
     rCanvas.black_name = `Loading ${black}...`;
     rCanvas.white_name = `Loading ${white}...`;
-    drawBoard(rCanvas, DIMENSION, rCanvas.board, BLACK_NM, animArray);
+    drawBoard(rCanvas, DIMENSION, rCanvas.board, BLACK_NM, rCanvas.animArray);
 
     return rCanvas;
 }
@@ -177,6 +179,31 @@ function addPossibleMoves(rCanvas, board_array, tomove, b_and_s, border, square)
   }
 }
 
+
+function makeFlips(x, y, rCanvas, bSize, bArray, tomove) {
+    let good = false;
+    let bracketObj;
+    for (let dy = -1; dy < 2; dy++) {
+        for (let dx = -1; dx < 2; dx++) {
+            if (!(dx === 0 && dy === 0)) {
+                bracketObj = findBracket(x, y, tomove, bArray, bSize, dx, dy);
+                if (bracketObj.good) {
+                    let cx = x;
+                    let cy = y;
+                    good = true;
+                    while (cx !== bracketObj.bx || cy !== bracketObj.by) {
+                        bArray[cy * bSize + cx] = tomove;
+                        cx += dx;
+                        cy += dy;
+                    }
+                }
+            }
+        }
+    }
+  return good;
+}
+
+
 function startAnimation(rCanvas, animArray) {
   let interval = setInterval(function() {
     let stable = true;
@@ -202,42 +229,46 @@ function startAnimation(rCanvas, animArray) {
   },16);
 }
 
-window.onload = function () {
-    let rCanvas = init("Yourself", "Yourself", 0,0);
+function highlight_tile(rCanvas, event){
+    rCanvas.getMousePos(event);
+    let cy = Math.floor(rCanvas.my / rCanvas.border_and_square);
+    let cx = Math.floor(rCanvas.mx / rCanvas.border_and_square);
+    let ox = rCanvas.select.x;
+    let oy = rCanvas.select.y;
+    rCanvas.select.x = rCanvas.border_and_square*cx+rCanvas.border;
+    rCanvas.select.y = rCanvas.border_and_square*cy+rCanvas.border;
+    rCanvas.select.width = rCanvas.square;
+    rCanvas.select.height = rCanvas.square;
+    if(ox !== rCanvas.select.x || oy !== rCanvas.select.y){
+        rCanvas.draw();
+    }
+}
 
-    window.addEventListener('resize', () => {
-        rCanvas.resize();
-    });
+function place_stone(rCanvas, event){
+    highlight_tile(rCanvas, event);
+    let olc = rCanvas.lastClicked;
+    let cy = Math.floor(rCanvas.my / rCanvas.border_and_square);
+    let cx = Math.floor(rCanvas.mx / rCanvas.border_and_square);
+    if (cx >= 0 && cx < rCanvas.lBSize && cy >= 0 && cy < rCanvas.lBSize){
+      rCanvas.lastClicked = cy * (rCanvas.lBSize+2) + cx + 3 + rCanvas.lBSize;
+    }
+    if (olc === -1) {
+        console.log('touched spot ' + rCanvas.lastClicked);
+        let resultGood = rCanvas.board[cy * rCanvas.lBSize + cx] === EMPTY_NM && makeFlips(cx, cy, rCanvas, rCanvas.lBSize, rCanvas.board, rCanvas.tomove);
+        if (resultGood) {
+            rCanvas.lastmove.x = rCanvas.border_and_square * cx + rCanvas.border;
+            rCanvas.lastmove.y = rCanvas.border_and_square * cy + rCanvas.border;
+            rCanvas.lastmove.width = rCanvas.square;
+            rCanvas.lastmove.height = rCanvas.square;
 
-
-    $("#input_parseable")
-        .click(function () {
-                $(this).find("button").click();
+            if (rCanvas.tomove === WHITE_NM) {
+                rCanvas.animArray[cy * rCanvas.lBSize + cx] = 19;
             }
-        )
-        .hover(
-            function(){
-                $(this).find("label").css({"text-decoration": "underline"});
-                $(this).css("cursor", "pointer");
-            },
-            function () {
-                $(this).find("label").css({"text-decoration": "none"});
-            }
-        );
 
+            drawBoard(rCanvas, rCanvas.board, 3 - rCanvas.tomove, rCanvas.animArray);
 
-    $("#input_pretty")
-        .click(function () {
-                $(this).find("button").click();
-            }
-        )
-        .hover(
-            function(){
-                $(this).find("label").css({"text-decoration": "underline"});
-                $(this).css("cursor", "pointer");
-            },
-            function () {
-                $(this).find("label").css({"text-decoration": "none"});
-            }
-        );
-};
+        }else{
+            rCanvas.lastClicked = -1;
+        }
+    }
+}

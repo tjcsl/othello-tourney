@@ -97,3 +97,20 @@ textarea {
 .modal-xl {
     max-width: 1300px;
 }
+
+#err_log {
+    color: #ff2600;
+}
+.log pre {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-line;
+}
+
+pre {
+    display: block;
+    font-family: monospace;
+    white-space: pre;
+    margin: 1em 0px;
+}

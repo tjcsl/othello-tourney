@@ -1,11 +1,32 @@
-// window.onload = function() {
-//     $("#input_parseable").change(function () {
-//         console.log("triggered");
-//         if ($(this).is(":checked")) {
-//             $(this).prop("checked", false);
-//         } else {
-//             $("#input_pretty").prop("checked", true);
-//             $(this).prop("checked", false);
-//         }
-//     });
-// }
+function on_load() {
+        $("#input_parseable")
+        .click(function () {
+                $(this).find("button").click();
+            }
+        )
+        .hover(
+            function(){
+                $(this).find("label").css({"text-decoration": "underline"});
+                $(this).css("cursor", "pointer");
+            },
+            function () {
+                $(this).find("label").css({"text-decoration": "none"});
+            }
+        );
+
+
+    $("#input_pretty")
+        .click(function () {
+                $(this).find("button").click();
+            }
+        )
+        .hover(
+            function(){
+                $(this).find("label").css({"text-decoration": "underline"});
+                $(this).css("cursor", "pointer");
+            },
+            function () {
+                $(this).find("label").css({"text-decoration": "none"});
+            }
+        );
+}
