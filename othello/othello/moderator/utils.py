@@ -5,6 +5,11 @@ from .constants import *
 
 bit_or = partial(reduce, operator.__or__)
 
+
+def is_on(x, pos):
+    return x & (1 << pos)
+
+
 def bit_not(x):
     return FULL_BOARD ^ x
 
@@ -36,4 +41,3 @@ def fill(current, opponent, direction):
     w |= ((w & mask) >> direction) & opponent
     w |= ((w & mask) >> direction) & opponent
     return (w & mask) >> direction
-

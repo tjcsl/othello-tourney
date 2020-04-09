@@ -16,6 +16,6 @@ MASKS = {
     -9: RIGHT_MASK
 }
 
-MOVES = {i: 1 << (63^i) for i in range(64)}
-POS = {MOVES[63^i]: 63^i for i in range(64)}
-LOG = {MOVES[63^i]:i for i in range(64)}
+MOVES = {i: 1 << (63 ^ i) for i in range(64)}
+POS = {MOVES[63 ^ i]: 63 ^ i for i in range(64)}
+LOG = {MOVES[63 ^ i]: i for i in range(64)}
