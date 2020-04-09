@@ -1,6 +1,5 @@
 from django.contrib import messages
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import render, redirect
 from django.forms.models import model_to_dict
 from django.views.generic.edit import FormView
 
@@ -16,11 +15,14 @@ class UploadView(FormView):
             submission = form.save(commit=False)
             submission.user = self.request.user
             submission.save()
-            success = True
-        except BaseException as e:
-            print(e)
-            success = False
-        return render(self.request, 'games/upload_complete.html', {'success': success})
+        except BaseException:
+            messages.error(self.request, "Unable to upload AI, try again later", extra_tags="danger")
+        return redirect("games:upload")
+
+    def form_invalid(self, form):
+        for error in form.errors.get_json_data()["__all__"]:
+            messages.error(self.request, error["message"], extra_tags="danger")
+        return redirect("games:upload")
 
 
 def play(request):

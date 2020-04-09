@@ -1,12 +1,6 @@
-import importlib.util
-import importlib.machinery
-
 from . import utils
+from ..apps.games.utils import import_strategy
 from ..apps.games.models import Game
-
-
-def import_strategy(path):
-    return importlib.machinery.SourceFileLoader("strategy", path, ).load_module()
 
 
 class Moderator:
@@ -28,7 +22,7 @@ class Moderator:
 
     def make_move(self, move):
         board = self.board.copy()
-        move = 1 << (63 - move)
+        move = utils.MOVES[move]
         board[self.current_player] |= move
         opponent = 1 ^ self.current_player
 
@@ -39,4 +33,6 @@ class Moderator:
                 board[self.current_player] |= c
                 board[opponent] &= utils.bit_not(c)
         self.board = board
-    
+
+
+
