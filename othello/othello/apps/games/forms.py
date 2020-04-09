@@ -14,15 +14,19 @@ class SubmissionForm(forms.ModelForm):
 
     def clean(self):
         cd = self.cleaned_data
-        with NamedTemporaryFile() as f:
+        with NamedTemporaryFile('r+') as f:
             for chunk in cd['code'].chunks():
-                f.write(chunk)
+                f.write(chunk.decode())
+            f.read()
             try:
                 import_strategy(f.name)
-            except AttributeError:
-                raise ValidationError("Cannot find attribute Strategy.best_strategy in file")
             except SyntaxError:
                 raise ValidationError("File has invalid syntax")
+            except AttributeError:
+                raise ValidationError("Cannot find attribute Strategy.best_strategy in file")
+            except AssertionError:
+                raise ValidationError("Attribute Strategy.best_strategy has an invalid amount of parameters")
+
         return cd
 
 
