@@ -14,10 +14,10 @@ class SubmissionForm(forms.ModelForm):
 
     def clean(self):
         cd = self.cleaned_data
-        with NamedTemporaryFile('r+') as f:
+        with NamedTemporaryFile('wb+') as f:
             for chunk in cd['code'].chunks():
-                f.write(chunk.decode())
-            f.read()
+                f.write(chunk)
+            f.read()  # for some reason importlib cannot read the file unless we do f.read first
             try:
                 import_strategy(f.name)
             except SyntaxError:

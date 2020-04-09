@@ -87,6 +87,10 @@ html, body {
     font-size: 1em;
 }
 
+.messages {
+    margin-bottom: 25px;
+}
+
 
 pre, code {
     font-family: 'Roboto Mono', monospace;
