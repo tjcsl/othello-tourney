@@ -1,7 +1,13 @@
 import operator
+import importlib.util
+import importlib.machinery
+
+from inspect import signature
 from functools import lru_cache, partial, reduce
 
+
 from .constants import *
+
 
 bit_or = partial(reduce, operator.__or__)
 
@@ -41,3 +47,9 @@ def fill(current, opponent, direction):
     w |= ((w & mask) >> direction) & opponent
     w |= ((w & mask) >> direction) & opponent
     return (w & mask) >> direction
+
+
+def import_strategy(path):
+    strat = importlib.machinery.SourceFileLoader("strategy", path).load_module().Strategy()
+    assert len(signature(strat.best_strategy).parameters) == 4
+    return strat

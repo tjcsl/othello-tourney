@@ -9,12 +9,12 @@ from .storage import OverwriteStorage
 class SubmissionManager(models.Manager):
     def safe_get(self, **kwargs):
         try:
-            return Submission.objects.get(**kwargs)
+            return Submission.objects.filter(**kwargs)
         except ObjectDoesNotExist:
-            return None
+            return Submission.objects.none()
 
-    def all_latest_submissions(self):
-        return Submission.objects.order_by('user', '-submitted_time').distinct('user')
+    def all_usable_submissions(self, user=None):
+        return Submission.objects.safe_get(user=user, usable=True) if user else Submission.objects.safe_get(usable=True)
 
 
 class Submission(models.Model):
@@ -28,6 +28,15 @@ class Submission(models.Model):
     submitted_time = models.DateTimeField(auto_now=True)
     code = models.FileField(upload_to=upload_path,
                             storage=OverwriteStorage(), default=None)
+    usable = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        if self.usable:
+            for x in Submission.objects.all_usable_submissions(self.user):
+                if x != self:
+                    x.usable = False
+                    x.save()
+        super(Submission, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.user.short_name
