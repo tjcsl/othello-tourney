@@ -20,6 +20,10 @@ def bit_not(x):
     return FULL_BOARD ^ x
 
 
+def binary_to_string(board):
+    return "".join(['O' if is_on(board[0], 63 - i) else 'X' if is_on(board[1], 63 - i) else '.' for i in range(64)])
+
+
 @lru_cache
 def hamming_weight(n):
     c = 0
@@ -47,6 +51,13 @@ def fill(current, opponent, direction):
     w |= ((w & mask) >> direction) & opponent
     w |= ((w & mask) >> direction) & opponent
     return (w & mask) >> direction
+
+
+def safe_int(x):
+    try:
+        return int(x)
+    except ValueError:
+        return -1
 
 
 def import_strategy(path):
