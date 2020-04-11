@@ -48,9 +48,9 @@ class Submission(models.Model):
 class GameManager(models.Manager):
     def safe_get(self, **kwargs):
         try:
-            return Game.objects.get(**kwargs)
+            return Game.objects.filter(**kwargs)
         except ObjectDoesNotExist:
-            return None
+            return Game.objects.none()
 
     def get_all_running(self):
         return Game.objects.all().filter(playing=True)
