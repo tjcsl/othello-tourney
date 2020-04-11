@@ -16,6 +16,9 @@ class SubmissionManager(models.Manager):
     def all_usable_submissions(self, user=None):
         return Submission.objects.safe_get(user=user, usable=True) if user else Submission.objects.safe_get(usable=True)
 
+    def get_all_submissions_for_user(self, user):
+        return Submission.objects.safe_get(user=user)
+
 
 class Submission(models.Model):
 
