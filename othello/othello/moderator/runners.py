@@ -2,8 +2,8 @@ import sys
 import shlex
 import logging
 import traceback
-import subprocess
 import threading
+import subprocess
 import multiprocessing as mp
 
 from queue import Queue, Empty
@@ -31,16 +31,10 @@ def get_stream_queue(stream, event):
     Takes in a stream, and returns a Queue that will return the output from that stream. Starts a background thread as a side effect.
     """
     threading.Thread(target=enqueue_stream_helper, args=(stream, q := Queue(), event), daemon=True).start()
-
     return q
 
 
-class HiddenPrints:
-    """
-    Surpresses all stdout from a subprocess so we
-    can only send what we need to to our parent
-    """
-
+class HiddenPrints:  # TODO: Add constructor and suppress stderr unless logging variable set
     def __enter__(self):
         self._original_stdout = sys.stdout
         sys.stdout = sys.stderr
@@ -77,7 +71,7 @@ class LocalRunner:
                 if p.is_alive():
                     p.terminate()
             return best_move.value, to_self.recv() if to_self.poll() else None
-        except:
+        except mp.ProcessError:
             traceback.print_exc()
             return -1, "Server Error"
 
@@ -93,12 +87,11 @@ class JailedRunner(LocalRunner):
         player = stdin.readline().strip()
         board = stdin.readline().strip()
 
-        data = (time_limit, player, board)
-
-        move, err = self.get_move(board, player, time_limit)
+        with HiddenPrints():
+            move, err = self.get_move(board, player, time_limit)
 
         if err is not None:
-            stderr.write(err)
+            stderr.write(f"{err}\n")
 
         stdout.write(f"{move}\n")
 
@@ -108,17 +101,32 @@ class JailedRunner(LocalRunner):
 
 class JailedRunnerCommunicator:
 
-    def __init__(self, path):
+    def __init__(self, path, logging_callback):
         self.path = path
+        self.logging_callback = logging_callback
         self.process = None
+        self.logger = None
 
     def start(self):
         cmd_args = shlex.split(OTHELLO_AI_RUN_COMMAND.format(self.path), posix=False)
         self.process = subprocess.Popen(cmd_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                         bufsize=1, universal_newlines=True, cwd=os.path.dirname(self.path))
-        self.stop_event = threading.Event()
-        self.stdout_stream = get_stream_queue(self.process.stdout, self.stop_event)
-        self.stderr_stream = get_stream_queue(self.process.stderr, self.stop_event)
+        self.process_stop_event = threading.Event()
+
+        self.stdout_stream = get_stream_queue(self.process.stdout, self.process_stop_event)
+        self.stderr_stream = get_stream_queue(self.process.stderr, self.process_stop_event)
+
+        self.logger = threading.Thread(target=self.error_wrapper, args=(self.logging_callback,), daemon=True)
+        self.logger.start()
+
+    def error_wrapper(self, callback):
+        while True:
+            if errs := self.check_for_errors():
+                callback(errs)
+            if self.process_stop_event.is_set():
+                if errs := self.check_for_errors():
+                    callback(errs)
+                break
 
     def check_for_errors(self):
         last_err_line, errs = "", []
@@ -133,8 +141,6 @@ class JailedRunnerCommunicator:
     def get_move(self, board, player, time_limit):
         data = f"{str(time_limit)}\n{player}\n{''.join(board)}\n"
 
-        if errs := self.check_for_errors():
-            log.error(errs)
         self.process.stdin.write(data)
         self.process.stdin.flush()
         log.debug("wrote data to subprocess")
@@ -145,17 +151,20 @@ class JailedRunnerCommunicator:
         except Empty:
             log.warning("Timeout reading from subprocess")
 
-        if errs2 := self.check_for_errors():
-            errs += errs2
-            log.error(errs)
+        if e := self.check_for_errors():  # check one last time
+            errs = e
+        else:
+            errs = None
 
         return safe_int(output.split("\n")[0]), errs
 
     def stop(self):
         if self.process is not None:
             self.process.kill()
-            self.stop_event.set()
+            self.process_stop_event.set()
             self.process = None
+        if self.logger is not None:
+            self.logger = None
 
     def __del__(self):
         self.stop()
