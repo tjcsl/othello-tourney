@@ -20,7 +20,8 @@ def enqueue_stream_helper(stream, q, event):
     the queue `q`
     """
     for line in iter(stream.readline, b''):
-        if event.is_set(): break
+        if event.is_set():
+            break
         q.put(line)
     stream.close()
 
@@ -29,10 +30,7 @@ def get_stream_queue(stream, event):
     """
     Takes in a stream, and returns a Queue that will return the output from that stream. Starts a background thread as a side effect.
     """
-    q = Queue()
-    t = threading.Thread(target=enqueue_stream_helper, args=(stream, q, event))
-    t.daemon = True  # Dies with the main program
-    t.start()
+    threading.Thread(target=enqueue_stream_helper, args=(stream, q := Queue(), event), daemon=True).start()
 
     return q
 
@@ -70,7 +68,7 @@ class LocalRunner:
 
         to_child, to_self = mp.Pipe()
         try:
-            p = mp.Process(self.strat.best_strategy, args=("".join(board), player, best_move, is_running, to_child))
+            p = mp.Process(target=self.play_wrapper, args=("".join(board), player, best_move, is_running), kwargs={"pipe_to_parent": to_child})
             p.start()
             p.join(time_limit)
             if p.is_alive():
@@ -78,7 +76,7 @@ class LocalRunner:
                 p.join(0.05)
                 if p.is_alive():
                     p.terminate()
-            return best_move.value, to_self.recv() if to_self.poll else None
+            return best_move.value, to_self.recv() if to_self.poll() else None
         except:
             traceback.print_exc()
             return -1, "Server Error"
@@ -94,6 +92,8 @@ class JailedRunner(LocalRunner):
         time_limit = int(stdin.readline().strip())
         player = stdin.readline().strip()
         board = stdin.readline().strip()
+
+        data = (time_limit, player, board)
 
         move, err = self.get_move(board, player, time_limit)
 
@@ -114,9 +114,8 @@ class JailedRunnerCommunicator:
 
     def start(self):
         cmd_args = shlex.split(OTHELLO_AI_RUN_COMMAND.format(self.path), posix=False)
-
         self.process = subprocess.Popen(cmd_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                        bufsize=1, universal_newlines=True, cwd=self.path)
+                                        bufsize=1, universal_newlines=True, cwd=os.path.dirname(self.path))
         self.stop_event = threading.Event()
         self.stdout_stream = get_stream_queue(self.process.stdout, self.stop_event)
         self.stderr_stream = get_stream_queue(self.process.stderr, self.stop_event)
@@ -132,7 +131,7 @@ class JailedRunnerCommunicator:
         return ''.join(errs)
 
     def get_move(self, board, player, time_limit):
-        data = f"{str(time_limit)}\n{player}\n{''.join(board)}"
+        data = f"{str(time_limit)}\n{player}\n{''.join(board)}\n"
 
         if errs := self.check_for_errors():
             log.error(errs)

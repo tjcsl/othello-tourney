@@ -1,7 +1,7 @@
 import sys
 import logging
 
-from .runners import JailedRunner
+from othello.othello.moderator.runners import JailedRunner
 
 log = logging.getLogger(__name__)
 
