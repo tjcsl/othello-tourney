@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.forms.models import model_to_dict
 from django.views.generic.edit import FormView
 
-from .models import Game, Submission
+from .models import Game
 from .forms import SubmissionForm, GameForm, WatchForm
 
 
@@ -46,5 +46,3 @@ def watch(request):
     if request.method == "POST":
         return render(request, "games/watch.html")
     return render(request, "games/watch_list.html", {'form': WatchForm()})
-
-

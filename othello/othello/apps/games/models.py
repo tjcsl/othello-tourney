@@ -28,6 +28,7 @@ class Submission(models.Model):
     objects = SubmissionManager()
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="user")
+    name = models.CharField(max_length=500, default="")
     submitted_time = models.DateTimeField(auto_now=True)
     code = models.FileField(upload_to=upload_path,
                             storage=OverwriteStorage(), default=None)

@@ -43,7 +43,7 @@ class HiddenPrints:  # TODO: Add constructor and suppress stderr unless logging 
         sys.stdout = self._original_stdout
 
 
-class LocalRunner:
+class LocalRunner:  # Called from JailedRunner, inherits accessibility restrictions
     def __init__(self, script_path):
         self.path = script_path
         self.strat = import_strategy(script_path)
@@ -76,7 +76,7 @@ class LocalRunner:
             return -1, "Server Error"
 
 
-class JailedRunner(LocalRunner):
+class JailedRunner(LocalRunner):  # Called from subprocess, no access to django channels/main application
 
     def run(self):
         while True:
@@ -99,7 +99,7 @@ class JailedRunner(LocalRunner):
         stderr.flush()
 
 
-class JailedRunnerCommunicator:
+class JailedRunnerCommunicator:  # Interface with main application, access to django channels
 
     def __init__(self, path, logging_callback):
         self.path = path
