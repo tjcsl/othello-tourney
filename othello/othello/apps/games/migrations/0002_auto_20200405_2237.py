@@ -19,6 +19,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='submission',
             name='code',
-            field=models.FileField(storage=othello.apps.games.models.OverwriteStorage(), upload_to=othello.apps.games.models.Submission.upload_path),
+            field=models.FileField(storage=othello.apps.games.models.OverwriteStorage(), upload_to=othello.apps.games.models.save_path),
         ),
     ]

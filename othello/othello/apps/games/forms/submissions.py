@@ -8,12 +8,17 @@ from ..models import Submission
 
 
 class SubmissionForm(forms.ModelForm):
+
+    name = forms.CharField(required=False)
+
     class Meta:
         model = Submission
         fields = ('name', 'code', )
 
     def clean(self):
         cd = self.cleaned_data
+        if not cd['name']:
+            cd['name'] = cd["code"].name
         with NamedTemporaryFile('wb+') as f:
             for chunk in cd['code'].chunks():
                 f.write(chunk)
@@ -39,5 +44,5 @@ class ChangeSubmissionForm(forms.Form):
     def __init__(self, user, *args, **kwargs):
         super(ChangeSubmissionForm, self).__init__(*args, **kwargs)
         self.fields["new_script"].queryset = Submission.objects.get_all_submissions_for_user(user=user)
-        self.fields["new_script"].label_from_instance = lambda obj: f"{obj.get_name()}"
+        self.fields["new_script"].label_from_instance = lambda obj: f"{obj.get_submission_name()}>"
 

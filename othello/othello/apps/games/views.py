@@ -1,7 +1,7 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.forms.models import model_to_dict
-from django.views.generic.edit import FormView
+from django.views.generic.edit import View, FormView
 
 from ..auth.decorators import login_required
 
@@ -17,10 +17,10 @@ class UploadView(FormView):
             submission = form.save(commit=False)
             submission.user = self.request.user
             submission.save()
+            success = True
         except:
             messages.error(self.request, "Unable to upload AI, try again later", extra_tags="danger")
             success = False
-        success = True
         return render(self.request, "games/upload.html", {'success': success})
 
     def form_invalid(self, form):

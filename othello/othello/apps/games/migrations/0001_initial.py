@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
             name='Submission',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('code', models.FileField(upload_to=othello.apps.games.models.Submission.upload_path)),
+                ('code', models.FileField(upload_to=othello.apps.games.models.save_path)),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='user', to=settings.AUTH_USER_MODEL)),
             ],
         ),
