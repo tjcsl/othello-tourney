@@ -34,6 +34,16 @@ class Submission(models.Model):
                             storage=OverwriteStorage(), default=None)
     usable = models.BooleanField(default=True)
 
+    def get_name(self):
+        return self.name
+
+    def get_code_filepath(self):
+        return self.code.path
+
+    @property
+    def is_usable(self):
+        return self.usable
+
     def save(self, *args, **kwargs):
         if self.usable:
             for x in Submission.objects.all_usable_submissions(self.user):
