@@ -2,14 +2,24 @@
 {% block title %}Othello: Upload{% endblock %}
 
 {% block main %}
-    <h4>You are logged in as {{ user.username }}.</h4>
-    <br>
-    <p>
-      Before uploading, please read <a href="{% url 'games:help' %}">About Uploading</a> carefully. It will save you many headaches.
-    </p>
-    <form action="" method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Upload File" name="submit">
-    </form>
+    {% if success %}
+        <h3>You have uploaded your AI successfully!</h3><br>
+        <p>
+            To edit your file, simply reupload another Python file (it will automatically be renamed strategy.py).
+        </p>
+        <p>
+            For more information see <a href="{% url 'games:help' %}">About Uploading</a>.
+        </p>
+        {% else %}
+            <h4>You are logged in as {{ user.username }}.</h4>
+            <br>
+            <p>
+              Before uploading, please read <a href="{% url 'games:help' %}">About Uploading</a> carefully. It will save you many headaches.
+            </p>
+            <form action="{% url 'games:upload' %}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit" value="Upload File" name="submit">
+            </form>
+    {% endif %}
 {% endblock %}

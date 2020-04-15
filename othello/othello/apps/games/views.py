@@ -3,8 +3,10 @@ from django.shortcuts import render, redirect
 from django.forms.models import model_to_dict
 from django.views.generic.edit import FormView
 
+from ..auth.decorators import login_required
+
 from .models import Game
-from .forms import SubmissionForm, GameForm, WatchForm
+from .forms import SubmissionForm, GameForm, WatchForm, ChangeSubmissionForm
 
 
 class UploadView(FormView):
@@ -15,14 +17,16 @@ class UploadView(FormView):
             submission = form.save(commit=False)
             submission.user = self.request.user
             submission.save()
-        except BaseException:
+        except:
             messages.error(self.request, "Unable to upload AI, try again later", extra_tags="danger")
-        return redirect("games:upload")
+            success = False
+        success = True
+        return render(self.request, "games/upload.html", {'success': success})
 
     def form_invalid(self, form):
         for error in form.errors.get_json_data()["__all__"]:
             messages.error(self.request, error["message"], extra_tags="danger")
-        return redirect("games:upload")
+        return render(self.request, "games/upload.html", {'success': False})
 
 
 def play(request):

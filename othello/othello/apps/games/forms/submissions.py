@@ -10,7 +10,7 @@ from ..models import Submission
 class SubmissionForm(forms.ModelForm):
     class Meta:
         model = Submission
-        fields = ('code', )
+        fields = ('name', 'code', )
 
     def clean(self):
         cd = self.cleaned_data
