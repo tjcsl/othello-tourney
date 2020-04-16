@@ -2,7 +2,7 @@
 .row{
     display: flex;
     height: 100%;
-    margin-left: 5px;
+    margin-left: 3px;
 }
 #first-form {
     margin-top: 20px;
