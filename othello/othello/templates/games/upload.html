@@ -40,11 +40,13 @@
                 </div>
                 <div id="second-form" class="column">
                     <form action="{% url 'games:upload' %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
                         <input type="hidden" name="action" value="change_submission">
                         <p>
                             {{ change_form.new_script.label }}
                             {{ change_form.new_script }}
                         </p>
+                        <input type="submit" value="Change Running Script" name="submit">
                     </form>
                 </div>
             </div>

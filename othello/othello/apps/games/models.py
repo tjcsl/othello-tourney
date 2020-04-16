@@ -66,8 +66,9 @@ class Submission(models.Model):
         for x in Submission.objects.get_all_submissions_for_user(self.user):
             if x != self:
                 x.usable = False
-                x.save()
-        self.usable = True
+            else:
+                x.usable = True
+            x.save()
 
     def save(self, *args, **kwargs):
         if self.usable:
@@ -78,7 +79,7 @@ class Submission(models.Model):
         super(Submission, self).save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.user.short_name}: {self.get_submission_name()}"
+        return f"{self.get_user_name()}: {self.get_submission_name()}"
 
 
 class GameManager(models.Manager):

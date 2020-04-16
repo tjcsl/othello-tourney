@@ -1,32 +1,10 @@
 from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.forms.models import model_to_dict
-from django.views.generic.edit import View, FormView
-
-from ..auth.decorators import login_required
+from django.views.generic.edit import View
 
 from .models import Game
 from .forms import SubmissionForm, GameForm, WatchForm, ChangeSubmissionForm
-
-
-# class UploadView(FormView):
-#     template_name, form_class = "games/upload.html", SubmissionForm
-#
-#     def form_valid(self, form):
-#         try:
-#             submission = form.save(commit=False)
-#             submission.user = self.request.user
-#             submission.save()
-#             success = True
-#         except:
-#             messages.error(self.request, "Unable to upload AI, try again later", extra_tags="danger")
-#             success = False
-#         return render(self.request, "games/upload.html", {'success': success})
-#
-#     def form_invalid(self, form):
-#         for error in form.errors.get_json_data()["__all__"]:
-#             messages.error(self.request, error["message"], extra_tags="danger")
-#         return render(self.request, "games/upload.html", {'success': False})
 
 
 class UploadView(View):
@@ -42,6 +20,42 @@ class UploadView(View):
                 'change_form': ChangeSubmissionForm(request.user)
             }
         )
+
+    def post(self, request):
+        action, success = request.POST.get("action", False), False
+
+        if action == "new_submission":
+            form = SubmissionForm(request.POST, request.FILES)
+            if form.is_valid():
+                try:
+                    submission = form.save(commit=False)
+                    submission.user = request.user
+                    submission.save()
+                    success = True
+                except:
+                    messages.error(request, "Unable to upload script at this time, try again later", extra_tags="danger")
+            else:
+                messages.error(request, "Unable to upload script at this time, try again later", extra_tags="danger")
+
+        elif action == "change_submission":
+            form = ChangeSubmissionForm(request.user, request.POST)
+            if form.is_valid():
+                try:
+                    form.cleaned_data.get("new_script", False).set_usable()
+                    success = True
+                except BaseException as e:
+                    messages.error(request, "Unable to set script as running script, try again later", extra_tags="danger")
+                    raise e
+            else:
+                messages.error(request, "Unable to set script as running script, try again later", extra_tags="danger")
+
+        else:
+            messages.error(request, "Received invalid request", extra_tags="danger")
+
+        if not success:
+            return redirect("games:upload")
+        else:
+            return render(request, self.template_name, {'success': success})
 
 
 def play(request):
