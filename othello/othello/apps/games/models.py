@@ -3,8 +3,9 @@ import uuid
 
 from django.db import models
 from django.conf import settings
+from django.dispatch import receiver
+from django.db.models.signals import post_delete
 from django.core.exceptions import ObjectDoesNotExist
-
 from .storage import OverwriteStorage
 
 
@@ -78,8 +79,17 @@ class Submission(models.Model):
                     x.save()
         super(Submission, self).save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        self.code.storage.delete(self.code.name)
+        super().delete(*args, **kwargs)
+
     def __str__(self):
         return f"{self.get_user_name()}: {self.get_submission_name()}"
+
+
+@receiver(post_delete, sender=Submission)
+def delete_submission_file(sender, instance, using, **kwargs):
+    instance.code.delete()
 
 
 class GameManager(models.Manager):

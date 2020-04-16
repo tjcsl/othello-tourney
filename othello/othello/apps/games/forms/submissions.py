@@ -3,8 +3,8 @@ from tempfile import NamedTemporaryFile
 from django import forms
 from django.core.exceptions import ValidationError
 
-from ..utils import import_strategy
 from ..models import Submission
+from ....sandboxing import import_strategy_sandboxed
 
 
 class SubmissionForm(forms.ModelForm):
@@ -24,14 +24,8 @@ class SubmissionForm(forms.ModelForm):
             for chunk in cd['code'].chunks():
                 f.write(chunk)
             f.read()  # for some reason importlib cannot read the file unless we do f.read first
-            try:
-                import_strategy(f.name)
-            except SyntaxError:
-                raise ValidationError("File has invalid syntax")
-            except AttributeError:
-                raise ValidationError("Cannot find attribute Strategy.best_strategy in file")
-            except AssertionError:
-                raise ValidationError("Attribute Strategy.best_strategy has an invalid amount of parameters")
+            if (errs := import_strategy_sandboxed(f.name)) != 0:
+                raise ValidationError(errs['message'])
 
         return cd
 
