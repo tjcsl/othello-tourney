@@ -2,10 +2,17 @@
 {% block title %}Othello: Home{% endblock %}
 {% block header %} Home {% endblock %}
 {% block main %}
-      <p>
+    <p>
         Welcome to the TJ AI othello tournament home page! Click on any of the links above to navigate.
-      </p>
-      <p>
-      For more information, see <a href="{% url 'games:about' %}">About</a>, <a href="https://en.wikipedia.org/wiki/Reversi">General Othello Information</a> or <a href="https://en.wikipedia.org/wiki/Computer_Othello">Computer Othello</a>.
-      </p>
-{% endblock %}
+    </p>
+    <p>
+        For more information, see <a href="{% url 'games:about' %}">About</a>, <a href="https://en.wikipedia.org/wiki/Reversi">General Othello Information</a> or <a href="https://en.wikipedia.org/wiki/Computer_Othello">Computer Othello</a>.
+    </p>
+    <br>
+    <h4 style="text-decoration: underline">
+        Scripts submitted before the 2020-21 school year are now invalid!
+    </h4>
+    <p>
+        The previously used 10x10 board has now been changed to the conventional, 8x8 Othello board (No more "<code>?</code>"s in board string).<br>
+         Read <a href="{% url 'games:help' %}">About Uploading</a> to see all changes.
+    {% endblock %}
