@@ -1,5 +1,10 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}Othello: Upload{% endblock %}
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/upload.css' %}">
+    <script type="text/javascript" src="{% static 'js/upload.js' %}"></script>
+{% endblock %}
 
 {% block main %}
     {% if success %}
@@ -16,18 +21,32 @@
             <p>
               Before uploading, please read <a href="{% url 'games:help' %}">About Uploading</a> carefully. It will save you many headaches.
             </p>
-            <form action="{% url 'games:upload' %}" method="post" enctype="multipart/form-data">
-                {% csrf_token %}
-                <p>
-                    {{ form.name.label }}
-                    {{ form.name }}
-                    <i id="name-help" class="fa fa-question-circle"></i>
-                </p>
-                <p>
-                    {{ form.code.label }}
-                    {{ form.code }}
-                </p>
-                <input type="submit" value="Upload File" name="submit">
-            </form>
+            <div class="row">
+                <div id="first-form" class="column">
+                    <form action="{% url 'games:upload' %}" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="new_submission">
+                        <p>
+                            {{ submission_form.name.label }}
+                            {{ submission_form.name }}
+                            <i id="name-help" class="fa fa-question-circle"></i>
+                        </p>
+                        <p>
+                            {{ submission_form.code.label }}
+                            {{ submission_form.code }}
+                        </p>
+                        <input type="submit" value="Upload File" name="submit">
+                    </form>
+                </div>
+                <div id="second-form" class="column">
+                    <form action="{% url 'games:upload' %}" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="action" value="change_submission">
+                        <p>
+                            {{ change_form.new_script.label }}
+                            {{ change_form.new_script }}
+                        </p>
+                    </form>
+                </div>
+            </div>
     {% endif %}
 {% endblock %}

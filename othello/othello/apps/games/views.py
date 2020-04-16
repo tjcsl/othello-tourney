@@ -9,24 +9,39 @@ from .models import Game
 from .forms import SubmissionForm, GameForm, WatchForm, ChangeSubmissionForm
 
 
-class UploadView(FormView):
-    template_name, form_class = "games/upload.html", SubmissionForm
+# class UploadView(FormView):
+#     template_name, form_class = "games/upload.html", SubmissionForm
+#
+#     def form_valid(self, form):
+#         try:
+#             submission = form.save(commit=False)
+#             submission.user = self.request.user
+#             submission.save()
+#             success = True
+#         except:
+#             messages.error(self.request, "Unable to upload AI, try again later", extra_tags="danger")
+#             success = False
+#         return render(self.request, "games/upload.html", {'success': success})
+#
+#     def form_invalid(self, form):
+#         for error in form.errors.get_json_data()["__all__"]:
+#             messages.error(self.request, error["message"], extra_tags="danger")
+#         return render(self.request, "games/upload.html", {'success': False})
 
-    def form_valid(self, form):
-        try:
-            submission = form.save(commit=False)
-            submission.user = self.request.user
-            submission.save()
-            success = True
-        except:
-            messages.error(self.request, "Unable to upload AI, try again later", extra_tags="danger")
-            success = False
-        return render(self.request, "games/upload.html", {'success': success})
 
-    def form_invalid(self, form):
-        for error in form.errors.get_json_data()["__all__"]:
-            messages.error(self.request, error["message"], extra_tags="danger")
-        return render(self.request, "games/upload.html", {'success': False})
+class UploadView(View):
+    template_name = "games/upload.html"
+
+    def get(self, request):
+        return render(
+            request,
+            self.template_name,
+            {
+                'success': False,
+                'submission_form': SubmissionForm(),
+                'change_form': ChangeSubmissionForm(request.user)
+            }
+        )
 
 
 def play(request):

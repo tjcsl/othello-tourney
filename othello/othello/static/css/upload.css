@@ -1,0 +1,37 @@
+/* Clear floats after the columns */
+.row{
+    display: flex;
+    height: 100%;
+}
+#first-form {
+    width: 35%;
+}
+#second-form {
+    width: 35%;
+}
+
+/* Responsive layout - makes the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 1534px) {
+    .column, #first-form, #second-form {
+        width: 100%;
+    }
+    #first-form {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+
+}
+
+.selectize-input {
+    font-family: 'Roboto Mono', monospace;
+    font-size: 16px;
+    background-color: transparent;
+    color: #805229;
+    border: #a06633 2px solid;
+}
+
+.selectize-dropdown {
+    color: #805229;
+    border: #a06633 2px solid;
+    font-size: 16px;
+}

@@ -38,11 +38,11 @@ class SubmissionForm(forms.ModelForm):
 class ChangeSubmissionForm(forms.Form):
     new_script = forms.ModelChoiceField(
         label="Change current AI:",
-        queryset=None
+        queryset=None,
     )
 
     def __init__(self, user, *args, **kwargs):
         super(ChangeSubmissionForm, self).__init__(*args, **kwargs)
         self.fields["new_script"].queryset = Submission.objects.get_all_submissions_for_user(user=user)
-        self.fields["new_script"].label_from_instance = lambda obj: f"{obj.get_submission_name()}>"
+        self.fields["new_script"].label_from_instance = lambda obj: f"{obj.get_submission_name()}"
 

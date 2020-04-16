@@ -43,6 +43,9 @@ class Submission(models.Model):
     def get_name(self):
         return self.name
 
+    def get_user_name(self):
+        return self.user.short_name
+
     def get_submitted_time(self):
         return self.submitted_time.strftime("%Y-%m-%d %H:%M:%S")
 
