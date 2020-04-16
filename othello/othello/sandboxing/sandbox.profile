@@ -3,6 +3,8 @@ nonewprivs
 nogroups
 noroot
 
+net none
+
 x11 none
 nodvd
 nosound

@@ -3,8 +3,15 @@ import json
 import shlex
 import subprocess
 
+DEBUG = False
 BASE_DIR = os.path.dirname(__file__)
-OTHELLO_AI_IMPORT_COMMAND = f"python3 {BASE_DIR}/import_wrapper.py {'{0}'}"
+IMPORT_WRAPPER = os.path.join(BASE_DIR, "import_wrapper.py")
+FIREJAIL_PROFILE = os.path.join(BASE_DIR, "sandbox.profile")
+
+if DEBUG:
+    OTHELLO_AI_IMPORT_COMMAND = f"python3 -u {IMPORT_WRAPPER} {'{0}'}"
+else:
+    OTHELLO_AI_IMPORT_COMMAND = f"firejail --quiet --profile={FIREJAIL_PROFILE} --whitelist={'{0}'} python3 -u {IMPORT_WRAPPER} {'{0}'}"
 
 
 def import_strategy_sandboxed(path):
@@ -14,4 +21,7 @@ def import_strategy_sandboxed(path):
     if p.returncode == 0:
         return 0
     else:
-        return json.loads(error.decode())
+        try:
+            return json.loads(error.decode())
+        except:
+            return {"message": "Unexpected error when validating submission"}
