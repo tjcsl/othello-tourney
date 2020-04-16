@@ -18,7 +18,15 @@
             </p>
             <form action="{% url 'games:upload' %}" method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                {{ form.as_p }}
+                <p>
+                    {{ form.name.label }}
+                    {{ form.name }}
+                    <i id="name-help" class="fa fa-question-circle"></i>
+                </p>
+                <p>
+                    {{ form.code.label }}
+                    {{ form.code }}
+                </p>
                 <input type="submit" value="Upload File" name="submit">
             </form>
     {% endif %}
