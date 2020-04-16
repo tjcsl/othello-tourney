@@ -1,9 +1,10 @@
 from django.contrib import messages
+from django.http import FileResponse
 from django.shortcuts import render, redirect
 from django.forms.models import model_to_dict
 from django.views.generic.edit import View
 
-from .models import Game
+from .models import Game, Submission
 from .forms import SubmissionForm, GameForm, WatchForm, ChangeSubmissionForm
 
 
@@ -35,19 +36,36 @@ class UploadView(View):
                 except:
                     messages.error(request, "Unable to upload script at this time, try again later", extra_tags="danger")
             else:
-                messages.error(request, "Unable to upload script at this time, try again later", extra_tags="danger")
+                for error in form.errors.get_json_data()["__all__"]:
+                    messages.error(request, error["message"], extra_tags="danger")
 
         elif action == "change_submission":
-            form = ChangeSubmissionForm(request.user, request.POST)
+            form = ChangeSubmissionForm(user=request.user, data=request.POST)
             if form.is_valid():
                 try:
                     form.cleaned_data.get("new_script", False).set_usable()
                     success = True
-                except BaseException as e:
+                except:
                     messages.error(request, "Unable to set script as running script, try again later", extra_tags="danger")
-                    raise e
             else:
                 messages.error(request, "Unable to set script as running script, try again later", extra_tags="danger")
+
+        elif action == "download_submission":
+            form = ChangeSubmissionForm(user=request.user, data=request.POST)
+            if form.is_valid():
+                cd = form.cleaned_data
+                submission = cd["new_script"]
+                if submission in Submission.objects.get_all_submissions_for_user(request.user):
+                    try:
+                        return FileResponse(submission.code.open('rb'), as_attachment=True, filename=f"{submission.get_submission_name()}.py")
+                    except BaseException as e:
+                        messages.error(request, "Unable to download script, try again later", extra_tags="danger")
+                        raise e
+                else:
+                    messages.error(request, "Cannot access specified submission", extra_tags="danger")
+            else:
+                for error in form.errors.get_json_data()["__all__"]:
+                    messages.error(request, error["message"], extra_tags="danger")
 
         else:
             messages.error(request, "Received invalid request", extra_tags="danger")
