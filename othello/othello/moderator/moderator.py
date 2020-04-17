@@ -1,5 +1,4 @@
 from . import utils
-from ..apps.games.models import Game
 
 
 PLAYERS = {
@@ -8,13 +7,20 @@ PLAYERS = {
 }
 
 
+class InvalidMoveError(BaseException):
+    def __init__(self, player, move, board):
+        self.player, self.move = player, move
+        self.board = utils.binary_to_string(board)
+
+    def __str__(self):
+        return f"{PLAYERS[self.player]} cannot move to square {self.move} on board {self.board}"
+
+
 class Moderator:
-    def __init__(self, game: Game):
-        self.black = game.black
-        self.white = game.white
+    def __init__(self):
         self.board = utils.INITIAL
+        self.game_over = False
         self.current_player = utils.BLACK
-        self.time_limit = game.time_limit
 
     def possible_moves(self):
         discriminator = utils.FULL_BOARD ^ (self.board[self.current_player] | self.board[1 ^ self.current_player])
@@ -34,7 +40,30 @@ class Moderator:
                 board[self.current_player] |= c
                 board[opponent] &= utils.bit_not(c)
         self.board = board
+        self.current_player = opponent
+
+    def is_game_over(self):
+        current_moves = self.possible_moves()
+        self.current_player ^= 1
+        opponent_moves = self.possible_moves()
+        self.current_player ^= 1
+        return self.board[0] & self.board[1] == utils.FULL_BOARD or not (current_moves or opponent_moves)
 
     def is_valid_move(self, attempted_move):
         return utils.MOVES[attempted_move] & self.possible_moves()
+
+    def submit_move(self, submitted_move):
+        if not self.is_valid_move(submitted_move):
+            raise InvalidMoveError(self.current_player, submitted_move, self.board)
+
+        self.make_move(submitted_move)
+
+        if self.is_game_over():
+            self.game_over = True
+            return False
+
+        return True
+
+    def get_game_state(self):
+        return self.game_over, self.board, self.current_player
 

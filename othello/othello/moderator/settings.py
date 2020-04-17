@@ -11,4 +11,4 @@ JAILEDRUNNER_DRIVER = os.path.join(PROJECT_ROOT, "moderator", "wrapper.py")
 if DEBUG:
     OTHELLO_AI_RUN_COMMAND = f"python3 -u {JAILEDRUNNER_DRIVER} {'{0}'}"
 else:
-    OTHELLO_AI_RUN_COMMAND = f"firejail --quiet --profile={FIREJAIL_PROFILE} --whitelist={'{0}'} --readonly={'{0}'} python3 -u {JAILEDRUNNER_DRIVER} {'{0}'}"
+    OTHELLO_AI_RUN_COMMAND = f"firejail --quiet --profile={FIREJAIL_PROFILE} --whitelist={'{0}'} python3 -u {JAILEDRUNNER_DRIVER} {'{0}'}"

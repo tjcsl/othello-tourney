@@ -3,7 +3,7 @@ import json
 import shlex
 import subprocess
 
-DEBUG = False
+DEBUG = True
 BASE_DIR = os.path.dirname(__file__)
 IMPORT_WRAPPER = os.path.join(BASE_DIR, "import_wrapper.py")
 FIREJAIL_PROFILE = os.path.join(BASE_DIR, "sandbox.profile")
