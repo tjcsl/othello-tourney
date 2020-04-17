@@ -144,3 +144,26 @@ class Move(models.Model):
     def __str__(self):
         return f"{self.game}, {self.player}, {self.board}, {self.move}, {self.valid}, {self.created_at}"
 
+
+class GameLogManager(models.Manager):
+
+    def get_latest_log(self):
+        return qs.order_by('-created_at')[0] if len(qs := self.get_queryset()) > 0 else None
+
+
+class GameLog(models.Model):
+
+    manager = GameLogManager()
+
+    log = models.CharField(max_length=10 * 1024, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class BlackGameLog(GameLog):
+
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="black_logs")
+
+
+class WhiteGameLog(GameLog):
+
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="white_logs")
