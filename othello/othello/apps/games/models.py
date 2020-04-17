@@ -6,6 +6,7 @@ from django.conf import settings
 from django.dispatch import receiver
 from django.db.models.signals import post_delete
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.validators import MaxLengthValidator, MinValueValidator
 from .storage import OverwriteStorage
 
 
@@ -115,4 +116,31 @@ class Game(models.Model):
         unique_together = ["black", "white", "time_limit",]
 
     def __str__(self):
-        return f"{self.black.user} v. {self.white.user} @ {self.time_limit}"
+        return f"{self.black.user} (Black) vs {self.white.user} (Yourself) [{self.time_limit}s]"
+
+
+class MoveManager(models.Manager):
+
+    def get_latest_move(self):
+        return qs.order_by('-created_at')[0] if len(qs := self.get_queryset()) > 0 else None
+
+
+class Move(models.Model):
+
+    manager = MoveManager()
+
+    PLAYER_CHOICES = (
+        ('B', 'Black'),
+        ('W', "White"),
+    )
+
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="moves")
+    created_at = models.DateTimeField(auto_now_add=True)
+    player = models.CharField(max_length=1, choices=PLAYER_CHOICES)
+    board = models.CharField(max_length=64, default="")
+    move = models.IntegerField(default=-1, validators=[MaxLengthValidator(64), MinValueValidator(-1)])
+    valid = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.game}, {self.player}, {self.board}, {self.move}, {self.valid}, {self.created_at}"
+

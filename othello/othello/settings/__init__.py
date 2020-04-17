@@ -20,14 +20,16 @@ CHANNEL_LAYERS = {
 }
 
 INSTALLED_APPS = [
-    "channels",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "channels",
     "social_django",
+    "django_celery_results",
+    "othello.apps",
     "othello.apps.auth.apps.AuthConfig",
     "othello.apps.games.apps.GamesConfig",
 ]
@@ -131,6 +133,11 @@ LOGIN_REDIRECT_URL = "games:upload"
 LOGOUT_REDIRECT_URL = "auth:index"
 
 SESSION_SAVE_EVERY_REQUEST = True
+
+CELERY_RESULT_BACKED = "django-db"
+
+CELERY_BROKER_URL = "redis://localhost:6379/1"
+
 
 SOCIAL_AUTH_LOGIN_ERROR_URL = "/"
 SOCIAL_AUTH_RAISE_EXCEPTIONS = False
