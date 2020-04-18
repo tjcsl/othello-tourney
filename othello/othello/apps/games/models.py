@@ -1,6 +1,7 @@
 import os
 import uuid
 
+from enum import Enum
 from django.db import models
 from django.conf import settings
 from django.dispatch import receiver
@@ -8,6 +9,11 @@ from django.db.models.signals import post_delete
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MaxLengthValidator, MinValueValidator
 from .storage import OverwriteStorage
+
+
+class Player(Enum):
+    BLACK = "X"
+    WHITE = "O"
 
 
 def save_path(instance, filename):
@@ -114,6 +120,9 @@ class Game(models.Model):
 
     class Meta:
         unique_together = ["black", "white", "time_limit",]
+
+    def get_code_filepath(self, player: Player):
+        return self.black.get_code_filepath() if player == Player.BLACK else self.white.get_code_filepath()
 
     def __str__(self):
         return f"{self.black.user} (Black) vs {self.white.user} (Yourself) [{self.time_limit}s]"

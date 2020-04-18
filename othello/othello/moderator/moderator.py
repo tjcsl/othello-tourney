@@ -22,6 +22,10 @@ class Moderator:
         self.game_over = False
         self.current_player = utils.BLACK
 
+    @property
+    def is_game_over(self):
+        return self.game_over
+
     def possible_moves(self):
         discriminator = utils.FULL_BOARD ^ (self.board[self.current_player] | self.board[1 ^ self.current_player])
         moves = utils.bit_or(utils.fill(self.board[self.current_player], self.board[1 ^ self.current_player], d) & discriminator for d in utils.MASKS)
@@ -42,7 +46,7 @@ class Moderator:
         self.board = board
         self.current_player = opponent
 
-    def is_game_over(self):
+    def check_game_over(self):
         current_moves = self.possible_moves()
         self.current_player ^= 1
         opponent_moves = self.possible_moves()
@@ -58,7 +62,7 @@ class Moderator:
 
         self.make_move(submitted_move)
 
-        if self.is_game_over():
+        if self.check_game_over():
             self.game_over = True
             return False
 
