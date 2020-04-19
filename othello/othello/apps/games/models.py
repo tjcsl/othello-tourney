@@ -57,9 +57,6 @@ class Submission(models.Model):
     def get_submission_name(self):
         return f'{self.get_name()}: <{self.get_submitted_time()}>'
 
-    def get_code_filepath(self):
-        return self.code.path
-
     def get_code_filename(self):
         return self.code.name
 
@@ -96,44 +93,33 @@ def delete_submission_file(sender, instance, using, **kwargs):
     instance.code.delete()
 
 
-class GameManager(models.Manager):
-    def safe_get(self, **kwargs):
-        try:
-            return Game.objects.get(**kwargs)
-        except ObjectDoesNotExist:
-            return Game.objects.none()
+class GameQuerySet(models.QuerySet):
 
-    def get_all_running(self):
-        return Game.objects.all().filter(playing=True)
+    def running(self):
+        return self.filter(playing=True)
 
 
 class Game(models.Model):
-    objects = GameManager()
+    objects = GameQuerySet.as_manager()
 
     black = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="black")
     white = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="white")
     time_limit = models.IntegerField(default=5,)
     playing = models.BooleanField(default=True)
 
-    def get_code_filepath(self, player: Player):
-        return self.black.get_code_filepath() if player == Player.BLACK else self.white.get_code_filepath()
-
-    def get_code_directory(self, player: Player):
-        return os.path.dirname(self.black.get_code_filepath()) if player == Player.BLACK else os.path.dirname(self.white.get_code_filepath())
-
     def __str__(self):
         return f"{self.black.user} (Black) vs {self.white.user} (Yourself) [{self.time_limit}s]"
 
 
-class MoveManager(models.Manager):
+class MoveQuerySet(models.QuerySet):
 
-    def get_latest_move(self):
-        return qs.order_by('-created_at')[0] if len(qs := self.get_queryset()) > 0 else None
+    def latest_move(self):
+        return self.order_by('-created_at')[0] if self.exists() else None
 
 
 class Move(models.Model):
 
-    manager = MoveManager()
+    manager = MoveQuerySet.as_manager()
 
     PLAYER_CHOICES = (
         (1, 'Black'),
@@ -151,18 +137,28 @@ class Move(models.Model):
         return f"{self.game}, {self.player}, {self.board}, {self.move}, {self.created_at}"
 
 
-class GameLogManager(models.Manager):
+class GameObjectSet(models.QuerySet):
 
-    def get_latest_log(self):
-        return qs.order_by('-created_at')[0] if len(qs := self.get_queryset()) > 0 else None
+    def latest_move(self):
+        return self.order_by('-created_at')[0] if self.exists() else None
 
 
-class GameLog(models.Model):
+class GameObject(models.Model):
 
-    manager = GameLogManager()
+    manager = GameObjectSet.as_manager()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class GameLog(GameObject):
 
     log = models.TextField(default="")
-    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class GameError(GameObject):
+
+    error_code = models.IntegerField()
+    message = models.TextField(default="")
 
 
 class BlackGameLog(GameLog):
@@ -175,27 +171,11 @@ class WhiteGameLog(GameLog):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="white_logs")
 
 
-class GameErrorManager(models.Manager):
-
-    def get_latest_log(self):
-        return qs.order_by('-created_at')[0] if len(qs := self.get_queryset()) > 0 else None
-
-
-class GameError(models.Model):
-
-    manager = GameErrorManager()
-
-    error_code = models.IntegerField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    message = models.TextField(default="")
-
-
-class BlackGameError(models.Model):
+class BlackGameError(GameError):
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="black_errors")
 
 
-class WhiteGameError(models.Model):
+class WhiteGameError(GameError):
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="white_errors")
-

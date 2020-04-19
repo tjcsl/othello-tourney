@@ -26,30 +26,3 @@ class GameConsumer(AsyncJsonWebsocketConsumer):
             self.game_group_name,
             self.game_id
         )
-
-    @database_sync_to_async
-    def get_game(self):
-        return Game.objects.safe_get(id=self.game_id)
-
-
-class GamePlayingConsumer(GameConsumer):
-    async def connect(self):
-        await super().connect()
-        self.game = await self.get_game()
-
-
-        if not self.game:
-            await self.send_json({
-                'type': "error",
-                'error': f"Cannot find game with ID: {self.game_id}"
-            })
-            await self.close()
-        elif not self.game.playing:
-            await self.send_json({
-                'type': "error",
-                'error': f"Game {self.game_id} has already concluded"
-            })
-
-
-class GameWatchingConsumer(GameConsumer):
-    pass
