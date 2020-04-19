@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.forms.models import model_to_dict
 from django.views.generic.edit import View
 
+from .tasks import run_game
 from .models import Game, Submission
 from .forms import SubmissionForm, GameForm, WatchForm, ChangeSubmissionForm
 
@@ -87,6 +88,7 @@ def play(request):
                 time_limit=cd['time_limit'],
                 playing=True
             )
+            run_game.delay(g.id)
             return render(request, "games/play.html", {'game': model_to_dict(g), 'is_watching': False})
         else:
             messages.error(request, "Unable to start game, try again later", extra_tags="danger")

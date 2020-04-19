@@ -24,6 +24,8 @@ def main():
     except AssertionError:
         sys.stderr.write(json.dumps({"message": "Attribute Strategy.best_strategy has an invalid amount of parameters"}))
         sys.exit(1)
+    except Exception as e:
+        sys.stderr.write(json.dumps({"message": f"Script is unable to be run, {str(e)}"}))
     sys.exit(0)
 
 

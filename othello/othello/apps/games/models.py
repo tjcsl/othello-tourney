@@ -102,7 +102,7 @@ def delete_submission_file(sender, instance, using, **kwargs):
 class GameManager(models.Manager):
     def safe_get(self, **kwargs):
         try:
-            return Game.objects.filter(**kwargs)
+            return Game.objects.get(**kwargs)
         except ObjectDoesNotExist:
             return Game.objects.none()
 
@@ -123,6 +123,9 @@ class Game(models.Model):
 
     def get_code_filepath(self, player: Player):
         return self.black.get_code_filepath() if player == Player.BLACK else self.white.get_code_filepath()
+
+    def get_code_directory(self, player: Player):
+        return os.path.dirname(self.black.get_code_filepath()) if player == Player.BLACK else os.path.dirname(self.white.get_code_filepath())
 
     def __str__(self):
         return f"{self.black.user} (Black) vs {self.white.user} (Yourself) [{self.time_limit}s]"
@@ -164,7 +167,7 @@ class GameLog(models.Model):
 
     manager = GameLogManager()
 
-    log = models.CharField(max_length=10 * 1024, default="")
+    log = models.TextField(default="")
     created_at = models.DateTimeField(auto_now_add=True)
 
 
@@ -176,3 +179,21 @@ class BlackGameLog(GameLog):
 class WhiteGameLog(GameLog):
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="white_logs")
+
+
+class GameError(models.Model):
+
+    error_code = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    message = models.TextField(default="")
+
+
+class BlackGameError(models.Model):
+
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="black_errors")
+
+
+class WhiteGameError(models.Model):
+
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="white_errors")
+

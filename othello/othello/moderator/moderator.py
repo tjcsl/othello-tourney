@@ -13,7 +13,7 @@ class InvalidMoveError(BaseException):
         self.board = utils.binary_to_string(board)
 
     def __str__(self):
-        return f"{PLAYERS[self.player]} cannot move to square {self.move} on board {self.board}"
+        return f"{self.move} is invalid for {self.player} on {self.board}"
 
 
 class Moderator:
@@ -69,5 +69,5 @@ class Moderator:
         return True
 
     def get_game_state(self):
-        return self.game_over, self.board, self.current_player
+        return self.board, self.current_player
 

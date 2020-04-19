@@ -1,3 +1,5 @@
+import io
+import os
 import sys
 import shlex
 import logging
@@ -35,9 +37,15 @@ def get_stream_queue(stream, event):
 
 
 class HiddenPrints:  # TODO: Add constructor and suppress stderr unless logging variable set
-    def __enter__(self):
+    def __init__(self, logging):
+        self.logging = logging
         self._original_stdout = sys.stdout
-        sys.stdout = sys.stderr
+
+    def __enter__(self):
+        if self.logging:
+            sys.stdout = sys.stderr
+        else:
+            sys.stdout = open(os.devnull, 'w')
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         sys.stdout = self._original_stdout
@@ -50,7 +58,7 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
         self.logging = getattr(self.strat, "logging", False)
 
     def play_wrapper(self, *game_args, pipe_to_parent):
-        with HiddenPrints():
+        with HiddenPrints(self.logging):
             try:
                 self.strat.best_strategy(*game_args)
                 pipe_to_parent.send(None)
@@ -87,11 +95,10 @@ class JailedRunner(LocalRunner):  # Called from subprocess, no access to django 
         player = stdin.readline().strip()
         board = stdin.readline().strip()
 
-        with HiddenPrints():
-            move, err = self.get_move(board, player, time_limit)
+        move, err = self.get_move(board, player, time_limit)
 
         if err is not None:
-            stderr.write(f"{err}\n")
+            stderr.write(f"SERVER: {err}\n")
 
         stdout.write(f"{move}\n")
 
