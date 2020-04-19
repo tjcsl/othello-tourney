@@ -1,19 +1,16 @@
 import os
 import uuid
 
-from enum import Enum
 from django.db import models
 from django.conf import settings
 from django.dispatch import receiver
 from django.db.models.signals import post_delete
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxLengthValidator, MinValueValidator
 from .storage import OverwriteStorage
 
-
-class Player(Enum):
-    BLACK = "X"
-    WHITE = "O"
+from ...moderator.moderator import Player
 
 
 def save_path(instance, filename):
@@ -116,10 +113,7 @@ class Game(models.Model):
     black = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="black")
     white = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="white")
     time_limit = models.IntegerField(default=5,)
-    playing = models.BooleanField(default=False)
-
-    class Meta:
-        unique_together = ["black", "white", "time_limit",]
+    playing = models.BooleanField(default=True)
 
     def get_code_filepath(self, player: Player):
         return self.black.get_code_filepath() if player == Player.BLACK else self.white.get_code_filepath()
@@ -142,8 +136,8 @@ class Move(models.Model):
     manager = MoveManager()
 
     PLAYER_CHOICES = (
-        ('B', 'Black'),
-        ('W', "White"),
+        (1, 'Black'),
+        (0, "White"),
     )
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="moves")
@@ -151,10 +145,10 @@ class Move(models.Model):
     player = models.CharField(max_length=1, choices=PLAYER_CHOICES)
     board = models.CharField(max_length=64, default="")
     move = models.IntegerField(default=-1, validators=[MaxLengthValidator(64), MinValueValidator(-1)])
-    valid = models.BooleanField(default=False)
+    possible = ArrayField(models.IntegerField(), default=list)
 
     def __str__(self):
-        return f"{self.game}, {self.player}, {self.board}, {self.move}, {self.valid}, {self.created_at}"
+        return f"{self.game}, {self.player}, {self.board}, {self.move}, {self.created_at}"
 
 
 class GameLogManager(models.Manager):
@@ -181,7 +175,15 @@ class WhiteGameLog(GameLog):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="white_logs")
 
 
+class GameErrorManager(models.Manager):
+
+    def get_latest_log(self):
+        return qs.order_by('-created_at')[0] if len(qs := self.get_queryset()) > 0 else None
+
+
 class GameError(models.Model):
+
+    manager = GameErrorManager()
 
     error_code = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)

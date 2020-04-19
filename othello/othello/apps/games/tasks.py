@@ -1,5 +1,4 @@
 import os
-import time
 import shlex
 import threading
 import subprocess
@@ -7,15 +6,18 @@ import subprocess
 from queue import Empty
 from celery import shared_task
 from django.conf import settings
+from celery.utils.log import get_task_logger
 
 from .utils import get_stream_queue
 from ... import moderator, sandboxing
-from ..games.models import Game, Move, Player, BlackGameLog, WhiteGameLog
+from ..games.models import Game, Player
 
 JAILEDRUNNER_DRIVER = os.path.join(settings.BASE_DIR, "moderator", "wrapper.py")
 OTHELLO_AI_RUN_COMMAND = f"python3 -u {JAILEDRUNNER_DRIVER} {'{path!r}'}"
 
-GAME_STATE_INPUT = "{time_limit!r}\n{0}\n{1}\n"  # Don't use keywords after the first so we can just *Moderator.get_game_state()[1:]
+GAME_STATE_INPUT = "{time_limit!r}\n{board!r}\n{player!r}\n"
+
+task_logger = get_task_logger(__name__)
 
 
 def check_for_errors(error_queue):
@@ -54,7 +56,8 @@ def run_game(game_id):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 bufsize=1,
-                cwd=game.get_code_directory(Player.WHITE)
+                universal_newlines=True,
+                cwd=settings.BASE_DIR
         )
     black = subprocess.Popen(
                 black_cmd_args,
@@ -62,36 +65,71 @@ def run_game(game_id):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 bufsize=1,
-                cwd=game.get_code_directory(Player.BLACK)
+                universal_newlines=True,
+                cwd=settings.BASE_DIR
         )
     stop_event = threading.Event()
 
     players = {
-        0: {"proc": white, "stdout": get_stream_queue(white.stdout, stop_event), "stderr": get_stream_queue(white.stderr, stop_event)},
-        1: {"proc": black, "stdout": get_stream_queue(black.stdout, stop_event), "stderr": get_stream_queue(black.stderr, stop_event)},
+        Player.WHITE: {"proc": white, "stderr": get_stream_queue(white.stderr, stop_event)},
+        Player.BLACK: {"proc": black, "stderr": get_stream_queue(black.stderr, stop_event)},
     }
 
+    forfeit = False
+
     while not mod.is_game_over:
-        data, current_player = GAME_STATE_INPUT.format(time_limit=time_limit, *mod.get_game_state()).encode('ascii'), players[mod.current_player]
-        logger, error_logger = (game.white_logs, game.white_errors) if mod.current_player == 0 else (game.black_logs, game.black_errors)
+        board, player, possible = mod.get_game_state()
 
+        task_logger.error(f"STATE: {player}, {board}")
+
+        data, current_player = GAME_STATE_INPUT.format(time_limit=time_limit, board=board, player=player), players[player]
+        logger, error_logger = (game.white_logs, game.white_errors) if player == Player.WHITE else (game.black_logs, game.black_errors)
+
+        task_logger.error("STARTING TO WRITE")
         current_player["proc"].stdin.write(data)
-        move, errors = -1, ""
+        current_player["proc"].stdin.flush()
+        task_logger.error("FINISHED WRITING")
 
-        try:
-            move = moderator.utils.safe_int(current_player["stdout"].get(timeout=time_limit+5))
-        except Empty:
-            move = -1
+        task_logger.error(f"ERRORS 1: {current_player['proc'].stderr.readline()}")
+        task_logger.error(f"ERRORS 2: {current_player['proc'].stderr.readline()}")
+        move = int(current_player["proc"].stdout.readline())
 
-        errors = check_for_errors(current_player["stderr"])
 
-        logger.create(game=game, log=errors)
+        # try:
+        #     move = int(current_player["proc"].stdout.readline().decode())
+        # except Empty:
+        #     task_logger.error("error reading from stdin")
+        #     move = -1
+        # except ValueError:
+        #     move = -1
+
+        task_logger.error(f"GOT MOVE: {move}")
+
+        # errors = check_for_errors(current_player["stderr"])
+        #
+        # task_logger.error(f"RECEIVED LOGS: {errors}")
+        #
+        # logger.create(game=game, log=errors)
 
         try:
             game_over = mod.submit_move(move)
         except moderator.InvalidMoveError as e:
             error_logger.create(game=game, error_code=-1, message=str(e))
+            forfeit, game_over = True, True
+            task_logger.error(f"INVALID MOVE: {str(e)}")
 
+        if game_over:
+            game.playing = False
+            if forfeit:
+                pass  # TODO: FILL THIS
+            game.save(update_fields=['playing'])
+            break
 
-
+        task_logger.error("FINISHED ROUND, MOVING ON...")
+        game.moves.create(
+            player=player.value,
+            board=board,
+            move=move,
+            possible=possible,
+        )
 

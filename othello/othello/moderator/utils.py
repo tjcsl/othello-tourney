@@ -1,11 +1,9 @@
-import os
 import operator
 import importlib.util
 import importlib.machinery
 
 from inspect import signature
 from functools import lru_cache, partial, reduce
-
 
 from .constants import *
 
@@ -23,6 +21,15 @@ def bit_not(x):
 
 def binary_to_string(board):
     return "".join(['O' if is_on(board[0], 63 - i) else 'X' if is_on(board[1], 63 - i) else '.' for i in range(64)])
+
+
+def possible_set(possible):
+    ret = set()
+    while possible:
+        b = possible & -possible
+        ret.add(POS[b])
+        possible -= b
+    return ret
 
 
 @lru_cache
@@ -54,14 +61,14 @@ def fill(current, opponent, direction):
     return (w & mask) >> direction
 
 
+def import_strategy(path):
+    strat = importlib.machinery.SourceFileLoader("strategy", path).load_module().Strategy()
+    assert len(signature(strat.best_strategy).parameters) == 4
+    return strat
+
+
 def safe_int(x):
     try:
         return int(x)
     except ValueError:
         return -1
-
-
-def import_strategy(path):
-    strat = importlib.machinery.SourceFileLoader("strategy", path).load_module().Strategy()
-    assert len(signature(strat.best_strategy).parameters) == 4
-    return strat

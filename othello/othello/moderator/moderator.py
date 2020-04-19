@@ -1,9 +1,15 @@
+from enum import Enum
 from . import utils
 
 
+class Player(Enum):
+    BLACK = 1
+    WHITE = 0
+
+
 PLAYERS = {
-    0: "O",
-    1: "X"
+    0: Player.WHITE,
+    1: Player.BLACK,
 }
 
 
@@ -69,5 +75,5 @@ class Moderator:
         return True
 
     def get_game_state(self):
-        return self.board, self.current_player
+        return utils.binary_to_string(self.board), PLAYERS[self.current_player], utils.possible_set(self.possible_moves())
 
