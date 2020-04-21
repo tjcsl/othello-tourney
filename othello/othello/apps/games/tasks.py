@@ -31,6 +31,8 @@ def run_game(game_id):
             while not mod.is_game_over:
                 board, current_player = mod.get_game_state()
 
+                task_logger.error(f"GAME: {str(game)} STATE: {board} {current_player.value}")
+
                 if current_player == Player.BLACK:
                     running_turn = player_black.get_move(board, current_player.value, time_limit)
                 elif current_player == Player.WHITE:
@@ -39,6 +41,8 @@ def run_game(game_id):
                 for log in running_turn:
                     temp_logger(log)
                 submitted_move, error = running_turn.return_value
+
+                task_logger.error(f"SUBMITTED {submitted_move}")
 
                 if error != 0:
                     temp_error(error)
