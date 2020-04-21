@@ -38,7 +38,7 @@ class ChangeSubmissionForm(forms.Form):
 
     def __init__(self, user, *args, **kwargs):
         super(ChangeSubmissionForm, self).__init__(*args, **kwargs)
-        choices = Submission.objects.get_all_submissions_for_user(user=user)
+        choices = Submission.objects.filter(user=user)
         self.fields["new_script"].queryset = choices
         self.fields["new_script"].initial = choices[0] if len(choices) >= 1 else None
         self.fields["new_script"].label_from_instance = lambda obj: f"{obj.get_submission_name()}"

@@ -27,8 +27,6 @@ def import_strategy_sandboxed(path):
 
 
 def get_sandbox_args(cmd_args, *, whitelist=None, readonly=None, extra_args=None):
-    if settings.DEBUG:
-        return [*cmd_args]
     firejail_args = [
         "firejail",
         "--quiet",

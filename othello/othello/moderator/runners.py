@@ -1,43 +1,30 @@
-import io
 import os
 import sys
-import shlex
-import logging
+import enum
+import time
+import select
 import traceback
-import threading
 import subprocess
 import multiprocessing as mp
 
-from queue import Queue, Empty
-
-from .utils import import_strategy, safe_int
-from .settings import *
-
-log = logging.getLogger(__name__)
+from ..sandboxing import get_sandbox_args
+from .utils import import_strategy, capture_generator_value
 
 
-def enqueue_stream_helper(stream, q, event):
-    """
-    Continuously reads from stream and puts any results into
-    the queue `q`
-    """
-    for line in iter(stream.readline, b''):
-        if event.is_set():
-            break
-        q.put(line)
-    stream.close()
+class UserError(enum.Enum):
+
+    NO_MOVE_ERROR = -1
+    READ_INVALID = -2
 
 
-def get_stream_queue(stream, event):
-    """
-    Takes in a stream, and returns a Queue that will return the output from that stream. Starts a background thread as a side effect.
-    """
-    threading.Thread(target=enqueue_stream_helper, args=(stream, q := Queue(), event), daemon=True).start()
-    return q
+class ServerError(enum.Enum):
+
+    TIMEOUT = -3
+    UNEXPECTED = -4
 
 
-class HiddenPrints:  # TODO: Add constructor and suppress stderr unless logging variable set
-    def __init__(self, logging):
+class HiddenPrints:
+    def __init__(self, logging=False):
         self.logging = logging
         self._original_stdout = sys.stdout
 
@@ -81,7 +68,7 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
             return best_move.value, to_self.recv() if to_self.poll() else None
         except mp.ProcessError:
             traceback.print_exc()
-            return -1, "Server Error"
+            return ServerError.UNEXPECTED, "Server Error"
 
 
 class JailedRunner(LocalRunner):  # Called from subprocess, no access to django channels/main application
@@ -106,72 +93,57 @@ class JailedRunner(LocalRunner):  # Called from subprocess, no access to django 
         stderr.flush()
 
 
-class JailedRunnerCommunicator:  # Interface with main application, access to django channels
+class PlayerRunner:
 
-    def __init__(self, path, logging_callback):
+    def __init__(self, path, jailed_driver, debug):
         self.path = path
-        self.logging_callback = logging_callback
+        self.debug = debug
+        self.jailed_driver = jailed_driver
         self.process = None
-        self.logger = None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop()
 
     def start(self):
-        cmd_args = shlex.split(OTHELLO_AI_RUN_COMMAND.format(self.path), posix=False)
+        cmd_args = ["python3", "-u", self.jailed_driver, self.path]
+        if self.debug:
+            cmd_args = get_sandbox_args(cmd_args)
+
         self.process = subprocess.Popen(cmd_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                         bufsize=1, universal_newlines=True, cwd=os.path.dirname(self.path))
-        self.process_stop_event = threading.Event()
 
-        self.stdout_stream = get_stream_queue(self.process.stdout, self.process_stop_event)
-        self.stderr_stream = get_stream_queue(self.process.stderr, self.process_stop_event)
+    def stop(self):
+        if self.process is not None:
+            self.process.kill()
+            self.process = None
 
-        self.logger = threading.Thread(target=self.error_wrapper, args=(self.logging_callback,), daemon=True)
-        self.logger.start()
-
-    def error_wrapper(self, callback):
-        while True:
-            if errs := self.check_for_errors():
-                callback(errs)
-            if self.process_stop_event.is_set():
-                if errs := self.check_for_errors():
-                    callback(errs)
-                break
-
-    def check_for_errors(self):
-        last_err_line, errs = "", []
-        while last_err_line is not None:
-            errs.append(last_err_line)
-            try:
-                last_err_line = self.stderr_stream.get_nowait()
-            except:
-                last_err_line = None
-        return ''.join(errs)
-
+    @capture_generator_value
     def get_move(self, board, player, time_limit):
         data = f"{str(time_limit)}\n{player}\n{''.join(board)}\n"
 
         self.process.stdin.write(data)
         self.process.stdin.flush()
-        log.debug("wrote data to subprocess")
 
-        output = ""
-        try:
-            output = self.stdout_stream.get(timeout=time_limit+10)
-        except Empty:
-            log.warning("Timeout reading from subprocess")
+        move = -1
 
-        if e := self.check_for_errors():  # check one last time
-            errs = e
-        else:
-            errs = None
+        start, total_timeout = time.time(), time_limit+5
+        while move == -1:
+            if (timeout := total_timeout - (time.time() - start)) <= 0:
+                return -1, ServerError.TIMEOUT
+            timeout = min(timeout, total_timeout)
 
-        return safe_int(output.split("\n")[0]), errs
+            files_ready = select.select([self.process.stdout, self.process.stderr], [], [], timeout)[0]
+            if self.process.stderr in files_ready:
+                yield self.process.stderr.read1(8192)
+            if self.process.stdout in files_ready:
+                try:
+                    move = int(self.process.stdout.readline())
+                    if move == -1:
+                        return -1, UserError.NO_MOVE_ERROR
+                except ValueError:
+                    return -1, UserError.READ_INVALID
 
-    def stop(self):
-        if self.process is not None:
-            self.process.kill()
-            self.process_stop_event.set()
-            self.process = None
-        if self.logger is not None:
-            self.logger = None
-
-    def __del__(self):
-        self.stop()
+        return move, 0

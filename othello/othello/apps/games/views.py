@@ -56,7 +56,7 @@ class UploadView(View):
             if form.is_valid():
                 cd = form.cleaned_data
                 submission = cd["new_script"]
-                if submission in Submission.objects.get_all_submissions_for_user(request.user):
+                if submission in Submission.objects.filter(request.user):
                     try:
                         return FileResponse(submission.code.open('rb'), as_attachment=True, filename=f"{submission.get_submission_name()}.py")
                     except BaseException as e:

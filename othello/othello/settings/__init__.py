@@ -80,6 +80,8 @@ DATABASES = {
     }
 }
 
+
+# Authentication
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -88,6 +90,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTHENTICATION_BACKENDS = ("othello.apps.auth.oauth.IonOauth2",)
+
+if DEBUG:
+    AUTH_PASSWORD_VALIDATORS = []
+    AUTHENTICATION_BACKENDS += ("django.contrib.auth.backends.ModelBackend",)
 
 SOCIAL_AUTH_USER_FIELDS = ["username", "first_name", "last_name", "email", "id"]
 
@@ -109,10 +115,12 @@ SOCIAL_AUTH_ALWAYS_ASSOCIATE = True
 
 AUTH_USER_MODEL = "authentication.User"
 
+SOCIAL_AUTH_LOGIN_ERROR_URL = "/"
+SOCIAL_AUTH_RAISE_EXCEPTIONS = False
 
-if DEBUG:
-    AUTH_PASSWORD_VALIDATORS = []
-    AUTHENTICATION_BACKENDS += ("django.contrib.auth.backends.ModelBackend",)
+LOGIN_URL = "auth:login"
+LOGIN_REDIRECT_URL = "games:upload"
+LOGOUT_REDIRECT_URL = "auth:index"
 
 
 # Internationalization
@@ -128,20 +136,12 @@ USE_L10N = True
 
 USE_TZ = True
 
-
-LOGIN_URL = "auth:login"
-LOGIN_REDIRECT_URL = "games:upload"
-LOGOUT_REDIRECT_URL = "auth:index"
-
 SESSION_SAVE_EVERY_REQUEST = True
 
+# Celery
 CELERY_RESULT_BACKED = "django-db"
 
 CELERY_BROKER_URL = "redis://localhost:6379/1"
-
-
-SOCIAL_AUTH_LOGIN_ERROR_URL = "/"
-SOCIAL_AUTH_RAISE_EXCEPTIONS = False
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "serve")
@@ -149,3 +149,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, "serve")
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "submissions")
+
+
+# Othello Settings
+JAILEDRUNNER_DRIVER = os.path.join(BASE_DIR, "moderator", "wrapper.py")
+OTHELLO_AI_RUN_COMMAND = f"python3 -u {JAILEDRUNNER_DRIVER} {'{path!r}'}"

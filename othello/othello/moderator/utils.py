@@ -3,9 +3,31 @@ import importlib.util
 import importlib.machinery
 
 from inspect import signature
-from functools import lru_cache, partial, reduce
+from functools import lru_cache, partial, reduce, wraps
 
 from .constants import *
+
+
+class Generator:
+    def __init__(self, gen):
+        self.gen = gen
+        self.return_value = None
+
+    def __iter__(self):
+        self.return_value = yield from self.gen
+
+
+def capture_generator_value(func):
+    @wraps(func)
+    def f(*args, **kwargs):
+        return Generator(f(*args, **kwargs))
+    return f
+
+
+def import_strategy(path):
+    strat = importlib.machinery.SourceFileLoader("strategy", path).load_module().Strategy()
+    assert len(signature(strat.best_strategy).parameters) == 4
+    return strat
 
 
 bit_or = partial(reduce, operator.__or__)
@@ -21,15 +43,6 @@ def bit_not(x):
 
 def binary_to_string(board):
     return "".join(['O' if is_on(board[0], 63 - i) else 'X' if is_on(board[1], 63 - i) else '.' for i in range(64)])
-
-
-def possible_set(possible):
-    ret = set()
-    while possible:
-        b = possible & -possible
-        ret.add(POS[b])
-        possible -= b
-    return ret
 
 
 @lru_cache
@@ -59,16 +72,3 @@ def fill(current, opponent, direction):
     w |= ((w & mask) >> direction) & opponent
     w |= ((w & mask) >> direction) & opponent
     return (w & mask) >> direction
-
-
-def import_strategy(path):
-    strat = importlib.machinery.SourceFileLoader("strategy", path).load_module().Strategy()
-    assert len(signature(strat.best_strategy).parameters) == 4
-    return strat
-
-
-def safe_int(x):
-    try:
-        return int(x)
-    except ValueError:
-        return -1
