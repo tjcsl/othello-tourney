@@ -13,14 +13,14 @@ from .utils import import_strategy, capture_generator_value
 
 class UserError(enum.Enum):
 
-    NO_MOVE_ERROR = -1
-    READ_INVALID = -2
+    NO_MOVE_ERROR = (-1, "No move submitted")
+    READ_INVALID = (-2, "Submitted move is not an integer")
 
 
 class ServerError(enum.Enum):
 
-    TIMEOUT = -3
-    UNEXPECTED = -4
+    TIMEOUT = (-3, "Timed out reading from subprocess")
+    UNEXPECTED = (-4, "Unexpected error")
 
 
 class HiddenPrints:
@@ -82,11 +82,13 @@ class JailedRunner(LocalRunner):  # Called from subprocess, no access to django 
         player = stdin.readline().strip()
         board = stdin.readline().strip()
 
-        move, err = self.get_move(board, player, time_limit)
+        with HiddenPrints(self.logging):
+            move, err = self.get_move(board, player, time_limit)
 
         if err is not None:
             stderr.write(f"SERVER: {err}\n")
 
+        stderr.write("HELLOOOOOOO\n")
         stdout.write(f"{move}\n")
 
         stdout.flush()

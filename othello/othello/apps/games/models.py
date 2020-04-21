@@ -95,6 +95,13 @@ class GameSet(models.QuerySet):
 
 
 class Game(models.Model):
+
+    OUTCOME_CHOICES = (
+        (Player.BLACK.value, "Black"),
+        (Player.WHITE.value, "White"),
+        ('T', "Tie")
+    )
+
     objects = GameSet.as_manager()
 
     black = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="black")
@@ -102,8 +109,8 @@ class Game(models.Model):
     time_limit = models.IntegerField(default=5,)
     playing = models.BooleanField(default=False)
 
-    winner = models.CharField(max_length=1, choices=PLAYER_CHOICES, default='')
     forfeit = models.BooleanField(default=False)
+    outcome = models.CharField(max_length=1, choices=OUTCOME_CHOICES, default='')
 
     def __str__(self):
         return f"{self.black.user} (Black) vs {self.white.user} (White) [{self.time_limit}s]"
