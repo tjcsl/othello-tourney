@@ -1,9 +1,9 @@
-from enum import Enum
+import enum
 
 from . import utils
 
 
-class Player(Enum):
+class Player(enum.Enum):
     BLACK = 'X'
     WHITE = 'O'
 
@@ -20,7 +20,7 @@ class InvalidMoveError(BaseException):
         self.board = utils.binary_to_string(board)
 
     def __str__(self):
-        return f"{self.move} is invalid for {self.player} on {self.board}"
+        return f"{self.move} is invalid for {PLAYERS[self.player].value} on {self.board}"
 
 
 class Moderator:
@@ -61,7 +61,7 @@ class Moderator:
         return self.board[0] & self.board[1] == utils.FULL_BOARD or not (current_moves or opponent_moves)
 
     def is_valid_move(self, attempted_move):
-        return utils.MOVES[attempted_move] & self.possible_moves()
+        return utils.MOVES.get(attempted_move, False) & self.possible_moves()
 
     def submit_move(self, submitted_move):
         if not self.is_valid_move(submitted_move):

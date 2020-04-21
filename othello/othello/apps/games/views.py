@@ -34,7 +34,7 @@ class UploadView(View):
                     submission.user = request.user
                     submission.save()
                     success = True
-                except:
+                except Exception as e:
                     messages.error(request, "Unable to upload script at this time, try again later", extra_tags="danger")
             else:
                 for error in form.errors.get_json_data()["__all__"]:

@@ -61,7 +61,7 @@ class Submission(models.Model):
         return self.usable
 
     def set_usable(self):
-        for x in Submission.objects.filter(self.user):
+        for x in Submission.objects.filter(user=self.user):
             if x != self:
                 x.usable = False
             else:
@@ -70,7 +70,7 @@ class Submission(models.Model):
 
     def save(self, *args, **kwargs):
         if self.usable:
-            for x in Submission.objects.filter(self.user):
+            for x in Submission.objects.filter(user=self.user):
                 if x != self:
                     x.usable = False
                     x.save()
@@ -103,10 +103,11 @@ class Game(models.Model):
     time_limit = models.IntegerField(default=5,)
     playing = models.BooleanField(default=False)
 
-    winner = models.CharField(max_length=1, choices=PLAYER_CHOICES, default=None)
+    winner = models.CharField(max_length=1, choices=PLAYER_CHOICES, default=None, null=True)
+    forfeit = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.black.user} (Black) vs {self.white.user} (Yourself) [{self.time_limit}s]"
+        return f"{self.black.user} (Black) vs {self.white.user} (White) [{self.time_limit}s]"
 
 
 class MoveSet(models.QuerySet):
@@ -123,7 +124,7 @@ class Move(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     player = models.CharField(max_length=1, choices=PLAYER_CHOICES)
     board = models.CharField(max_length=64, default="")
-    move = models.IntegerField(default=-1, validators=[MaxLengthValidator(64), MinValueValidator(-1)])
+    move = models.IntegerField(default=-1)
 
     def __str__(self):
         return f"{self.game}, {self.player}, {self.board}, {self.move}, {self.created_at}"

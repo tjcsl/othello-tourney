@@ -3,6 +3,8 @@ from django.urls import include, path
 
 from .apps.errors.views import *
 
+admin.site.site_header = "Othello Database Administration"
+
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("othello.apps.auth.urls", namespace="auth")),

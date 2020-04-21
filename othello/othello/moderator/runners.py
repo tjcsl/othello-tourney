@@ -95,11 +95,12 @@ class JailedRunner(LocalRunner):  # Called from subprocess, no access to django 
 
 class PlayerRunner:
 
-    def __init__(self, path, jailed_driver, debug):
+    def __init__(self, path, settings):
         self.path = path
-        self.debug = debug
-        self.jailed_driver = jailed_driver
+        self.settings = settings
         self.process = None
+
+        self.start()
 
     def __enter__(self):
         return self
@@ -108,12 +109,12 @@ class PlayerRunner:
         self.stop()
 
     def start(self):
-        cmd_args = ["python3", "-u", self.jailed_driver, self.path]
-        if self.debug:
+        cmd_args = ["python3", "-u", self.settings.JAILEDRUNNER_DRIVER, self.path]
+        if not self.settings.DEBUG:
             cmd_args = get_sandbox_args(cmd_args)
 
         self.process = subprocess.Popen(cmd_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                        bufsize=1, universal_newlines=True, cwd=os.path.dirname(self.path))
+                                        bufsize=0, universal_newlines=True, cwd=os.path.dirname(self.path))
 
     def stop(self):
         if self.process is not None:
@@ -122,9 +123,7 @@ class PlayerRunner:
 
     @capture_generator_value
     def get_move(self, board, player, time_limit):
-        data = f"{str(time_limit)}\n{player}\n{''.join(board)}\n"
-
-        self.process.stdin.write(data)
+        self.process.stdin.write(f"{str(time_limit)}\n{player}\n{''.join(board)}\n")
         self.process.stdin.flush()
 
         move = -1
@@ -137,7 +136,7 @@ class PlayerRunner:
 
             files_ready = select.select([self.process.stdout, self.process.stderr], [], [], timeout)[0]
             if self.process.stderr in files_ready:
-                yield self.process.stderr.read1(8192)
+                yield self.process.stderr.read(8192)
             if self.process.stdout in files_ready:
                 try:
                     move = int(self.process.stdout.readline())

@@ -26,8 +26,8 @@ def run_game(game_id):
 
     mod, time_limit = Moderator(), game.time_limit
 
-    with PlayerRunner(game.black.code.path, settings.JAILEDRUNNER_DRIVER, settings.DEBUG) as player_black:
-        with PlayerRunner(game.white.code.path, settings.JAILEDRUNNER_DRIVER, settings.DEBUG) as player_white:
+    with PlayerRunner(game.black.code.path, settings) as player_black:
+        with PlayerRunner(game.white.code.path, settings) as player_white:
             while not mod.is_game_over:
                 board, current_player = mod.get_game_state()
 

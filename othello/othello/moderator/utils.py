@@ -2,7 +2,6 @@ import operator
 import importlib.util
 import importlib.machinery
 
-from inspect import signature
 from functools import lru_cache, partial, reduce, wraps
 
 from .constants import *
@@ -17,17 +16,15 @@ class Generator:
         self.return_value = yield from self.gen
 
 
-def capture_generator_value(func):
-    @wraps(func)
-    def f(*args, **kwargs):
+def capture_generator_value(f):
+    @wraps(f)
+    def g(*args, **kwargs):
         return Generator(f(*args, **kwargs))
-    return f
+    return g
 
 
 def import_strategy(path):
-    strat = importlib.machinery.SourceFileLoader("strategy", path).load_module().Strategy()
-    assert len(signature(strat.best_strategy).parameters) == 4
-    return strat
+    return importlib.machinery.SourceFileLoader("strategy", path).load_module().Strategy()
 
 
 bit_or = partial(reduce, operator.__or__)
@@ -42,7 +39,7 @@ def bit_not(x):
 
 
 def binary_to_string(board):
-    return "".join(['O' if is_on(board[0], 63 - i) else 'X' if is_on(board[1], 63 - i) else '.' for i in range(64)])
+    return "".join(['o' if is_on(board[0], 63 - i) else 'x' if is_on(board[1], 63 - i) else '.' for i in range(64)])
 
 
 @lru_cache

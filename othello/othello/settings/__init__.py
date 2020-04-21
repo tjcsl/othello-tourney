@@ -152,5 +152,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "submissions")
 
 
 # Othello Settings
-JAILEDRUNNER_DRIVER = os.path.join(BASE_DIR, "moderator", "wrapper.py")
-OTHELLO_AI_RUN_COMMAND = f"python3 -u {JAILEDRUNNER_DRIVER} {'{path!r}'}"
+IMPORT_DRIVER = os.path.join(BASE_DIR, "sandboxing", "import_wrapper.py")
+
+JAILEDRUNNER_DRIVER = os.path.abspath(os.path.join(os.path.dirname(BASE_DIR), "run_ai_jailed.py"))
+
+FIREJAIL_PROFILE = os.path.join(BASE_DIR, "sandboxing", "sandbox.profile")
+
