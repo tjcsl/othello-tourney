@@ -5,7 +5,6 @@ from django.db import models
 from django.conf import settings
 from django.dispatch import receiver
 from django.db.models.signals import post_delete
-from django.core.validators import MaxLengthValidator, MinValueValidator
 
 from .storage import OverwriteStorage
 from ...moderator.moderator import Player
@@ -103,7 +102,7 @@ class Game(models.Model):
     time_limit = models.IntegerField(default=5,)
     playing = models.BooleanField(default=False)
 
-    winner = models.CharField(max_length=1, choices=PLAYER_CHOICES, default=None, null=True)
+    winner = models.CharField(max_length=1, choices=PLAYER_CHOICES, default='')
     forfeit = models.BooleanField(default=False)
 
     def __str__(self):
@@ -112,7 +111,7 @@ class Game(models.Model):
 
 class MoveSet(models.QuerySet):
 
-    def latest_move(self):
+    def latest(self):
         return self.order_by('-created_at')[0] if self.exists() else None
 
 
@@ -129,3 +128,32 @@ class Move(models.Model):
     def __str__(self):
         return f"{self.game}, {self.player}, {self.board}, {self.move}, {self.created_at}"
 
+
+class GameObjectSet(models.QuerySet):
+
+    def latest(self):
+        return self.order_by('-created_at')[0] if self.exists() else None
+
+
+class GameObject(models.Model):
+
+    manager = GameObjectSet.as_manager()
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    player = models.CharField(max_length=1, choices=PLAYER_CHOICES)
+
+    class Meta:
+        abstract = True
+
+
+class GameError(GameObject):
+
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="errors")
+    error_code = models.IntegerField(default=-1)
+    error_msg = models.CharField(max_length=10*1024, default="")
+
+
+class GameLog(GameObject):
+
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="logs")
+    message = models.CharField(max_length=10*1024, default="")
