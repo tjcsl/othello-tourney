@@ -18,7 +18,6 @@ pip install -r requirements.txt
 cp othello/othello/settings/secret.sample.py othello/othello/settings/secret.py
 
 # Setup Django DB Tables
-cd othello
 python3 manage.py migrate
 python3 manage.py loaddata othello/models/yourself.json
 python3 manage.py collectstatic --noinput
