@@ -9,11 +9,6 @@ from ...moderator import Moderator, PlayerRunner, InvalidMoveError
 
 task_logger = get_task_logger(__name__)
 
-
-def temp_logger(msg):
-    print(msg)
-
-
 def temp_error(err):
     task_logger.error(f"SERVER ERROR {err.value}")
 
@@ -39,7 +34,7 @@ def run_game(game_id):
                     running_turn = player_white.get_move(board, current_player.value, time_limit)
 
                 for log in running_turn:
-                    temp_logger(log)
+                    task_logger.error(f"LOGGGG : {log}")
                 submitted_move, error = running_turn.return_value
 
                 task_logger.error(f"SUBMITTED {submitted_move}")

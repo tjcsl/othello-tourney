@@ -13,26 +13,27 @@ from .utils import import_strategy, capture_generator_value
 
 class UserError(enum.Enum):
 
-    NO_MOVE_ERROR = (-1, "No move submitted")
-    READ_INVALID = (-2, "Submitted move is not an integer")
+    NO_MOVE_ERROR = -1#(-1, "No move submitted")
+    READ_INVALID = -2#(-2, "Submitted move is not an integer")
 
 
 class ServerError(enum.Enum):
 
-    TIMEOUT = (-3, "Timed out reading from subprocess")
-    UNEXPECTED = (-4, "Unexpected error")
+    TIMEOUT = -3#(-3, "Timed out reading from subprocess")
+    UNEXPECTED = -4#(-4, "Unexpected error")
 
 
 class HiddenPrints:
     def __init__(self, logging=False):
         self.logging = logging
-        self._original_stdout = sys.stdout
 
     def __enter__(self):
+        self._original_stdout = sys.stdout
         if self.logging:
             sys.stdout = sys.stderr
         else:
             sys.stdout = open(os.devnull, 'w')
+        return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         sys.stdout = self._original_stdout
@@ -82,13 +83,11 @@ class JailedRunner(LocalRunner):  # Called from subprocess, no access to django 
         player = stdin.readline().strip()
         board = stdin.readline().strip()
 
-        with HiddenPrints(self.logging):
-            move, err = self.get_move(board, player, time_limit)
+        move, err = self.get_move(board, player, time_limit)
 
         if err is not None:
             stderr.write(f"SERVER: {err}\n")
 
-        stderr.write("HELLOOOOOOO\n")
         stdout.write(f"{move}\n")
 
         stdout.flush()
@@ -116,7 +115,7 @@ class PlayerRunner:
             cmd_args = get_sandbox_args(cmd_args)
 
         self.process = subprocess.Popen(cmd_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                        bufsize=0, universal_newlines=True, cwd=os.path.dirname(self.path))
+                                        bufsize=0, universal_newlines=True, cwd=os.path.dirname(self.path), preexec_fn=os.setpgrp,)
 
     def stop(self):
         if self.process is not None:
@@ -127,24 +126,24 @@ class PlayerRunner:
     def get_move(self, board, player, time_limit):
         self.process.stdin.write(f"{str(time_limit)}\n{player}\n{''.join(board)}\n")
         self.process.stdin.flush()
-
         move = -1
 
         start, total_timeout = time.time(), time_limit+5
         while move == -1:
             if (timeout := total_timeout - (time.time() - start)) <= 0:
                 return -1, ServerError.TIMEOUT
-            timeout = min(timeout, total_timeout)
 
             files_ready = select.select([self.process.stdout, self.process.stderr], [], [], timeout)[0]
+            print(files_ready, self.process.stderr in files_ready, self.process.stdout in files_ready)
             if self.process.stderr in files_ready:
-                yield self.process.stderr.read(8192)
+                log = self.process.stderr.read(8192)
+                print(log)
+                yield log
             if self.process.stdout in files_ready:
                 try:
                     move = int(self.process.stdout.readline())
-                    if move == -1:
+                    if move < 0 or move >= 64:
                         return -1, UserError.NO_MOVE_ERROR
                 except ValueError:
                     return -1, UserError.READ_INVALID
-
         return move, 0
