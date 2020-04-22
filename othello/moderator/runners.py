@@ -7,20 +7,22 @@ import traceback
 import subprocess
 import multiprocessing as mp
 
+from contextlib import redirect_stdout
 from ..sandboxing import get_sandbox_args
 from .utils import import_strategy, capture_generator_value
 
 
 class UserError(enum.Enum):
 
-    NO_MOVE_ERROR = -1#(-1, "No move submitted")
-    READ_INVALID = -2#(-2, "Submitted move is not an integer")
+    NO_MOVE_ERROR = (-1, "No move submitted")
+    READ_INVALID = (-2, "Submitted move is not an integer")
 
 
 class ServerError(enum.Enum):
 
-    TIMEOUT = -3#(-3, "Timed out reading from subprocess")
-    UNEXPECTED = -4#(-4, "Unexpected error")
+    TIMEOUT = (-3, "Timed out reading from subprocess")
+    UNEXPECTED = (-4, "Unexpected error")
+    PROCESS_EXITED = (-5, "Process exited unexpectedly")
 
 
 class HiddenPrints:
@@ -43,15 +45,14 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
     def __init__(self, script_path):
         self.path = script_path
         self.strat = import_strategy(script_path)
-        self.logging = getattr(self.strat, "logging", False)
+        self.target = sys.stderr if getattr(self.strat, "logging", False) else open(os.devnull, "w")
 
     def play_wrapper(self, *game_args, pipe_to_parent):
-        with HiddenPrints(self.logging):
-            try:
-                self.strat.best_strategy(*game_args)
-                pipe_to_parent.send(None)
-            except:
-                pipe_to_parent.send(traceback.format_exc())
+        try:
+            self.strat.best_strategy(*game_args)
+            pipe_to_parent.send(None)
+        except:
+            pipe_to_parent.send(traceback.format_exc())
 
     def get_move(self, board, player, time_limit):
         best_move, is_running = mp.Value("i", -1), mp.Value("i", 1)
@@ -83,7 +84,8 @@ class JailedRunner(LocalRunner):  # Called from subprocess, no access to django 
         player = stdin.readline().strip()
         board = stdin.readline().strip()
 
-        move, err = self.get_move(board, player, time_limit)
+        with redirect_stdout(self.target):
+            move, err = self.get_move(board, player, time_limit)
 
         if err is not None:
             stderr.write(f"SERVER: {err}\n")
@@ -128,8 +130,10 @@ class PlayerRunner:
         self.process.stdin.flush()
         move = -1
 
-        start, total_timeout = time.time(), time_limit+5
+        start, total_timeout = time.time(), time_limit+10
         while move == -1:
+            if self.process.poll():
+                return -1, ServerError.PROCESS_EXITED
             if (timeout := total_timeout - (time.time() - start)) <= 0:
                 return -1, ServerError.TIMEOUT
 

@@ -28,11 +28,15 @@ def run_game(game_id):
 
                 task_logger.error(f"GAME: {str(game)} STATE: {board} {current_player.value}")
 
-                if current_player == Player.BLACK:
-                    running_turn = player_black.get_move(board, current_player.value, time_limit)
-                elif current_player == Player.WHITE:
-                    running_turn = player_white.get_move(board, current_player.value, time_limit)
+                try:
+                    if current_player == Player.BLACK:
+                        running_turn = player_black.get_move(board, current_player.value, time_limit)
+                    elif current_player == Player.WHITE:
+                        running_turn = player_white.get_move(board, current_player.value, time_limit)
+                except BaseException as e:
+                    task_logger.error(str(e))
 
+                task_logger.error(running_turn)
                 for log in running_turn:
                     task_logger.error(f"LOGGGG : {log}")
                 submitted_move, error = running_turn.return_value
