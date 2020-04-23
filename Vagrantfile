@@ -1,6 +1,6 @@
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "ubuntu/bionic64"
+  config.vm.box = "ubuntu/focal64"
 
   config.vm.network "forwarded_port", guest: 8000, host: 8000
   config.vm.network "forwarded_port", guest: 6379, host: 6379
@@ -21,8 +21,6 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder ".", "/home/vagrant/othello"
 
   config.vm.provision "shell", path: "config/vagrant/provision_vagrant.sh"
-  config.vm.provision "shell", path: "config/vagrant/install_pyenv.sh", privileged: false
-  config.vm.provision "shell", path: "config/vagrant/setup_project.sh", privileged: false
   config.vm.provision "docker" do |d|
     d.run "redis", image: "redis:5", args: "-p 6379:6379", daemonize: true
   end
