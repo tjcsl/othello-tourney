@@ -9,6 +9,7 @@ from ...moderator import Moderator, PlayerRunner, InvalidMoveError
 
 task_logger = get_task_logger(__name__)
 
+
 def temp_error(err):
     task_logger.error(f"SERVER ERROR {err.value}")
 
@@ -25,8 +26,6 @@ def run_game(game_id):
         with PlayerRunner(game.white.code.path, settings) as player_white:
             while not mod.is_game_over:
                 board, current_player = mod.get_game_state()
-
-                task_logger.error(f"GAME: {str(game)} STATE: {board} {current_player.value}")
 
                 try:
                     if current_player == Player.BLACK:

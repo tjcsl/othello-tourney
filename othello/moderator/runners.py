@@ -25,7 +25,7 @@ class ServerError(enum.Enum):
     PROCESS_EXITED = (-5, "Process exited unexpectedly")
 
 
-class HiddenPrints:
+class PrintLogger:
     def __init__(self, logging=False):
         self.logging = logging
 
@@ -45,7 +45,7 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
     def __init__(self, script_path):
         self.path = script_path
         self.strat = import_strategy(script_path)
-        self.target = sys.stderr if getattr(self.strat, "logging", False) else open(os.devnull, "w")
+        self.logging = getattr(self.strat, "logging", False)
 
     def play_wrapper(self, *game_args, pipe_to_parent):
         try:
@@ -84,7 +84,7 @@ class JailedRunner(LocalRunner):  # Called from subprocess, no access to django 
         player = stdin.readline().strip()
         board = stdin.readline().strip()
 
-        with redirect_stdout(self.target):
+        with PrintLogger(self.logging):
             move, err = self.get_move(board, player, time_limit)
 
         if err is not None:
@@ -117,7 +117,7 @@ class PlayerRunner:
             cmd_args = get_sandbox_args(cmd_args)
 
         self.process = subprocess.Popen(cmd_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                        bufsize=0, universal_newlines=True, cwd=os.path.dirname(self.path), preexec_fn=os.setpgrp,)
+                                        bufsize=0, cwd=os.path.dirname(self.path), preexec_fn=os.setpgrp,)
 
     def stop(self):
         if self.process is not None:
@@ -126,7 +126,7 @@ class PlayerRunner:
 
     @capture_generator_value
     def get_move(self, board, player, time_limit):
-        self.process.stdin.write(f"{str(time_limit)}\n{player}\n{''.join(board)}\n")
+        self.process.stdin.write(f"{str(time_limit)}\n{player}\n{''.join(board)}\n".encode("latin-1"))
         self.process.stdin.flush()
         move = -1
 
@@ -138,11 +138,8 @@ class PlayerRunner:
                 return -1, ServerError.TIMEOUT
 
             files_ready = select.select([self.process.stdout, self.process.stderr], [], [], timeout)[0]
-            print(files_ready, self.process.stderr in files_ready, self.process.stdout in files_ready)
             if self.process.stderr in files_ready:
-                log = self.process.stderr.read(8192)
-                print(log)
-                yield log
+                yield self.process.stderr.read(8192).decode("latin-1")
             if self.process.stdout in files_ready:
                 try:
                     move = int(self.process.stdout.readline())
