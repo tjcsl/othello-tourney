@@ -29,32 +29,30 @@ class GameConsumer(JsonWebsocketConsumer):
         self.accept()
 
         async_to_sync(self.channel_layer.group_add)(
-            self.game.channels_group_name(), self.channel_name
+            self.game.channels_group_name, self.channel_name
         )
 
     def disconnect(self, code):
         self.connected = False
 
-    def game_update(self):
+    def game_update(self, event):
         self.update_game()
 
-    def game_log(self):
+    def game_log(self, event):
         self.send_log()
 
-    def game_error(self):
+    def game_error(self, event):
         self.send_error()
 
     def update_game(self):
         if self.connected:
             self.game.refresh_from_db()
-            self.send(serialize_game_info(self.game))
+            self.send_json(serialize_game_info(self.game))
 
     def send_log(self):
         if self.connected:
-            self.game.logs.refresh_from_db()
-            self.send(serialize_game_log(self.game.logs.latest()))
+            self.send_json(serialize_game_log(self.game.logs.latest()))
 
     def send_error(self):
         if self.connected:
-            self.game.errors.refresh_from_db()
-            self.send(serialize_game_error(self.game.errors.latest()))
+            self.send_json(serialize_game_error(self.game.errors.latest()))

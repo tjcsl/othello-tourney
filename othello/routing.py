@@ -4,6 +4,8 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 
 from django.urls import path
 
+from .apps.games.consumers import GameConsumer
+
 
 class WebsocketCloseConsumer(WebsocketConsumer):
     def connect(self):
@@ -17,14 +19,17 @@ class WebsocketCloseConsumer(WebsocketConsumer):
         pass
 
 
-application = ProtocolTypeRouter({
-    'websocket': AuthMiddlewareStack(
-        URLRouter(
-            [
-                path('ws/play/<int:game_id>', consumers.GameConsumer),
-                path('ws/watch/<int:game_id>', consumers.GameConsumer),
-                path('<path:path>', WebsocketCloseConsumer)
-            ]
+application = ProtocolTypeRouter(
+    {
+        "websocket": AuthMiddlewareStack(
+            URLRouter(
+                [
+                    path("play/<int:game_id>", GameConsumer),
+                    path("watch/<int:game_id>", GameConsumer),
+                    path("<path:path>", WebsocketCloseConsumer),
+                ]
+            )
         )
-    ),
-})
+    }
+)
+

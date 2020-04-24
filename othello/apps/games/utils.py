@@ -1,8 +1,7 @@
-import json
-
 
 def serialize_game_info(game):
     data = {
+        "type": "game.update",
         "id": game.id,
         "game_over": not game.playing,
         "black": game.black.get_user_name(),
@@ -26,16 +25,18 @@ def serialize_game_info(game):
 
 def serialize_game_log(log):
     data = {
+        "type": "game.log",
         "player": log.player,
         "message": log.message
     }
-    return json.dumps(data)
+    return data
 
 
 def serialize_game_error(error):
     data = {
+        "type": "game.error",
         "player": error.player,
         "code": error.error_code,
         "message": error.error_msg
     }
-    return json.dumps(data)
+    return data

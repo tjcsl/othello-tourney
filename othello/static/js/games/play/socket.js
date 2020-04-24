@@ -1,9 +1,9 @@
 const PROTOCOL = window.location.protocol === "https:" ? "wss" : "ws";
-const PATH = `${PROTOCOL}://${window.location.host}/ws`;
+const PATH = `${PROTOCOL}://${window.location.host}`;
 
 
 function add_listeners(socket){
-    let rCanvas = init("Yourself", "Yourself", 0,0);
+    let rCanvas = init(game.black, game.white, 0,0);
 
     window.addEventListener('resize', () => { // Makes board reactive to browser size changes
         rCanvas.resize();
@@ -27,13 +27,15 @@ function add_listeners(socket){
     };
 
     socket.onmessage = function (message) {
-        console.log("received websocket message", message.data);
         let data = JSON.parse(message.data);
-        console.log(data);
+        console.log(`NEW DATA ${data}, ${data.type}`);
         switch(data.type){
-            case 'log':
+            case 'game.log':
                 console.log(data.message);
                 break;
+            case 'game.update':
+                console.log(`STATE: ${data.board}, ${data.game_over}, ${JSON.stringify(data.new_move)}`);
+                break
             default:
                 console.error(`Invalid message type: ${data.type}`);
                 return;
@@ -45,6 +47,6 @@ function add_listeners(socket){
 window.onload = function () {
     on_load();
     let socket;
-    socket = is_watching ? new WebSocket(`${PATH}/watch/${game.id}/`) : new WebSocket(`${PATH}/play/${game.id}/`);
+    socket = is_watching ? new WebSocket(`${PATH}/watch/${game.id}`) : new WebSocket(`${PATH}/play/${game.id}`);
     add_listeners(socket);
 };

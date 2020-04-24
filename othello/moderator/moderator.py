@@ -16,11 +16,11 @@ PLAYERS = {
 
 class InvalidMoveError(RuntimeError):
     def __init__(self, board, player, move):
-        self.player, self.move = player, move
-        self.board = utils.binary_to_string(board)
+        self.code = -3
+        self.message = f"{move} is invalid for {PLAYERS[player].value} on {utils.binary_to_string(board)}"
 
     def __str__(self):
-        return f"{self.move} is invalid for {PLAYERS[self.player].value} on {self.board}"
+        return self.message
 
 
 class Moderator:
@@ -31,6 +31,9 @@ class Moderator:
 
     def is_game_over(self):
         return self.game_over
+
+    def get_board(self):
+        return utils.binary_to_string(self.board)
 
     def possible_moves(self):
         discriminator = utils.FULL_BOARD ^ (self.board[self.current_player] | self.board[1 ^ self.current_player])
