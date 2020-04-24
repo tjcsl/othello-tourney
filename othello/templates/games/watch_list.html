@@ -1,15 +1,18 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load static %}
 {% block title %}Othello: Watch{% endblock %}
+
 {% block head %}
     <link rel="stylesheet" href="{% static 'css/games/play/design.css' %}">
     <script type="text/javascript" src="{% static 'js/games/play/design.js' %}"></script>
 {% endblock %}
 
 {% block main %}
-    <form action="{% url 'games:watch' %}" method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Submit">
-    </form>
+    <div class="container-fluid centered">
+        <div class="playform align-content-center">
+            {% for game in games %}
+                <a href="{% url 'games:watch' game_id=game.id %}">{{ game }}</a>
+            {% endfor %}
+        </div>
+    </div>
 {% endblock %}

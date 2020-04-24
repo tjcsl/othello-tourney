@@ -69,3 +69,12 @@ def fill(current, opponent, direction):
     w |= ((w & mask) >> direction) & opponent
     w |= ((w & mask) >> direction) & opponent
     return (w & mask) >> direction
+
+
+def possible_set(possible):
+    p_s = []
+    while possible:
+        b = -possible & possible
+        p_s.append(POS[b])
+        possible -= b
+    return p_s

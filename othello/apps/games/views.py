@@ -1,12 +1,12 @@
 from django.contrib import messages
 from django.http import FileResponse
-from django.shortcuts import render, redirect
-from django.forms.models import model_to_dict
 from django.views.generic.edit import View
+from django.shortcuts import render, redirect
 
 from .tasks import run_game
 from .models import Game, Submission
-from .forms import SubmissionForm, GameForm, WatchForm, ChangeSubmissionForm
+from .utils import serialize_game_info
+from .forms import SubmissionForm, GameForm, ChangeSubmissionForm
 
 
 class UploadView(View):
@@ -82,20 +82,20 @@ def play(request):
         form = GameForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            g, created = Game.objects.get_or_create(
+            g = Game.objects.create(
                 black=cd['black'],
                 white=cd['white'],
                 time_limit=cd['time_limit'],
                 playing=True
             )
             run_game.delay(g.id)
-            return render(request, "games/play.html", {'game': model_to_dict(g), 'is_watching': False})
+            return render(request, "games/play.html", {'game': serialize_game_info(g), 'is_watching': False})
         else:
             messages.error(request, "Unable to start game, try again later", extra_tags="danger")
     return render(request, "games/design.html", {'form': GameForm()})
 
 
-def watch(request):
-    if request.method == "POST":
-        return render(request, "games/watch.html")
-    return render(request, "games/watch_list.html", {'form': WatchForm()})
+def watch(request, game_id=False):
+    if game_id:
+        return render(request, "games/watch.html", {'game': serialize_game_info(Game.objects.get(id=game_id)), 'is_watching': True})
+    return render(request, "games/watch_list.html", {'games': Game.objects.running()})

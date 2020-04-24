@@ -3,19 +3,25 @@ import json
 
 def serialize_game_info(game):
     data = {
+        "id": game.id,
         "game_over": not game.playing,
         "black": game.black.get_user_name(),
         "white": game.white.get_user_name(),
         "board": game.board,
-        "winner": game.winner,
+        "outcome": game.outcome,
         "forfeit": game.forfeit
     }
     if move := game.moves.latest():
-        data['new_move'] = {"tile": move.move, "player": move.player}
+        data['new_move'] = {
+            "tile": move.move,
+            "player": move.player,
+            "flipped": move.flipped,
+            "possible": move.possible,
+        }
     else:
         data['new_move'] = None
 
-    return json.dumps(data)
+    return data
 
 
 def serialize_game_log(log):

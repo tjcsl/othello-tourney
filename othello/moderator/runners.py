@@ -7,7 +7,6 @@ import traceback
 import subprocess
 import multiprocessing as mp
 
-from contextlib import redirect_stdout
 from ..sandboxing import get_sandbox_args
 from .utils import import_strategy, capture_generator_value
 
@@ -98,10 +97,10 @@ class JailedRunner(LocalRunner):  # Called from subprocess, no access to django 
 
 class PlayerRunner:
 
-    def __init__(self, path, settings):
+    def __init__(self, path, driver, debug):
         self.path = path
-        self.settings = settings
         self.process = None
+        self.driver, self.debug = driver, debug
 
         self.start()
 
@@ -112,8 +111,8 @@ class PlayerRunner:
         self.stop()
 
     def start(self):
-        cmd_args = ["python3", "-u", self.settings.JAILEDRUNNER_DRIVER, self.path]
-        if not self.settings.DEBUG:
+        cmd_args = ["python3", "-u", self.driver, self.path]
+        if not self.debug:
             cmd_args = get_sandbox_args(cmd_args)
 
         self.process = subprocess.Popen(cmd_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,

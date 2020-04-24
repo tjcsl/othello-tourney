@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from django.shortcuts import render
 
 
@@ -14,6 +14,7 @@ def default(request):
 
 urlpatterns = [
     path("play/", views.play, name="play"),
+    path("watch/<int:game_id>", views.watch, name="watch"),
     path("watch/", views.watch, name="watch"),
     path("upload/", login_required(views.UploadView.as_view()), name="upload"),
     path("about/", default, name="about"),

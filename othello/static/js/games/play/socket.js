@@ -45,6 +45,6 @@ function add_listeners(socket){
 window.onload = function () {
     on_load();
     let socket;
-    socket = new WebSocket(`${PATH}/play/${game.id}/`);
+    socket = is_watching ? new WebSocket(`${PATH}/watch/${game.id}/`) : new WebSocket(`${PATH}/play/${game.id}/`);
     add_listeners(socket);
 };

@@ -3,8 +3,7 @@ import uuid
 
 from django.db import models
 from django.conf import settings
-from django.dispatch import receiver
-from django.db.models.signals import post_delete
+from django.contrib.postgres.fields import ArrayField
 
 from .storage import OverwriteStorage
 from ...moderator.moderator import Player
@@ -83,11 +82,6 @@ class Submission(models.Model):
         return f"{self.get_user_name()}: {self.get_submission_name()}"
 
 
-@receiver(post_delete, sender=Submission)
-def delete_submission_file(sender, instance, using, **kwargs):
-    instance.code.delete()
-
-
 class GameSet(models.QuerySet):
 
     def running(self):
@@ -107,6 +101,7 @@ class Game(models.Model):
     black = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="black")
     white = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="white")
     time_limit = models.IntegerField(default=5,)
+    board = models.CharField(max_length=64, default="...........................ox......xo...........................")
     playing = models.BooleanField(default=False)
 
     forfeit = models.BooleanField(default=False)
@@ -129,8 +124,10 @@ class Move(models.Model):
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="moves")
     created_at = models.DateTimeField(auto_now_add=True)
     player = models.CharField(max_length=1, choices=PLAYER_CHOICES)
-    board = models.CharField(max_length=64, default="")
     move = models.IntegerField(default=-1)
+
+    flipped = ArrayField(models.IntegerField(default=-1), default=list)
+    possible = ArrayField(models.IntegerField(default=-1), default=list)
 
     def __str__(self):
         return f"{self.game}, {self.player}, {self.board}, {self.move}, {self.created_at}"
