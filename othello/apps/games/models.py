@@ -107,6 +107,10 @@ class Game(models.Model):
     forfeit = models.BooleanField(default=False)
     outcome = models.CharField(max_length=1, choices=OUTCOME_CHOICES, default='')
 
+    @property
+    def channels_group_name(self):
+        return f"game-{self.id}"
+
     def __str__(self):
         return f"{self.black.user} (Black) vs {self.white.user} (White) [{self.time_limit}s]"
 
