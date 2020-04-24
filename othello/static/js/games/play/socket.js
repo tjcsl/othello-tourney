@@ -31,7 +31,7 @@ function add_listeners(socket){
         console.log(`NEW DATA ${data}, ${data.type}`);
         switch(data.type){
             case 'game.log':
-                console.log(data.message);
+                console.log(`LOG: ${data.message}`);
                 break;
             case 'game.update':
                 console.log(`STATE: ${data.board}, ${data.game_over}, ${JSON.stringify(data.new_move)}`);

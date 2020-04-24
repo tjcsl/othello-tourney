@@ -1,8 +1,9 @@
+from time import sleep
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 
-from .models import Game
 from .utils import *
+from .models import Game
 
 
 class GameConsumer(JsonWebsocketConsumer):
@@ -34,6 +35,8 @@ class GameConsumer(JsonWebsocketConsumer):
 
     def disconnect(self, code):
         self.connected = False
+        super().disconnect(code=code)
+        self.close()
 
     def game_update(self, event):
         self.update_game()
@@ -47,7 +50,10 @@ class GameConsumer(JsonWebsocketConsumer):
     def update_game(self):
         if self.connected:
             self.game.refresh_from_db()
-            self.send_json(serialize_game_info(self.game))
+            self.send_json(game := serialize_game_info(self.game))
+            if game['game_over']:
+                sleep(0.5)
+                self.disconnect(code=0)
 
     def send_log(self):
         if self.connected:

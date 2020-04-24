@@ -73,8 +73,9 @@ def run_game(game_id):
                         flipped, possible = submitted
                     else:
                         game.forfeit, game.playing = False, False
+                        game.board = mod.get_board()
                         game.outcome = current_player.value
-                        game.save(update_fields=["forfeit", "outcome", "playing"])
+                        game.save(update_fields=["board", "forfeit", "outcome", "playing"])
                         send_through_socket(game, "game.update")
                         task_logger.error("GAME OVER")
                         break
