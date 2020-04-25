@@ -1,9 +1,15 @@
 .gameContainer {
     display: flex;
     flex-direction: row;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     justify-content: center;
     align-items: flex-start;
+}
+
+@media (max-width: 1200px) {
+    .gameContainer {
+        flex-direction: column;
+    }
 }
 
 .gameContainer-left {
@@ -20,14 +26,15 @@
 
 div#player-score-box {
     background-color: #805229;
+    word-break: break-word;
 }
 
 p {
     display: block;
     margin-block-start: 1em;
     margin-block-end: 1em;
-    margin-inline-start: 0px;
-    margin-inline-end: 0px;
+    margin-inline-start: 0;
+    margin-inline-end: 0;
 }
 
 p.player-score {
@@ -112,5 +119,5 @@ pre {
     display: block;
     font-family: monospace;
     white-space: pre;
-    margin: 1em 0px;
+    margin: 1em 0;
 }

@@ -3,10 +3,10 @@
 
 {% block head %}
     <link rel="stylesheet" href="{% static 'css/games/base.css' %}">
-    <script type="text/javascript" src="{% static 'js/games/base.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/play/canvas.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/play/othello.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/play/board.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/games/base.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/play/socket.js' %}"></script>
     {% block extra_head %}{% endblock %}
 {% endblock %}
@@ -14,7 +14,8 @@
 
 {% block main %}
     <div class="gameContainer" id="gameContainer">
-        <div class="gameContainer-left">
+        <div class="gameContainer-left" id="black-logs">
+            black logs
         </div>
         <div class="gameContainer-center">
             <div class="canvasContainer">
@@ -28,11 +29,11 @@
                 </div>
             </div>
             <div class="downloadHistory">
-                <button type="button" data-toggle="modal" data-target="#downloadModal">Download Game</button>
+                <button id="downloadHistoryButton" type="button" data-toggle="modal" data-target="#downloadModal">Download Game</button>
             </div>
         </div>
-        <div class="gameContainer-right">
-            <code class="log"><pre id="err_log"></pre></code>
+        <div class="gameContainer-right" id="white-logs">
+            <code class="log"><pre id="err_log">white logs</pre></code>
         </div>
     </div>
     <div class="modal fade" id="downloadModal">
@@ -49,14 +50,14 @@
                                 <label for="pretty">Pretty</label>
                                 <button id="pretty_download" class="download_history">Download</button>
                             </h4>
-                                <textarea disabled></textarea>
+                                <textarea id="prettyHistory" disabled></textarea>
                         </div>
                         <div class="column" id="input_parseable">
                             <h4>
                                 <label for="parseable">Parseable</label>
                                 <button id="parseable_download" class="download_history">Download</button>
                             </h4>
-                                <textarea disabled></textarea>
+                                <textarea id="parseableHistory" disabled></textarea>
                         </div>
                     </div>
                 </div>

@@ -29,4 +29,10 @@ function on_load() {
                 $(this).find("label").css({"text-decoration": "none"});
             }
         );
+
+    $("#downloadHistoryButton")
+        .click(function () {
+            $("#prettyHistory").text(generate_pretty_history());
+            $("#parseableHistory").text(generate_parseable_history());
+        })
 }

@@ -272,3 +272,11 @@ function place_stone(rCanvas, event){
         }
     }
 }
+
+function generate_pretty_history() {
+    return "pretty history"
+}
+
+function generate_parseable_history() {
+    return "parsable history"
+}
