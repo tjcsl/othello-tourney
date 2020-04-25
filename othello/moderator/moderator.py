@@ -83,7 +83,7 @@ class Moderator:
         if not self.possible_moves():
             self.current_player = 1 ^ self.current_player
 
-        return utils.possible_set(self.possible_moves()), flipped
+        return list(utils.isolate_bits(self.possible_moves())), flipped
 
     def get_game_state(self):
         return utils.binary_to_string(self.board), PLAYERS[self.current_player]

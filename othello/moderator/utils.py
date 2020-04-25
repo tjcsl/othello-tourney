@@ -71,10 +71,8 @@ def fill(current, opponent, direction):
     return (w & mask) >> direction
 
 
-def possible_set(possible):
-    p_s = []
-    while possible:
-        b = -possible & possible
-        p_s.append(POS[b])
-        possible -= b
-    return p_s
+def isolate_bits(x):
+    while x:
+        b = -x & x
+        yield POS[b]
+        x -= b
