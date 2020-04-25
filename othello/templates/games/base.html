@@ -15,7 +15,7 @@
 {% block main %}
     <div class="gameContainer" id="gameContainer">
         <div class="gameContainer-left" id="black-logs">
-            black logs
+            <textarea id="black-logs-area" class="area-log" disabled></textarea>
         </div>
         <div class="gameContainer-center">
             <div class="canvasContainer">
@@ -33,7 +33,7 @@
             </div>
         </div>
         <div class="gameContainer-right" id="white-logs">
-            <code class="log"><pre id="err_log">white logs</pre></code>
+            <textarea id="white-logs-area" class="area-log" disabled></textarea>
         </div>
     </div>
     <div class="modal fade" id="downloadModal">
