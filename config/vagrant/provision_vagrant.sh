@@ -38,7 +38,7 @@ cd othello
 python3 -m venv venv
 source ./venv/bin/activate
 pip install -r requirements.txt
-cp othello/settings/secret.sample.py othello/settings/secret.py
+cp -n othello/settings/secret.sample.py othello/settings/secret.py
 
 # Setup Django DB Tables
 python3 manage.py migrate
