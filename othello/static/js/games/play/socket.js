@@ -19,9 +19,6 @@ function add_listeners(socket){
             rCanvas.lastClicked = -1;
             place_stone(rCanvas, event);
         });
-        rCanvas.black_name = game.black;
-        rCanvas.white_name = game.white;
-        drawBoard(rCanvas, DIMENSION, rCanvas.board, BLACK_NM, rCanvas.animArray);
     };
 
     socket.onclose = function () {
@@ -31,8 +28,13 @@ function add_listeners(socket){
 
     socket.onmessage = function (message) {
         let data = JSON.parse(message.data);
-        console.log(`NEW DATA ${data}, ${data.type}`);
         switch(data.type){
+            case 'game.start':
+                console.log("starting game");
+                rCanvas.black_name = game.black;
+                rCanvas.white_name = game.white;
+                drawBoard(rCanvas, data.board, data.possible, BLACK_NM, rCanvas.animArray);
+                break;
             case 'game.log':
                 console.log(`LOG: ${data.message}`);
                 break;

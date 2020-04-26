@@ -95,13 +95,14 @@ class Game(models.Model):
         (Player.WHITE.value, "White"),
         ('T', "Tie")
     )
+    INITIAL_BOARD = "...........................ox......xo..........................."
 
     objects = GameSet.as_manager()
 
     black = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="black")
     white = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="white")
     time_limit = models.IntegerField(default=5,)
-    board = models.CharField(max_length=64, default="...........................ox......xo...........................")
+    board = models.CharField(max_length=64, default=INITIAL_BOARD)
     playing = models.BooleanField(default=False)
 
     forfeit = models.BooleanField(default=False)
@@ -134,7 +135,7 @@ class Move(models.Model):
     possible = ArrayField(models.IntegerField(default=-1), default=list)
 
     def __str__(self):
-        return f"{self.game}, {self.player}, {self.board}, {self.move}, {self.created_at}"
+        return f"{self.game}, {self.player}, {self.move}, {self.created_at}"
 
 
 class GameObjectSet(models.QuerySet):

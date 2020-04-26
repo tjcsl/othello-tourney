@@ -2,7 +2,9 @@ import os
 import sys
 import enum
 import time
+import psutil
 import select
+import signal
 import traceback
 import subprocess
 import multiprocessing as mp
@@ -108,7 +110,18 @@ class PlayerRunner:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.stop()
+        if self.process is not None:
+            children = psutil.Process(self.process.pid).children(recursive=True)
+            try:
+                os.killpg(self.process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                self.process.kill()
+            for child in children:
+                try:
+                    child.kill()
+                except psutil.NoSuchProcess:
+                    pass
+            self.process = None
 
     def start(self):
         cmd_args = ["python3", "-u", self.driver, self.path]
@@ -117,11 +130,6 @@ class PlayerRunner:
 
         self.process = subprocess.Popen(cmd_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                         bufsize=0, cwd=os.path.dirname(self.path), preexec_fn=os.setpgrp,)
-
-    def stop(self):
-        if self.process is not None:
-            self.process.kill()
-            self.process = None
 
     @capture_generator_value
     def get_move(self, board, player, time_limit):

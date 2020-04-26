@@ -1,14 +1,12 @@
 const DIMENSION = 8;
 
-const EMPTY_NM = 0;
-const WHITE_NM = 1;
-const BLACK_NM = 2;
+const WHITE_NM = 0;
+const BLACK_NM = 1;
 
 // (need to be the same characters as used by the server)
 const EMPTY_CH = '.';
 const WHITE_CH = 'o';
-const BLACK_CH = '@';
-const OUTER_CH = '?';
+const BLACK_CH = 'x';
 
 // CO = "color"
 const EMPTY_CO = '#117711';
@@ -38,15 +36,6 @@ for (let i = 0; i < 20; i++) {
   STONE_IMAGES[i].src = `/static/img/stones/${i}.png`;
 }
 
-// Create lookup dictionaries for easy conversion later one
-const CH2NM = {
-    EMPTY_CH: EMPTY_NM,
-    WHITE_CH: WHITE_NM,
-    BLACK_CH: BLACK_NM,
-};
-const NM2CO = [EMPTY_CO, WHITE_CO, BLACK_CO];
-
-
 HISTORY = [];
 let RCANVAS;
 
@@ -74,19 +63,19 @@ function init(black, white, timelimit, watching) {
     rCanvas.imgBoard = [];
     rCanvas.animArray = [];
     for (let i=0; i<DIMENSION*DIMENSION; i++) {
-        rCanvas.board[i] = 0;
-        rCanvas.animArray[i] = 0;
+        rCanvas.board[i] = EMPTY_CH;
+        rCanvas.animArray[i] = EMPTY_CH;
     }
     rCanvas.lBSize = 0;
 
     rCanvas.black_name = `Loading ${black}...`;
     rCanvas.white_name = `Loading ${white}...`;
-    drawBoard(rCanvas, DIMENSION, rCanvas.board, BLACK_NM, rCanvas.animArray);
+    drawBoard(rCanvas, rCanvas.board, [], BLACK_NM, rCanvas.animArray);
 
     return rCanvas;
 }
 
-function drawBoard(rCanvas, board_array, tomove, anim_array) {
+function drawBoard(rCanvas, board_array, possible, tomove, anim_array) {
     console.log("drawing board", tomove);
 
     let row_col_position = Math.min(rCanvas.rWidth, rCanvas.rHeight);
@@ -104,7 +93,7 @@ function drawBoard(rCanvas, board_array, tomove, anim_array) {
     rCanvas.add(rCanvas.lastmove);
 
     addPieces(rCanvas, board_array, border_and_square, border, square, anim_array);
-    addPossibleMoves(rCanvas, board_array, tomove, border_and_square, border, square);
+    addPossibleMoves(rCanvas, possible, border_and_square, border, square);
     rCanvas.add(rCanvas.select);
 
     let counts = countPieces(DIMENSION, board_array);
@@ -132,51 +121,42 @@ function addTiles(rCanvas, bSize, bArray, b_and_s, border, square) {
 
 
 function addPieces(rCanvas, board_array, b_and_s, border, square, animArray) {
-  if (DIMENSION !== rCanvas.lBSize) {
-    rCanvas.imgBoard = [];
-  }
-  for(let y=0; y<DIMENSION; y++){
-    for(let x=0; x<DIMENSION; x++){
-        let index = DIMENSION * y + x;
-        if (DIMENSION !== rCanvas.lBSize) {
-          rCanvas.imgBoard[index] = new RImg(b_and_s * x + border, b_and_s * y + border, square, square, EMPTY_CO, false);
-      }
-      if (rCanvas.board[index] === EMPTY_NM && board_array[index] === WHITE_NM) {
-        animArray[index] = 19; //set anim to full white if piece was just placed (otherwise it would defualt to 0 and flip)
-      }
+    if (DIMENSION !== rCanvas.lBSize) {
+        rCanvas.imgBoard = [];
+        }
+    for(let y=0; y<DIMENSION; y++){
+        for(let x=0; x<DIMENSION; x++){
+            let index = DIMENSION * y + x;
+            console.log(board_array[index])
+            if (DIMENSION !== rCanvas.lBSize) {
+                rCanvas.imgBoard[index] = new RImg(b_and_s * x + border, b_and_s * y + border, square, square, EMPTY_CO, false);
+            }
+            if (rCanvas.board[index] === EMPTY_CH && board_array[index] === WHITE_CH) {
+                animArray[index] = 19; //set anim to full white if piece was just placed (otherwise it would defualt to 0 and flip)
+            }else if(rCanvas.board[index] === EMPTY_CH && board_array[index] === BLACK_CH){
+                animArray[index] = 2;
+            }
 
-      if (board_array[index] === WHITE_NM || board_array[index] === BLACK_NM) {
-        rCanvas.imgBoard[index].image = STONE_IMAGES[animArray[index]];
-        rCanvas.imgBoard[index].shadow =  true;
-      } else if (board_array[index] === EMPTY_NM) {
-        rCanvas.imgBoard[index].image = undefined; //TILE_IMG; //tile image doesn't match board
-        rCanvas.imgBoard[index].shadow =  false;
-      }
+            if (board_array[index] === WHITE_CH || board_array[index] === BLACK_CH) {
+                rCanvas.imgBoard[index].image = STONE_IMAGES[animArray[index]];
+                rCanvas.imgBoard[index].shadow =  true;
+            } else if (board_array[index] === EMPTY_CH) {
+                rCanvas.imgBoard[index].image = undefined; //TILE_IMG; //tile image doesn't match board
+                rCanvas.imgBoard[index].shadow =  false;
+            }
 
-      rCanvas.board[index] = board_array[index];
-      rCanvas.add(rCanvas.imgBoard[index]);
+            rCanvas.board[index] = board_array[index];
+            rCanvas.add(rCanvas.imgBoard[index]);
+        }
     }
-  }
 }
 
-function addPossibleMoves(rCanvas, board_array, tomove, b_and_s, border, square) {
-  for (var y=0; y<DIMENSION; y++) {
-    for (var x=0; x<DIMENSION; x++) {
-      if (getSpot(x, y, board_array, DIMENSION) === EMPTY_NM) {
-          let badspot = true;
-          for (let dy=-1; dy<2 && badspot; dy++) {
-          for (let dx=-1; dx<2 && badspot; dx++) {
-            if (!(dx === 0 && dy === 0) && findBracket(x, y, tomove, board_array, DIMENSION, dx, dy).good) {
-              badspot = false;
-            }
-          }
-        }
-        if (!badspot) {
-          rCanvas.add(new RRect(b_and_s*x+border, b_and_s*y+border, square, square, GOODMOVE_CO, 0.4));
-        }
-      }
-    }
-  }
+function addPossibleMoves(rCanvas, possible, b_and_s, border, square) {
+    possible.forEach((index) => {
+        let x = Math.trunc(index/DIMENSION),
+            y = index % DIMENSION;
+        rCanvas.add(new RRect(b_and_s*x+border, b_and_s*y+border, square, square, GOODMOVE_CO, 0.4));
+    });
 }
 
 
@@ -209,12 +189,12 @@ function startAnimation(rCanvas, animArray) {
     let stable = true;
 
     for (let i=0; i<rCanvas.lBSize*rCanvas.lBSize; i++) {
-      if (rCanvas.board[i] === BLACK_NM && animArray[i] > 0) {
+      if (rCanvas.board[i] === BLACK_CH && animArray[i] > 0) {
         animArray[i] -= 1;
         rCanvas.imgBoard[i].image = STONE_IMAGES[animArray[i]];
         stable = false;
       }
-      else if (rCanvas.board[i] === WHITE_NM && animArray[i] < 19) {
+      else if (rCanvas.board[i] === WHITE_CH && animArray[i] < 19) {
         animArray[i] += 1;
         rCanvas.imgBoard[i].image = STONE_IMAGES[animArray[i]];
         stable = false;
@@ -254,7 +234,7 @@ function place_stone(rCanvas, event){
     }
     if (olc === -1) {
         console.log('touched spot ' + rCanvas.lastClicked);
-        let resultGood = rCanvas.board[cy * rCanvas.lBSize + cx] === EMPTY_NM && makeFlips(cx, cy, rCanvas, rCanvas.lBSize, rCanvas.board, rCanvas.tomove);
+        let resultGood = rCanvas.board[cy * rCanvas.lBSize + cx] === EMPTY_CH && makeFlips(cx, cy, rCanvas, rCanvas.lBSize, rCanvas.board, rCanvas.tomove);
         if (resultGood) {
             rCanvas.lastmove.x = rCanvas.border_and_square * cx + rCanvas.border;
             rCanvas.lastmove.y = rCanvas.border_and_square * cy + rCanvas.border;

@@ -13,17 +13,13 @@ class GameConsumer(JsonWebsocketConsumer):
         self.connected = False
 
     def connect(self):
-        game_id = self.scope["url_route"]["kwargs"]["game_id"]
-
         try:
-            self.game = Game.objects.get(id=game_id)
+            self.game = Game.objects.get(id=self.scope["url_route"]["kwargs"]["game_id"])
         except Game.DoesNotExist:
-            self.close()
-            return
+            return self.close()
 
         if not self.game.playing:
-            self.close()
-            return
+            return self.close()
 
         self.connected = True
         self.accept()
@@ -31,11 +27,22 @@ class GameConsumer(JsonWebsocketConsumer):
         async_to_sync(self.channel_layer.group_add)(
             self.game.channels_group_name, self.channel_name
         )
+        async_to_sync(self.channel_layer.group_send)(
+            self.game.channels_group_name, {"type": "game.start"}
+        )
 
     def disconnect(self, code):
         self.connected = False
         super().disconnect(code=code)
         self.close()
+
+    def game_start(self, event):
+        if self.connected:
+            self.send_json({
+                "type": "game.start",
+                "board": [*Game.INITIAL_BOARD],
+                "possible": [26, 19, 44, 37]
+            })
 
     def game_update(self, event):
         self.update_game()
@@ -56,7 +63,10 @@ class GameConsumer(JsonWebsocketConsumer):
 
     def send_log(self):
         if self.connected:
-            self.send_json(serialize_game_log(self.game.logs.latest()))
+            log = self.game.logs.latest()
+            has_access = log.game.black.user == self.scope["user"] if log.player == "Black" else log.game.white.user == self.scope["user"]
+            if has_access:
+                self.send_json(serialize_game_log(log))
 
     def send_error(self):
         if self.connected:

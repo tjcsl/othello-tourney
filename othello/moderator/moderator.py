@@ -35,6 +35,12 @@ class Moderator:
     def get_board(self):
         return utils.binary_to_string(self.board)
 
+    def outcome(self):
+        if self.is_game_over():
+            black, white = utils.hamming_weight(self.board[utils.BLACK]), utils.hamming_weight(self.board[utils.WHITE])
+            return PLAYERS[utils.BLACK].value if black > white else PLAYERS[utils.WHITE].value if white < black else 'T'
+        return False
+
     def possible_moves(self):
         discriminator = utils.FULL_BOARD ^ (self.board[self.current_player] | self.board[1 ^ self.current_player])
         moves = utils.bit_or(utils.fill(self.board[self.current_player], self.board[1 ^ self.current_player], d) & discriminator for d in utils.MASKS)
@@ -45,20 +51,17 @@ class Moderator:
         move = utils.MOVES[move]
         board[self.current_player] |= move
         opponent = 1 ^ self.current_player
-        flipped = list()
+        flipped = 0
 
         for i in utils.MASKS:
             c = utils.fill(move, board[opponent], i)
             if c & board[self.current_player] != 0:
                 c = (c & utils.MASKS[i*-1]) << i*-1 if i < 0 else (c & utils.MASKS[i*-1]) >> i
+                flipped |= c
                 board[self.current_player] |= c
                 board[opponent] &= utils.bit_not(c)
-                while c:
-                    b = c & -c
-                    flipped.append(utils.POS[b])
-                    c -= b
         self.board, self.current_player = board, opponent
-        return flipped
+        return list(utils.isolate_bits(flipped))
 
     def check_game_over(self):
         current_moves = self.possible_moves()

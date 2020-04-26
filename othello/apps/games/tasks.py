@@ -31,8 +31,6 @@ def run_game(game_id):
             while not mod.is_game_over():
                 board, current_player = mod.get_game_state()
 
-                task_logger.error(f"GAME STATE: {board}, {current_player}")
-
                 try:
                     if current_player == Player.BLACK:
                         running_turn = player_black.get_move(board, current_player.value, time_limit)
@@ -48,8 +46,6 @@ def run_game(game_id):
                     )
                     send_through_socket(game, "game.log")
                 submitted_move, error = running_turn.return_value
-
-                task_logger.error(f"SUBMITTED {submitted_move}")
 
                 if error != 0:
                     game.errors.create(
@@ -74,13 +70,12 @@ def run_game(game_id):
                     else:
                         game.forfeit, game.playing = False, False
                         game.board = mod.get_board()
-                        game.outcome = current_player.value
+                        game.outcome = mod.outcome()
                         game.save(update_fields=["board", "forfeit", "outcome", "playing"])
                         send_through_socket(game, "game.update")
                         task_logger.error("GAME OVER")
                         break
                 except InvalidMoveError as e:
-                    task_logger.error(e)
                     game.errors.create(
                         player=current_player.value,
                         error_code=e.code,
@@ -101,3 +96,6 @@ def run_game(game_id):
                 )
                 game.save(update_fields=["board"])
                 send_through_socket(game, "game.update")
+
+    game.playing = False
+    game.save(update_fields=["playing"])

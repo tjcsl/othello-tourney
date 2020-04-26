@@ -26,10 +26,10 @@ function countPieces(dim, bArray) {
   let bCount = 0;
   let wCount = 0;
   for(let i=0; i<dim*dim; i++){
-    if (bArray[i] === WHITE_NM) {
+    if (bArray[i] === WHITE_CH) {
       wCount++;
     }
-    else if (bArray[i] === BLACK_NM) {
+    else if (bArray[i] === BLACK_CH) {
       bCount++;
     }
   }

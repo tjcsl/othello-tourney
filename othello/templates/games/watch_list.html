@@ -3,16 +3,23 @@
 {% block title %}Othello: Watch{% endblock %}
 
 {% block head %}
-    <link rel="stylesheet" href="{% static 'css/games/play/design.css' %}">
-    <script type="text/javascript" src="{% static 'js/games/play/design.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/games/design.css' %}">
+    <script type="text/javascript" src="{% static 'js/games/design.js' %}"></script>
 {% endblock %}
 
 {% block main %}
     <div class="container-fluid centered">
         <div class="playform align-content-center">
-            {% for game in games %}
-                <a href="{% url 'games:watch' game_id=game.id %}">{{ game }}</a>
-            {% endfor %}
+            <h6>
+                Select a game to watch  <i id="watch-help" class="fa fa-question-circle"></i>
+            </h6>
+            {% if games %}
+                {% for game in games %}
+                    <a href="{% url 'games:watch' game_id=game.id %}">{{ game }}</a><br>
+                {% endfor %}
+            {% else %}
+                <p>There are no games currently playing</p>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
