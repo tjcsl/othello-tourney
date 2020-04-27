@@ -13,6 +13,7 @@ PLAYERS = {
     1: Player.BLACK,
 }
 
+INITIAL_BOARD = "...........................ox......xo..........................."
 
 class InvalidMoveError(RuntimeError):
     def __init__(self, board, player, move):

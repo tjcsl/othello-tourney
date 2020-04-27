@@ -6,7 +6,6 @@ def serialize_game_info(game):
         "game_over": not game.playing,
         "black": game.black.get_user_name(),
         "white": game.white.get_user_name(),
-        "board": game.board,
         "outcome": game.outcome,
         "forfeit": game.forfeit
     }
@@ -14,12 +13,12 @@ def serialize_game_info(game):
         data['new_move'] = {
             "tile": move.move,
             "player": move.player,
+            "board": move.board,
             "flipped": move.flipped,
             "possible": move.possible,
         }
     else:
         data['new_move'] = None
-
     return data
 
 

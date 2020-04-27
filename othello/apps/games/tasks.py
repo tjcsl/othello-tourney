@@ -5,7 +5,7 @@ from celery.utils.log import get_task_logger
 from channels.layers import get_channel_layer
 
 from ..games.models import Game, Player
-from ...moderator import Moderator, PlayerRunner, InvalidMoveError, ServerError, UserError
+from ...moderator import *
 
 task_logger = get_task_logger(__name__)
 
@@ -25,9 +25,19 @@ def run_game(game_id):
         return
 
     mod, time_limit = Moderator(), game.time_limit
+    game_over = False
 
     with PlayerRunner(game.black.code.path, settings.JAILEDRUNNER_DRIVER, settings.DEBUG) as player_black:
         with PlayerRunner(game.white.code.path, settings.JAILEDRUNNER_DRIVER, settings.DEBUG) as player_white:
+            game.moves.create(
+                board=INITIAL_BOARD,
+                player=Player.BLACK.value,
+                possible=[26, 19, 44, 37]
+            )
+            task_logger.error('sending')
+            send_through_socket(game, "game.update")
+            task_logger.error('sent')
+            return
             while not mod.is_game_over():
                 board, current_player = mod.get_game_state()
 
@@ -50,8 +60,8 @@ def run_game(game_id):
                 if error != 0:
                     game.errors.create(
                         player=current_player.value,
-                        error_code=error[0],
-                        error_msg=error[1],
+                        error_code=error.value[0],
+                        error_msg=error.value[1],
                     )
                     if isinstance(error, ServerError):
                         game.forfeit = False
@@ -68,13 +78,7 @@ def run_game(game_id):
                     if submitted := mod.submit_move(submitted_move):
                         flipped, possible = submitted
                     else:
-                        game.forfeit, game.playing = False, False
-                        game.board = mod.get_board()
-                        game.outcome = mod.outcome()
-                        game.save(update_fields=["board", "forfeit", "outcome", "playing"])
-                        send_through_socket(game, "game.update")
-                        task_logger.error("GAME OVER")
-                        break
+                        game_over = True
                 except InvalidMoveError as e:
                     game.errors.create(
                         player=current_player.value,
@@ -87,14 +91,19 @@ def run_game(game_id):
                     send_through_socket(game, "game.error")
                     break
 
-                game.board = mod.get_board()
                 game.moves.create(
                     player=current_player.value,
                     move=submitted_move,
+                    board=mod.get_board(),
                     flipped=flipped,
                     possible=possible
                 )
-                game.save(update_fields=["board"])
+                if game_over:
+                    game.forfeit, game.playing = False, False
+                    game.outcome = mod.outcome()
+                    game.save(update_fields=["forfeit", "outcome", "playing"])
+                    task_logger.error("GAME OVER")
+                    break
                 send_through_socket(game, "game.update")
 
     game.playing = False

@@ -27,22 +27,11 @@ class GameConsumer(JsonWebsocketConsumer):
         async_to_sync(self.channel_layer.group_add)(
             self.game.channels_group_name, self.channel_name
         )
-        async_to_sync(self.channel_layer.group_send)(
-            self.game.channels_group_name, {"type": "game.start"}
-        )
 
     def disconnect(self, code):
         self.connected = False
         super().disconnect(code=code)
         self.close()
-
-    def game_start(self, event):
-        if self.connected:
-            self.send_json({
-                "type": "game.start",
-                "board": [*Game.INITIAL_BOARD],
-                "possible": [26, 19, 44, 37]
-            })
 
     def game_update(self, event):
         self.update_game()

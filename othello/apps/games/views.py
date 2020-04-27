@@ -1,5 +1,8 @@
+from datetime import timedelta
+
 from django.contrib import messages
 from django.http import FileResponse
+from django.utils.timezone import now
 from django.views.generic.edit import View
 from django.shortcuts import render, redirect
 
@@ -88,7 +91,7 @@ def play(request):
                 time_limit=cd['time_limit'],
                 playing=True
             )
-            run_game.delay(g.id)
+            run_game.apply_async([g.id], countdown=1)
             return render(request, "games/play.html", {'game': serialize_game_info(g), 'is_watching': False})
         else:
             messages.error(request, "Unable to start game, try again later", extra_tags="danger")
