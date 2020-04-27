@@ -29,15 +29,14 @@ def run_game(game_id):
 
     with PlayerRunner(game.black.code.path, settings.JAILEDRUNNER_DRIVER, settings.DEBUG) as player_black:
         with PlayerRunner(game.white.code.path, settings.JAILEDRUNNER_DRIVER, settings.DEBUG) as player_white:
+
             game.moves.create(
                 board=INITIAL_BOARD,
                 player=Player.BLACK.value,
                 possible=[26, 19, 44, 37]
             )
-            task_logger.error('sending')
             send_through_socket(game, "game.update")
-            task_logger.error('sent')
-            return
+
             while not mod.is_game_over():
                 board, current_player = mod.get_game_state()
 
