@@ -32,7 +32,7 @@ def run_game(game_id):
 
             game.moves.create(
                 board=INITIAL_BOARD,
-                player=Player.BLACK.value,
+                player="-",
                 possible=[26, 19, 44, 37]
             )
             send_through_socket(game, "game.update")
@@ -107,3 +107,4 @@ def run_game(game_id):
 
     game.playing = False
     game.save(update_fields=["playing"])
+    game.delete()

@@ -7,18 +7,21 @@ def serialize_game_info(game):
         "black": game.black.get_user_name(),
         "white": game.white.get_user_name(),
         "outcome": game.outcome,
-        "forfeit": game.forfeit
+        "forfeit": game.forfeit,
+        "moves": None
     }
-    if move := game.moves.latest():
-        data['new_move'] = {
-            "tile": move.move,
-            "player": move.player,
-            "board": move.board,
-            "flipped": move.flipped,
-            "possible": move.possible,
-        }
-    else:
-        data['new_move'] = None
+    if moves := game.moves.order_by('-created_at'):
+        data['moves'] = [
+            {
+                "id": move.id,
+                "tile": move.move,
+                "player": move.player,
+                "board": move.board,
+                "flipped": move.flipped,
+                "possible": move.possible,
+            }
+            for move in moves
+        ]
     return data
 
 

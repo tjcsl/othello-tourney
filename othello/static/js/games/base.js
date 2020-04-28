@@ -3,9 +3,6 @@ function on_load() {
         $("#gameContainer div:first").insertAfter($("#gameContainer div:last"));
     }
     $("#input_parseable")
-        .click(function () {
-                $(this).find("button").click();
-            })
         .hover(
             function(){
                 $(this).find("label").css({"text-decoration": "underline"});
@@ -17,9 +14,6 @@ function on_load() {
 
 
     $("#input_pretty")
-        .click(function () {
-                $(this).find("button").click();
-            })
         .hover(
             function(){
                 $(this).find("label").css({"text-decoration": "underline"});
@@ -28,10 +22,4 @@ function on_load() {
             function () {
                 $(this).find("label").css({"text-decoration": "none"});
             });
-
-    $("#downloadHistoryButton")
-        .click(function () {
-            $("#prettyHistory").text(generate_pretty_history());
-            $("#parseableHistory").text(generate_parseable_history());
-        });
 }

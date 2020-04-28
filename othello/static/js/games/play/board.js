@@ -36,7 +36,7 @@ for (let i = 0; i < 20; i++) {
   STONE_IMAGES[i].src = `/static/img/stones/${i}.png`;
 }
 
-HISTORY = [];
+let HISTORY;
 let RCANVAS;
 
 function init(black, white, timelimit, watching) {
@@ -75,7 +75,7 @@ function init(black, white, timelimit, watching) {
     return rCanvas;
 }
 
-function drawBoard(rCanvas, board_array, possible, tomove, anim_array) {
+function drawBoard(rCanvas, board_array, possible, tomove, anim_array, ) {
     console.log("drawing board", tomove);
 
     let row_col_position = Math.min(rCanvas.rWidth, rCanvas.rHeight);
@@ -253,10 +253,32 @@ function place_stone(rCanvas, event){
     }
 }
 
+function prettyPrint(board) {
+    let out = `  1 2 3 4 5 6 7 8\n`;
+    for(let w=0;w<8;w++){
+        out += `${w+1} `
+        for(let h=0;h<8;h++){
+            out += `${board[w*8+h]} `;
+        }
+        out += '\n';
+    }
+    return out
+}
+
 function generate_pretty_history() {
-    return "pretty history"
+    let out = `${RCANVAS.black_name},${RCANVAS.white_name}\n`;
+    for(let i=HISTORY.length-1;i>=0;i--){
+        out += prettyPrint(HISTORY[i].board);
+        out += `${HISTORY[i].board.split(BLACK_CH).length - 1}-${HISTORY[i].board.split(WHITE_CH).length - 1} ${HISTORY[i].player}\n\n`;
+    }
+    $("#prettyHistory").text(out);
 }
 
 function generate_parseable_history() {
-    return "parsable history"
+    let out = `${RCANVAS.black_name},${RCANVAS.white_name}\n`;
+    for(let i=HISTORY.length-1;i>=0;i--){
+        let board = HISTORY[i].board;
+        out += `${board} ${HISTORY[i].player} ${HISTORY[i].tile} ${board.split(BLACK_CH).length - 1} ${board.split(WHITE_CH).length - 1}\n`
+    }
+    $("#parseableHistory").text(out);
 }
