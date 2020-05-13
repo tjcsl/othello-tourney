@@ -122,7 +122,7 @@ class MoveSet(models.QuerySet):
 
 class Move(models.Model):
 
-    manager = MoveSet.as_manager()
+    objects = MoveSet.as_manager()
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="moves")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -145,7 +145,7 @@ class GameObjectSet(models.QuerySet):
 
 class GameObject(models.Model):
 
-    manager = GameObjectSet.as_manager()
+    objects = GameObjectSet.as_manager()
 
     created_at = models.DateTimeField(auto_now_add=True)
     player = models.CharField(max_length=1, choices=PLAYER_CHOICES)
