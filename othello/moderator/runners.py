@@ -104,9 +104,8 @@ class PlayerRunner:
         self.process = None
         self.driver, self.debug = driver, debug
 
-        self.start()
-
     def __enter__(self):
+        self.start()
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -132,7 +131,7 @@ class PlayerRunner:
                                         bufsize=0, cwd=os.path.dirname(self.path), preexec_fn=os.setpgrp,)
 
     @capture_generator_value
-    def get_move(self, board, player, time_limit):
+    def get_move(self, board, player, time_limit, last_move):
         self.process.stdin.write(f"{str(time_limit)}\n{player}\n{''.join(board)}\n".encode("latin-1"))
         self.process.stdin.flush()
         move = -1
@@ -155,3 +154,23 @@ class PlayerRunner:
                 except ValueError:
                     return -1, UserError.READ_INVALID
         return move, 0
+
+
+class YourselfRunner:
+
+    def __init__(self, game):
+        self.game = game
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    @capture_generator_value
+    def get_move(self, board, player, time_limit, last_move):
+        yield "Choose your move!"
+        while True:
+            if (m := self.game.moves.latest()) != last_move:
+                return m, 0
+

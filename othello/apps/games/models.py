@@ -116,7 +116,7 @@ class Game(models.Model):
 
 class MoveSet(models.QuerySet):
 
-    def latest(self):
+    def latest(self, **kwargs):
         return self.order_by('-created_at')[0] if self.exists() else None
 
 

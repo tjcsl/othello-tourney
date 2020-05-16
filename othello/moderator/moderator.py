@@ -15,6 +15,7 @@ PLAYERS = {
 
 INITIAL_BOARD = "...........................ox......xo..........................."
 
+
 class InvalidMoveError(RuntimeError):
     def __init__(self, board, player, move):
         self.code = -3
