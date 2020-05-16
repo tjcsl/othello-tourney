@@ -2,10 +2,9 @@ import os
 import uuid
 
 from django.db import models
-from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 
-from .storage import OverwriteStorage
 from ...moderator.moderator import Player
 
 
@@ -15,7 +14,7 @@ PLAYER_CHOICES = (
 )
 
 
-def save_path(instance, filename):
+def _save_path(instance, filename):
     return os.path.join(instance.user.short_name, f"{uuid.uuid4()}.py")
 
 
@@ -24,19 +23,20 @@ class SubmissionSet(models.QuerySet):
     def usable(self, user=None):
         return self.filter(user=user, usable=True) if user else self.filter(usable=True)
 
+    def delete(self):
+        for obj in self:
+            obj.code.delete()
+        super(SubmissionSet, self).delete()
+
 
 class Submission(models.Model):
 
     objects = SubmissionSet.as_manager()
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="user")
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="user")
     name = models.CharField(max_length=500, default="")
     submitted_time = models.DateTimeField(auto_now=True)
-    code = models.FileField(
-        upload_to=save_path,
-        storage=OverwriteStorage(),
-        default=None,
-    )
+    code = models.FileField(upload_to=_save_path, default=None,)
     usable = models.BooleanField(default=True)
 
     def get_name(self):
@@ -75,8 +75,8 @@ class Submission(models.Model):
         super(Submission, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        self.code.storage.delete(self.code.name)
-        super().delete(*args, **kwargs)
+        self.code.delete()
+        super(Submission, self).delete(*args, **kwargs)
 
     def __str__(self):
         return f"{self.get_user_name()}: {self.get_submission_name()}"
