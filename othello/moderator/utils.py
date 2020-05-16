@@ -1,3 +1,4 @@
+import enum
 import operator
 import importlib.util
 import importlib.machinery
@@ -5,6 +6,20 @@ import importlib.machinery
 from functools import lru_cache, partial, reduce, wraps
 
 from .constants import *
+
+
+class UserError(enum.Enum):
+
+    NO_MOVE_ERROR = (-1, "No move submitted")
+    READ_INVALID = (-2, "Submitted move is not an integer")
+    INVALID_MOVE = (-3, "{move} is invalid for {player} on {board}")
+
+
+class ServerError(enum.Enum):
+
+    TIMEOUT = (-4, "Timed out reading from subprocess")
+    UNEXPECTED = (-5, "Unexpected error")
+    PROCESS_EXITED = (-6, "Process exited unexpectedly")
 
 
 class Generator:

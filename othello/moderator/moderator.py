@@ -18,8 +18,8 @@ INITIAL_BOARD = "...........................ox......xo..........................
 
 class InvalidMoveError(RuntimeError):
     def __init__(self, board, player, move):
-        self.code = -3
-        self.message = f"{move} is invalid for {PLAYERS[player].value} on {utils.binary_to_string(board)}"
+        self.code = utils.UserError.INVALID_MOVE[0]
+        self.message = utils.UserError.INVALID_MOVE[1].format(move=move, player=PLAYERS[player].value, board=utils.binary_to_string(board))
 
     def __str__(self):
         return self.message

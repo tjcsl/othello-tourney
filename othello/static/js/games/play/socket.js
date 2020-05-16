@@ -56,6 +56,7 @@ function add_listeners(socket){
 
     socket.onmessage = function (message) {
         let data = JSON.parse(message.data);
+        console.log(data)
         switch(data.type){
             case 'game.log':
                 console.log(`LOG: ${data.message}`);

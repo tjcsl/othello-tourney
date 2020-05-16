@@ -10,20 +10,7 @@ import subprocess
 import multiprocessing as mp
 
 from ..sandboxing import get_sandbox_args
-from .utils import import_strategy, capture_generator_value
-
-
-class UserError(enum.Enum):
-
-    NO_MOVE_ERROR = (-1, "No move submitted")
-    READ_INVALID = (-2, "Submitted move is not an integer")
-
-
-class ServerError(enum.Enum):
-
-    TIMEOUT = (-3, "Timed out reading from subprocess")
-    UNEXPECTED = (-4, "Unexpected error")
-    PROCESS_EXITED = (-5, "Process exited unexpectedly")
+from .utils import UserError, ServerError, import_strategy, capture_generator_value
 
 
 class PrintLogger:
@@ -172,5 +159,5 @@ class YourselfRunner:
         yield "Choose your move!"
         while True:
             if (m := self.game.moves.latest()) != last_move:
-                return m, 0
+                return m.move, 0
 

@@ -62,6 +62,7 @@ def run_game(game_id):
                 )
                 send_through_socket(game, "game.log")
             submitted_move, error = running_turn.return_value
+            print(submitted_move, error)
 
             if error != 0:
                 game.errors.create(
