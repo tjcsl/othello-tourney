@@ -4,7 +4,7 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 
 from django.urls import path
 
-from .apps.games.consumers import GameConsumer
+from .apps.games.consumers import *
 
 
 class WebsocketCloseConsumer(WebsocketConsumer):
@@ -24,7 +24,7 @@ application = ProtocolTypeRouter(
         "websocket": AuthMiddlewareStack(
             URLRouter(
                 [
-                    path("play/<int:game_id>", GameConsumer),
+                    path("play/<int:game_id>", GamePlayingConsumer),
                     path("watch/<int:game_id>", GameConsumer),
                     path("<path:path>", WebsocketCloseConsumer),
                 ]

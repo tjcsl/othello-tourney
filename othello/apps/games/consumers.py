@@ -2,7 +2,7 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 
 from .utils import *
-from .models import Game
+from .models import Game, Submission
 
 
 class GameConsumer(JsonWebsocketConsumer):
@@ -18,8 +18,16 @@ class GameConsumer(JsonWebsocketConsumer):
         except Game.DoesNotExist:
             return self.close()
 
+        try:
+            yourself = Submission.objects.get(user__username="Yourself")
+        except Submission.DoesNotExist:
+            return self.close()
+
         if not self.game.playing:
             return self.close()
+
+        self.is_black_yourself = self.game.black == yourself
+        self.is_white_yourself = self.game.white == yourself
 
         self.connected = True
         self.accept()
@@ -49,6 +57,7 @@ class GameConsumer(JsonWebsocketConsumer):
             self.send_json(game)
             if game['game_over']:
                 self.disconnect(code=0)
+                self.game.delete()
 
     def send_log(self):
         if self.connected:
@@ -60,3 +69,15 @@ class GameConsumer(JsonWebsocketConsumer):
     def send_error(self):
         if self.connected:
             self.send_json(serialize_game_error(self.game.errors.latest()))
+
+
+class GamePlayingConsumer(GameConsumer):
+
+    def receive_json(self, content, **kwargs):
+        player = content.get('player', False)
+        move = int(content.get('move', False))
+        if move:
+            if player == 'O' and self.is_white_yourself:
+                self.game.moves.create(player=player, move=move)
+            elif player == 'X' and self.is_black_yourself:
+                self.game.moves.create(player=player, move=move)

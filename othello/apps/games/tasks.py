@@ -1,3 +1,4 @@
+from asyncio import sleep
 from celery import shared_task
 from django.conf import settings
 from asgiref.sync import async_to_sync
@@ -83,7 +84,8 @@ def run_game(game_id):
 
             try:
                 if submitted := mod.submit_move(submitted_move):
-                    flipped, possible = submitted
+                    possible = submitted
+                    print("MOVE: " + str(submitted_move) + str(possible))
                 else:
                     game_over = True
             except InvalidMoveError as e:
@@ -102,7 +104,6 @@ def run_game(game_id):
                 player=current_player.value,
                 move=submitted_move,
                 board=mod.get_board(),
-                flipped=flipped,
                 possible=possible
             )
             if game_over:
@@ -112,7 +113,8 @@ def run_game(game_id):
                 task_logger.error("GAME OVER")
                 break
             send_through_socket(game, "game.update")
-
     game.playing = False
     game.save(update_fields=["playing"])
-    game.delete()
+    send_through_socket(game, "game.update")
+    black_runner.stop()
+    white_runner.stop()

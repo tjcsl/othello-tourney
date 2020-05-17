@@ -96,6 +96,17 @@ class PlayerRunner:
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        self.stop()
+
+    def start(self):
+        cmd_args = ["python3", "-u", self.driver, self.path]
+        if not self.debug:
+            cmd_args = get_sandbox_args(cmd_args)
+
+        self.process = subprocess.Popen(cmd_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                        bufsize=0, cwd=os.path.dirname(self.path), preexec_fn=os.setpgrp,)
+
+    def stop(self):
         if self.process is not None:
             children = psutil.Process(self.process.pid).children(recursive=True)
             try:
@@ -108,14 +119,6 @@ class PlayerRunner:
                 except psutil.NoSuchProcess:
                     pass
             self.process = None
-
-    def start(self):
-        cmd_args = ["python3", "-u", self.driver, self.path]
-        if not self.debug:
-            cmd_args = get_sandbox_args(cmd_args)
-
-        self.process = subprocess.Popen(cmd_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                        bufsize=0, cwd=os.path.dirname(self.path), preexec_fn=os.setpgrp,)
 
     @capture_generator_value
     def get_move(self, board, player, time_limit, last_move):
@@ -154,10 +157,14 @@ class YourselfRunner:
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
 
+    def stop(self):
+        pass
+
     @capture_generator_value
     def get_move(self, board, player, time_limit, last_move):
         yield "Choose your move!"
         while True:
             if (m := self.game.moves.latest()) != last_move:
+                m.delete()
                 return m.move, 0
 

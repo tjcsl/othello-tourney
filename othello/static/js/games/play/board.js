@@ -36,6 +36,9 @@ for (let i = 0; i < 20; i++) {
   STONE_IMAGES[i].src = `/static/img/stones/${i}.png`;
 }
 
+const OLD_TO_NEW = {11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 16: 5, 17: 6, 18: 7, 21: 8, 22: 9, 23: 10, 24: 11, 25: 12, 26: 13, 27: 14, 28: 15, 31: 16, 32: 17, 33: 18, 34: 19, 35: 20, 36: 21, 37: 22, 38: 23, 41: 24, 42: 25, 43: 26, 44: 27, 45: 28, 46: 29, 47: 30, 48: 31, 51: 32, 52: 33, 53: 34, 54: 35, 55: 36, 56: 37, 57: 38, 58: 39, 61: 40, 62: 41, 63: 42, 64: 43, 65: 44, 66: 45, 67: 46, 68: 47, 71: 48, 72: 49, 73: 50, 74: 51, 75: 52, 76: 53, 77: 54, 78: 55, 81: 56, 82: 57, 83: 58, 84: 59, 85: 60, 86: 61, 87: 62, 88: 63}
+const NEW_TO_OLD = {0: 11, 1: 12, 2: 13, 3: 14, 4: 15, 5: 16, 6: 17, 7: 18, 8: 21, 9: 22, 10: 23, 11: 24, 12: 25, 13: 26, 14: 27, 15: 28, 16: 31, 17: 32, 18: 33, 19: 34, 20: 35, 21: 36, 22: 37, 23: 38, 24: 41, 25: 42, 26: 43, 27: 44, 28: 45, 29: 46, 30: 47, 31: 48, 32: 51, 33: 52, 34: 53, 35: 54, 36: 55, 37: 56, 38: 57, 39: 58, 40: 61, 41: 62, 42: 63, 43: 64, 44: 65, 45: 66, 46: 67, 47: 68, 48: 71, 49: 72, 50: 73, 51: 74, 52: 75, 53: 76, 54: 77, 55: 78, 56: 81, 57: 82, 58: 83, 59: 84, 60: 85, 61: 86, 62: 87, 63: 88}
+
 let HISTORY;
 let RCANVAS;
 
@@ -75,8 +78,7 @@ function init(black, white, timelimit, watching) {
     return rCanvas;
 }
 
-function drawBoard(rCanvas, board_array, possible, tomove, anim_array, ) {
-    console.log("drawing board", tomove);
+function drawBoard(rCanvas, board_array, possible, tomove, anim_array, move,) {
 
     let row_col_position = Math.min(rCanvas.rWidth, rCanvas.rHeight);
     let border = row_col_position/(11*DIMENSION+1);
@@ -90,6 +92,9 @@ function drawBoard(rCanvas, board_array, possible, tomove, anim_array, ) {
     rCanvas.objects = [rCanvas.fullbg];
 
     addTiles(rCanvas, DIMENSION, board_array, border_and_square, border, square);
+    let x = move % DIMENSION,
+        y = Math.trunc(move/DIMENSION);
+    rCanvas.add(new RRect(border_and_square*x+border, border_and_square*y+border, square, square, LASTMOVE_CO, 0.4));
     rCanvas.add(rCanvas.lastmove);
 
     addPieces(rCanvas, board_array, border_and_square, border, square, anim_array);
@@ -127,7 +132,6 @@ function addPieces(rCanvas, board_array, b_and_s, border, square, animArray) {
     for(let y=0; y<DIMENSION; y++){
         for(let x=0; x<DIMENSION; x++){
             let index = DIMENSION * y + x;
-            console.log(board_array[index])
             if (DIMENSION !== rCanvas.lBSize) {
                 rCanvas.imgBoard[index] = new RImg(b_and_s * x + border, b_and_s * y + border, square, square, EMPTY_CO, false);
             }
@@ -152,9 +156,10 @@ function addPieces(rCanvas, board_array, b_and_s, border, square, animArray) {
 }
 
 function addPossibleMoves(rCanvas, possible, b_and_s, border, square) {
+    console.log(possible);
     possible.forEach((index) => {
-        let x = Math.trunc(index/DIMENSION),
-            y = index % DIMENSION;
+        let x = index % DIMENSION,
+            y = Math.trunc(index/DIMENSION);
         rCanvas.add(new RRect(b_and_s*x+border, b_and_s*y+border, square, square, GOODMOVE_CO, 0.4));
     });
 }
@@ -230,7 +235,7 @@ function place_stone(rCanvas, event){
     let cy = Math.floor(rCanvas.my / rCanvas.border_and_square);
     let cx = Math.floor(rCanvas.mx / rCanvas.border_and_square);
     if (cx >= 0 && cx < rCanvas.lBSize && cy >= 0 && cy < rCanvas.lBSize){
-      rCanvas.lastClicked = cy * (rCanvas.lBSize+2) + cx + 3 + rCanvas.lBSize;
+      rCanvas.lastClicked = OLD_TO_NEW[cy * (rCanvas.lBSize+2) + cx + 3 + rCanvas.lBSize];
     }
     if (olc === -1) {
         console.log('touched spot ' + rCanvas.lastClicked);

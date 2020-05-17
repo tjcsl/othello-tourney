@@ -15,13 +15,14 @@ def serialize_game_info(game):
             {
                 "id": move.id,
                 "tile": move.move,
-                "player": move.player,
+                "player": move.player.lower(),
                 "board": move.board,
-                "flipped": move.flipped,
                 "possible": move.possible,
             }
             for move in moves
         ]
+    if not game.playing:
+        data['moves'][0]["possible"] = data['moves'][0]['flipped'] = []
     return data
 
 

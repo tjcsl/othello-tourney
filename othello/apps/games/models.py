@@ -39,9 +39,6 @@ class Submission(models.Model):
     code = models.FileField(upload_to=_save_path, default=None,)
     usable = models.BooleanField(default=True)
 
-    def get_name(self):
-        return self.name
-
     def get_user_name(self):
         return self.user.short_name
 
@@ -49,10 +46,7 @@ class Submission(models.Model):
         return self.submitted_time.strftime("%Y-%m-%d %H:%M:%S")
 
     def get_submission_name(self):
-        return f'{self.get_name()}: <{self.get_submitted_time()}>'
-
-    def get_code_filename(self):
-        return self.code.name
+        return f'{self.name}: <{self.get_submitted_time()}>'
 
     @property
     def is_usable(self):
@@ -130,7 +124,6 @@ class Move(models.Model):
     player = models.CharField(max_length=1, choices=PLAYER_CHOICES)
     move = models.IntegerField(default=-10)
 
-    flipped = ArrayField(models.IntegerField(default=-1), default=list)
     possible = ArrayField(models.IntegerField(default=-1), default=list)
 
     def __str__(self):

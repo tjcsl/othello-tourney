@@ -18,8 +18,8 @@ INITIAL_BOARD = "...........................ox......xo..........................
 
 class InvalidMoveError(RuntimeError):
     def __init__(self, board, player, move):
-        self.code = utils.UserError.INVALID_MOVE[0]
-        self.message = utils.UserError.INVALID_MOVE[1].format(move=move, player=PLAYERS[player].value, board=utils.binary_to_string(board))
+        self.code = utils.UserError.INVALID_MOVE.value[0]
+        self.message = utils.UserError.INVALID_MOVE.value[1].format(move=move, player=PLAYERS[player].value, board=utils.binary_to_string(board))
 
     def __str__(self):
         return self.message
@@ -53,17 +53,14 @@ class Moderator:
         move = utils.MOVES[move]
         board[self.current_player] |= move
         opponent = 1 ^ self.current_player
-        flipped = 0
 
         for i in utils.MASKS:
             c = utils.fill(move, board[opponent], i)
             if c & board[self.current_player] != 0:
                 c = (c & utils.MASKS[i*-1]) << i*-1 if i < 0 else (c & utils.MASKS[i*-1]) >> i
-                flipped |= c
                 board[self.current_player] |= c
                 board[opponent] &= utils.bit_not(c)
         self.board, self.current_player = board, opponent
-        return list(utils.isolate_bits(flipped))
 
     def check_game_over(self):
         current_moves = self.possible_moves()
@@ -79,7 +76,7 @@ class Moderator:
         if not self.is_valid_move(submitted_move):
             raise InvalidMoveError(self.board, self.current_player, submitted_move)
 
-        flipped = self.make_move(submitted_move)
+        self.make_move(submitted_move)
 
         if self.check_game_over():
             self.game_over = True
@@ -88,7 +85,7 @@ class Moderator:
         if not self.possible_moves():
             self.current_player = 1 ^ self.current_player
 
-        return list(utils.isolate_bits(self.possible_moves())), flipped
+        return list(utils.isolate_bits(self.possible_moves()))
 
     def get_game_state(self):
         return utils.binary_to_string(self.board), PLAYERS[self.current_player]

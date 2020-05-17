@@ -1,11 +1,12 @@
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "ubuntu/focal64"
+  config.vm.box = "generic/ubuntu2004"
 
   config.vm.network "forwarded_port", guest: 8000, host: 8000
   config.vm.network "forwarded_port", guest: 6379, host: 6379
   config.ssh.forward_agent = true
   config.vm.hostname = "othellovm"
+  config.vm.boot_timeout = 600
   config.vm.define "othello-vagrant" do |v|
   end
 

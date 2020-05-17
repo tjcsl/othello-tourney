@@ -1,5 +1,6 @@
 const PROTOCOL = window.location.protocol === "https:" ? "wss" : "ws";
 const PATH = `${PROTOCOL}://${window.location.host}`;
+let socket;
 
 
 function add_listeners(socket){
@@ -62,14 +63,16 @@ function add_listeners(socket){
                 console.log(`LOG: ${data.message}`);
                 break;
             case 'game.update':
+                console.log(data)
                 if(data.moves[0].tile === -10){
                     console.log("starting game");
                     rCanvas.black_name = data.black;
                     rCanvas.white_name = data.white;
                     console.log(JSON.stringify(data))
-                    drawBoard(rCanvas, data.moves[0].board, data.moves[0].possible, BLACK_NM, rCanvas.animArray);
+                    drawBoard(rCanvas, data.moves[0].board, data.moves[0].possible, BLACK_NM, rCanvas.animArray, 36);
                 }else{
-                    console.log(data.moves[0])
+                    let player = data.moves[0].player === BLACK_CH ? WHITE_NM : BLACK_NM;
+                    drawBoard(rCanvas, data.moves[0].board, data.moves[0].possible, player, rCanvas.animArray, data.moves[0].tile);
                 }
                 HISTORY = data.moves;
                 break
@@ -83,7 +86,6 @@ function add_listeners(socket){
 
 window.onload = function () {
     on_load();
-    let socket;
     socket = is_watching ? new WebSocket(`${PATH}/watch/${game.id}`) : new WebSocket(`${PATH}/play/${game.id}`);
     add_listeners(socket);
 };

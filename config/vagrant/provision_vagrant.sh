@@ -7,6 +7,9 @@ apt -y upgrade
 
 timedatectl set-timezone America/New_York
 
+# Install utilities
+apt -y install htop net-tools
+
 # Install Python 3.8
 apt -y install python3
 apt -y install python3-pip python3-venv python3-virtualenv
@@ -42,6 +45,6 @@ cp -n othello/settings/secret.sample.py othello/settings/secret.py
 
 # Setup Django DB Tables
 python3 manage.py migrate
-python3 manage.py loaddata othello/models/yourself.json
+python3 manage.py loaddata othello/fixtures/yourself.json
 python3 manage.py collectstatic --noinput
 
