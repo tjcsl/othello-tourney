@@ -4,6 +4,7 @@ set -e
 
 apt update
 apt -y upgrade
+apt -y autoremove
 
 timedatectl set-timezone America/New_York
 
