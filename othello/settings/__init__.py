@@ -1,5 +1,6 @@
 import os
 from .secret import *
+from celery.schedules import crontab
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MODERATOR_ROOT = os.path.join(BASE_DIR, "moderator")
@@ -129,19 +130,24 @@ LOGOUT_REDIRECT_URL = "auth:index"
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "America/New_York"
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 SESSION_SAVE_EVERY_REQUEST = True
 
 # Celery
 CELERY_RESULT_BACKED = "django-db"
-
 CELERY_BROKER_URL = "redis://localhost:6379/1"
+CELERY_TIMEZONE = "America/New_York"
+CELERY_BEAT_SCHEDULE = {
+    'delete-old-games': {
+        'task': 'othello.apps.games.tasks.delete_old_games',
+        'schedule': crontab(),
+        'args': (),
+    }
+}
+
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "serve")
@@ -153,8 +159,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "submissions")
 
 # Othello Settings
 IMPORT_DRIVER = os.path.join(BASE_DIR, "sandboxing", "import_wrapper.py")
-
 JAILEDRUNNER_DRIVER = os.path.abspath(os.path.join(os.path.dirname(BASE_DIR), "run_ai_jailed.py"))
-
 FIREJAIL_PROFILE = os.path.join(BASE_DIR, "sandboxing", "sandbox.profile")
 

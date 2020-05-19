@@ -67,15 +67,8 @@ class Strategy():
         You may submit code any amount of times, and the Othello server will record and store all your submissions. If you wish, you may retrieve any previously submitted script from the upload page.
     </p>
     <p>
-        In addition to retrieving previously submitted scripts, you now have the option to set a previously submitted script as the "running" script.
-        This means you can tell the Othello server to run a specific script that you previously submitted, instead of the most recently submitted script, when playing your code against other users.
-    </p>
-    <p>
-        You can access this feature, along with retrieving past submissions on the <a href="{% url 'games:upload' %}">Upload Page</a>.
-    </p>
-    <p>
-        Note: If you choose to set a previous script as "running" instead of the most recent submission, that decision will be overwritten the next time you submit a script.
-        Meaning, every time you upload a script, that script will automatically become the "running" script.
+        All your code submissions will persist on the Othello server, and you can retrieve previous submissions through the <a href="{% url 'games:upload' %}">Upload Page</a>. The Othello server will always
+        use your most recent code submission when running your AI against other players. (If you were to submit twice, your second submission would be used to play against other users)
     </p>
     <p>
         Note: When uploading a script, you will be given an option to attach a "name" or "label" to that script.
@@ -98,7 +91,7 @@ class Strategy():
         Other Info
     </h3>
     <p>
-        If you code fails to return a move, returns an invalid move, or errors for whatever reason, it will be treated as a forfeit.
+        If your code fails to return a move, returns an invalid move, or errors for whatever reason, it will be treated as a forfeit.
         As such, make sure you code works on your computer before using this website to test against other AIs.
         Just as a reminder, if your code is caught cheating during the tournament in any way, you <b>will</b> be caught and given an integrity violation, so just don't do it.
     </p>

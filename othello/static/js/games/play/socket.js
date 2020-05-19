@@ -1,10 +1,9 @@
 const PROTOCOL = window.location.protocol === "https:" ? "wss" : "ws";
 const PATH = `${PROTOCOL}://${window.location.host}`;
-let socket;
 
 
 function add_listeners(socket){
-    let rCanvas = init(game.black, game.white, 0,0);
+    let rCanvas = init(game.black, game.white);
 
     $(window).on('resize', function () {
         rCanvas.resize();
@@ -16,7 +15,7 @@ function add_listeners(socket){
 
     function clickHandler(event){
         rCanvas.lastClicked = -1;
-        place_stone(rCanvas, event);
+        place_stone(rCanvas, event, socket);
     }
 
     $(document).on('mousemove', mouseOver);
@@ -86,6 +85,6 @@ function add_listeners(socket){
 
 window.onload = function () {
     on_load();
-    socket = is_watching ? new WebSocket(`${PATH}/watch/${game.id}`) : new WebSocket(`${PATH}/play/${game.id}`);
+    let socket = is_watching ? new WebSocket(`${PATH}/watch/${game.id}`) : new WebSocket(`${PATH}/play/${game.id}`);
     add_listeners(socket);
 };

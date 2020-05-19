@@ -95,10 +95,12 @@ class Game(models.Model):
     black = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="black")
     white = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="white")
     time_limit = models.IntegerField(default=5,)
-    playing = models.BooleanField(default=False)
 
     forfeit = models.BooleanField(default=False)
     outcome = models.CharField(max_length=1, choices=OUTCOME_CHOICES, default='')
+
+    playing = models.BooleanField(default=False)
+    is_tournament = models.BooleanField(default=False)
 
     @property
     def channels_group_name(self):

@@ -29,18 +29,18 @@ class SubmissionForm(forms.ModelForm):
         return cd
 
 
-class ChangeSubmissionForm(forms.Form):
-    new_script = forms.ModelChoiceField(
-        label="Change current AI:",
+class DownloadSubmissionForm(forms.Form):
+    script = forms.ModelChoiceField(
+        label="Previous Submissions:",
         queryset=None,
     )
 
     def __init__(self, user, *args, **kwargs):
-        super(ChangeSubmissionForm, self).__init__(*args, **kwargs)
+        super(DownloadSubmissionForm, self).__init__(*args, **kwargs)
         choices = Submission.objects.filter(user=user)
-        self.fields["new_script"].queryset = choices
-        self.fields["new_script"].initial = choices[0] if len(choices) >= 1 else None
-        self.fields["new_script"].label_from_instance = lambda obj: f"{obj.get_submission_name()}"
+        self.fields["script"].queryset = choices
+        self.fields["script"].initial = choices[0] if choices.exists() else None
+        self.fields["script"].label_from_instance = lambda obj: f"{obj.get_submission_name()}"
 
 
 class GameForm(forms.Form):

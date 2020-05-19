@@ -38,11 +38,15 @@ for (let i = 0; i < 20; i++) {
 
 const OLD_TO_NEW = {11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 16: 5, 17: 6, 18: 7, 21: 8, 22: 9, 23: 10, 24: 11, 25: 12, 26: 13, 27: 14, 28: 15, 31: 16, 32: 17, 33: 18, 34: 19, 35: 20, 36: 21, 37: 22, 38: 23, 41: 24, 42: 25, 43: 26, 44: 27, 45: 28, 46: 29, 47: 30, 48: 31, 51: 32, 52: 33, 53: 34, 54: 35, 55: 36, 56: 37, 57: 38, 58: 39, 61: 40, 62: 41, 63: 42, 64: 43, 65: 44, 66: 45, 67: 46, 68: 47, 71: 48, 72: 49, 73: 50, 74: 51, 75: 52, 76: 53, 77: 54, 78: 55, 81: 56, 82: 57, 83: 58, 84: 59, 85: 60, 86: 61, 87: 62, 88: 63}
 const NEW_TO_OLD = {0: 11, 1: 12, 2: 13, 3: 14, 4: 15, 5: 16, 6: 17, 7: 18, 8: 21, 9: 22, 10: 23, 11: 24, 12: 25, 13: 26, 14: 27, 15: 28, 16: 31, 17: 32, 18: 33, 19: 34, 20: 35, 21: 36, 22: 37, 23: 38, 24: 41, 25: 42, 26: 43, 27: 44, 28: 45, 29: 46, 30: 47, 31: 48, 32: 51, 33: 52, 34: 53, 35: 54, 36: 55, 37: 56, 38: 57, 39: 58, 40: 61, 41: 62, 42: 63, 43: 64, 44: 65, 45: 66, 46: 67, 47: 68, 48: 71, 49: 72, 50: 73, 51: 74, 52: 75, 53: 76, 54: 77, 55: 78, 56: 81, 57: 82, 58: 83, 59: 84, 60: 85, 61: 86, 62: 87, 63: 88}
+const PLAYERS = {
+    1: BLACK_CH,
+    0: WHITE_CH,
+}
 
 let HISTORY;
 let RCANVAS;
 
-function init(black, white, timelimit, watching) {
+function init(black, white) {
     let canvas = document.getElementById("canvas");
     let gwidth, gheight;
     gwidth = 1000;
@@ -165,30 +169,6 @@ function addPossibleMoves(rCanvas, possible, b_and_s, border, square) {
 }
 
 
-function makeFlips(x, y, rCanvas, bSize, bArray, tomove) {
-    let good = false;
-    let bracketObj;
-    for (let dy = -1; dy < 2; dy++) {
-        for (let dx = -1; dx < 2; dx++) {
-            if (!(dx === 0 && dy === 0)) {
-                bracketObj = findBracket(x, y, tomove, bArray, bSize, dx, dy);
-                if (bracketObj.good) {
-                    let cx = x;
-                    let cy = y;
-                    good = true;
-                    while (cx !== bracketObj.bx || cy !== bracketObj.by) {
-                        bArray[cy * bSize + cx] = tomove;
-                        cx += dx;
-                        cy += dy;
-                    }
-                }
-            }
-        }
-    }
-  return good;
-}
-
-
 function startAnimation(rCanvas, animArray) {
   let interval = setInterval(function() {
     let stable = true;
@@ -229,7 +209,7 @@ function highlight_tile(rCanvas, event){
     }
 }
 
-function place_stone(rCanvas, event){
+function place_stone(rCanvas, event, socket){
     highlight_tile(rCanvas, event);
     let olc = rCanvas.lastClicked;
     let cy = Math.floor(rCanvas.my / rCanvas.border_and_square);
@@ -239,18 +219,18 @@ function place_stone(rCanvas, event){
     }
     if (olc === -1) {
         console.log('touched spot ' + rCanvas.lastClicked);
-        let resultGood = rCanvas.board[cy * rCanvas.lBSize + cx] === EMPTY_CH && makeFlips(cx, cy, rCanvas, rCanvas.lBSize, rCanvas.board, rCanvas.tomove);
+        let resultGood = rCanvas.board[cy * rCanvas.lBSize + cx] === EMPTY_CH && HISTORY[0].possible.includes(rCanvas.lastClicked);
+        console.log(resultGood)
         if (resultGood) {
             rCanvas.lastmove.x = rCanvas.border_and_square * cx + rCanvas.border;
             rCanvas.lastmove.y = rCanvas.border_and_square * cy + rCanvas.border;
             rCanvas.lastmove.width = rCanvas.square;
             rCanvas.lastmove.height = rCanvas.square;
 
-            if (rCanvas.tomove === WHITE_NM) {
-                rCanvas.animArray[cy * rCanvas.lBSize + cx] = 19;
-            }
-
-            drawBoard(rCanvas, rCanvas.board, 3 - rCanvas.tomove, rCanvas.animArray);
+            socket.send(JSON.stringify({
+                "player": PLAYERS[rCanvas.tomove],
+                "move": rCanvas.lastClicked
+            }));
 
         }else{
             rCanvas.lastClicked = -1;

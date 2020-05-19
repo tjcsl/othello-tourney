@@ -165,6 +165,7 @@ class YourselfRunner:
         yield "Choose your move!"
         while True:
             if (m := self.game.moves.latest()) != last_move:
+                print(m.move, last_move.move)
                 m.delete()
                 return m.move, 0
 

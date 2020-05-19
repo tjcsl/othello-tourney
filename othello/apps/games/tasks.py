@@ -118,3 +118,8 @@ def run_game(game_id):
     send_through_socket(game, "game.update")
     black_runner.stop()
     white_runner.stop()
+
+
+@shared_task
+def delete_old_games():
+    Game.objects.filter(playing=False, is_tournament=False).delete()

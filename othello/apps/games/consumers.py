@@ -2,6 +2,7 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 
 from .utils import *
+from .tasks import run_game
 from .models import Game, Submission
 
 
@@ -50,6 +51,9 @@ class GameConsumer(JsonWebsocketConsumer):
     def game_error(self, event):
         self.send_error()
 
+    def game_ping(self, event):
+        self.send_json({"type": "game.ping"})
+
     def update_game(self):
         if self.connected:
             self.game.refresh_from_db()
@@ -73,11 +77,16 @@ class GameConsumer(JsonWebsocketConsumer):
 
 class GamePlayingConsumer(GameConsumer):
 
+    def connect(self):
+        super(GamePlayingConsumer, self).connect()
+        run_game.delay(self.game.id)
+
     def receive_json(self, content, **kwargs):
+        self.game.is_active = True
+
         player = content.get('player', False)
-        move = int(content.get('move', False))
-        if move:
-            if player == 'O' and self.is_white_yourself:
+        if move := int(content.get('move', False)):
+            if player == 'o' and self.is_white_yourself:
                 self.game.moves.create(player=player, move=move)
-            elif player == 'X' and self.is_black_yourself:
+            elif player == 'x' and self.is_black_yourself:
                 self.game.moves.create(player=player, move=move)
