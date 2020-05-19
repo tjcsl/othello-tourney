@@ -1,4 +1,3 @@
-from asyncio import sleep
 from celery import shared_task
 from django.conf import settings
 from asgiref.sync import async_to_sync
@@ -32,9 +31,9 @@ def run_game(game_id):
     mod, time_limit = Moderator(), game.time_limit
     game_over = False
 
-    black_runner = YourselfRunner(game) \
+    black_runner = YourselfRunner(game, settings.YOURSELF_TIMEOUT) \
         if game.black == yourself else PlayerRunner(game.black.code.path, settings.JAILEDRUNNER_DRIVER, settings.DEBUG)
-    white_runner = YourselfRunner(game) \
+    white_runner = YourselfRunner(game, settings.YOURSELF_TIMEOUT) \
         if game.white == yourself else PlayerRunner(game.white.code.path, settings.JAILEDRUNNER_DRIVER, settings.DEBUG)
 
     with black_runner as player_black, white_runner as player_white:
@@ -120,6 +119,6 @@ def run_game(game_id):
     white_runner.stop()
 
 
-@shared_task
-def delete_old_games():
-    Game.objects.filter(playing=False, is_tournament=False).delete()
+# @shared_task
+# def delete_old_games():
+#     Game.objects.filter(playing=False, is_tournament=False).delete()

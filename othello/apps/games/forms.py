@@ -47,7 +47,7 @@ class GameForm(forms.Form):
     choices = Submission.objects.usable()
     black = forms.ModelChoiceField(label="Black:", queryset=choices, initial="Yourself")
     white = forms.ModelChoiceField(label="White:", queryset=choices, initial="Yourself")
-    time_limit = forms.IntegerField(label="Time Limit (secs):", initial=5, min_value=1)
+    time_limit = forms.IntegerField(label="Time Limit (secs):", initial=5, min_value=1, max_value=15)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

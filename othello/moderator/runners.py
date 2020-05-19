@@ -1,6 +1,5 @@
 import os
 import sys
-import enum
 import time
 import psutil
 import select
@@ -148,7 +147,8 @@ class PlayerRunner:
 
 class YourselfRunner:
 
-    def __init__(self, game):
+    def __init__(self, game, timeout):
+        self.timeout = timeout
         self.game = game
 
     def __enter__(self):
@@ -163,7 +163,10 @@ class YourselfRunner:
     @capture_generator_value
     def get_move(self, board, player, time_limit, last_move):
         yield "Choose your move!"
+        start = time.time()
         while True:
+            if (time.time() - start) > self.timeout:
+                return -1, UserError.NO_MOVE_ERROR
             if (m := self.game.moves.latest()) != last_move:
                 print(m.move, last_move.move)
                 m.delete()
