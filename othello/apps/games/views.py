@@ -1,8 +1,9 @@
+import json
+
 from django.contrib import messages
 from django.http import FileResponse
 from django.shortcuts import render, redirect
 
-from .tasks import run_game
 from .models import Game, Submission
 from .utils import serialize_game_info
 from ..auth.decorators import login_required
@@ -66,10 +67,13 @@ def play(request):
                 playing=True,
                 ping=True,
             )
+            cd['black'], cd['white'] = cd['black'].id, cd['white'].id
+            request.session["form-data"] = json.dumps(cd)
             return render(request, "games/play.html", {'game': serialize_game_info(g), 'is_watching': False})
         else:
             messages.error(request, "Unable to start game, try again later", extra_tags="danger")
-    return render(request, "games/design.html", {'form': GameForm()})
+    initial = json.loads(request.session.get("form-data", "{}"))
+    return render(request, "games/design.html", {'form': GameForm(initial=initial)})
 
 
 def watch(request, game_id=False):
