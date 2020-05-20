@@ -91,6 +91,7 @@ class Game(models.Model):
     )
 
     objects = GameSet.as_manager()
+    created_at = models.DateTimeField(auto_now=True)
 
     black = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="black")
     white = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="white")

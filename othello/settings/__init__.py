@@ -161,5 +161,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "submissions")
 IMPORT_DRIVER = os.path.join(BASE_DIR, "sandboxing", "import_wrapper.py")
 JAILEDRUNNER_DRIVER = os.path.abspath(os.path.join(os.path.dirname(BASE_DIR), "run_ai_jailed.py"))
 FIREJAIL_PROFILE = os.path.join(BASE_DIR, "sandboxing", "sandbox.profile")
-YOURSELF_TIMEOUT = 300
+YOURSELF_TIMEOUT = 300  # seconds
+STALE_GAME = 5  # hours
 

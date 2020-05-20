@@ -1,4 +1,7 @@
+from datetime import datetime, timedelta
+
 from celery import shared_task
+from django.db.models import Q
 from django.conf import settings
 from asgiref.sync import async_to_sync
 from celery.utils.log import get_task_logger
@@ -21,10 +24,9 @@ def send_through_socket(game, event_type):
 def run_game(game_id):
     try:
         game = Game.objects.get(id=game_id)
+        yourself = Submission.objects.get(user__username="Yourself")
     except Game.DoesNotExist:
         return
-    try:
-        yourself = Submission.objects.get(user__username="Yourself")
     except Submission.DoesNotExist:
         return
 
@@ -121,4 +123,5 @@ def run_game(game_id):
 
 @shared_task
 def delete_old_games():
-    Game.objects.filter(playing=False, is_tournament=False).delete()
+    Game.objects.filter(is_tournament=False)\
+        .filter(Q(playing=False) | Q(created_at__lt=datetime.now() - timedelta(hours=settings.STALE_GAME))).delete()
