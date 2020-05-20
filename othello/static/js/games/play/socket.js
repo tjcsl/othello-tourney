@@ -4,9 +4,10 @@ const PATH = `${PROTOCOL}://${window.location.host}`;
 
 function add_listeners(socket){
     let rCanvas = init(game.black, game.white);
-
+    $(".canvasContainer").width($("#canvas").width());
     $(window).on('resize', function () {
         rCanvas.resize();
+        $(".canvasContainer").width($("#canvas").width());
     });
 
     function mouseOver(event){
@@ -70,11 +71,19 @@ function add_listeners(socket){
                     console.log(JSON.stringify(data))
                     drawBoard(rCanvas, data.moves[0].board, data.moves[0].possible, BLACK_NM, rCanvas.animArray, 36);
                 }else{
+                    rCanvas.black_name = data.black;
+                    rCanvas.white_name = data.white;
                     let player = data.moves[0].player === BLACK_CH ? WHITE_NM : BLACK_NM;
                     drawBoard(rCanvas, data.moves[0].board, data.moves[0].possible, player, rCanvas.animArray, data.moves[0].tile);
                 }
                 HISTORY = data.moves;
                 break
+            case 'game.error':
+                game_error(data.player, data.code, data.message);
+                $("#black-logs-area").append("Disconnected from server");
+                $("#white-logs-area").append("Disconnected from server");
+                socket.close();
+                break;
             default:
                 console.error(`Invalid message type: ${data.type}`);
                 return;

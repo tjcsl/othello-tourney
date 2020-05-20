@@ -14,10 +14,13 @@
 
 {% block main %}
     <div class="gameContainer" id="gameContainer">
-        <div class="gameContainer-left" id="black-logs">
-            <textarea id="black-logs-area" class="area-log" disabled></textarea>
+        <div class="gameContainer-left col" id="black-logs">
+            <div id="black-logs-area" class="area-log">
+                <h3 style="text-decoration: underline">Black Logs</h3>
+                <pre>contenteditablecontenteditablecontenteditable</pre>
+            </div>
         </div>
-        <div class="gameContainer-center">
+        <div class="gameContainer-center col">
             <div class="canvasContainer">
                 <canvas id="canvas">
                     This browser is incompatible
@@ -32,8 +35,12 @@
                 <button id="downloadHistoryButton" type="button" data-toggle="modal" data-target="#downloadModal">Download Game</button>
             </div>
         </div>
-        <div class="gameContainer-right" id="white-logs">
-            <textarea id="white-logs-area" class="area-log" disabled></textarea>
+        <div class="gameContainer-right col" id="white-logs">
+            <div id="white-logs-area" class="area-log">
+                <h3 style="text-decoration: underline">White Logs</h3>
+                <pre>contenteditablecontenteditablecontenteditable</pre>
+                <pre>contenteditablecontenteditablecontenteditable</pre>
+            </div>
         </div>
     </div>
     <div class="modal fade" id="downloadModal">

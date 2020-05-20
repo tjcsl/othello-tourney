@@ -29,7 +29,7 @@ def serialize_game_info(game):
 def serialize_game_log(log):
     data = {
         "type": "game.log",
-        "player": log.player,
+        "player": log.player.lower(),
         "message": log.message
     }
     return data
@@ -38,7 +38,7 @@ def serialize_game_log(log):
 def serialize_game_error(error):
     data = {
         "type": "game.error",
-        "player": error.player,
+        "player": error.player.lower(),
         "code": error.error_code,
         "message": error.error_msg
     }

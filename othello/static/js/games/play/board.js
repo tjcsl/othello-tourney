@@ -200,16 +200,19 @@ function highlight_tile(rCanvas, event){
     let cx = Math.floor(rCanvas.mx / rCanvas.border_and_square);
     let ox = rCanvas.select.x;
     let oy = rCanvas.select.y;
-    rCanvas.select.x = rCanvas.border_and_square*cx+rCanvas.border;
-    rCanvas.select.y = rCanvas.border_and_square*cy+rCanvas.border;
+    rCanvas.select.x = rCanvas.border_and_square * cx + rCanvas.border;
+    rCanvas.select.y = rCanvas.border_and_square * cy + rCanvas.border;
     rCanvas.select.width = rCanvas.square;
     rCanvas.select.height = rCanvas.square;
-    if(ox !== rCanvas.select.x || oy !== rCanvas.select.y){
+    if (ox !== rCanvas.select.x || oy !== rCanvas.select.y) {
         rCanvas.draw();
     }
+
 }
 
 function place_stone(rCanvas, event, socket){
+    if(is_watching)
+        return
     highlight_tile(rCanvas, event);
     let olc = rCanvas.lastClicked;
     let cy = Math.floor(rCanvas.my / rCanvas.border_and_square);
@@ -237,6 +240,14 @@ function place_stone(rCanvas, event, socket){
         }
     }
 }
+
+
+function game_error(player, code, message){
+    let error_area = player === 'x' ? $("#black-logs-area") : $("#white-logs-area")
+    let error = `${message}\nForfeited with error code ${code}`
+    error_area.append(`${error}`);
+}
+
 
 function prettyPrint(board) {
     let out = `  1 2 3 4 5 6 7 8\n`;
