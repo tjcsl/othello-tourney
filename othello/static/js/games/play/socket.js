@@ -52,8 +52,9 @@ function add_listeners(socket){
     };
 
     socket.onclose = function () {
-        console.log("disconnected from socket");
-0    };
+        $("#black-logs-area").append(`<pre class="err_log">Disconnected from server</pre>`);
+        $("#white-logs-area").append(`<pre class="err_log">Disconnected from server</pre>`);
+    };
 
     socket.onmessage = function (message) {
         let data = JSON.parse(message.data);

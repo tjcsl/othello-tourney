@@ -8,8 +8,8 @@ from asgiref.sync import async_to_sync
 from celery.utils.log import get_task_logger
 from channels.layers import get_channel_layer
 
-from ..games.models import Game, Player, Submission
 from ...moderator import *
+from ..games.models import Game, Player, Submission
 
 task_logger = get_task_logger(__name__)
 
