@@ -119,6 +119,6 @@ def run_game(game_id):
     white_runner.stop()
 
 
-# @shared_task
-# def delete_old_games():
-#     Game.objects.filter(playing=False, is_tournament=False).delete()
+@shared_task
+def delete_old_games():
+    Game.objects.filter(playing=False, is_tournament=False).delete()

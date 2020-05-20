@@ -143,7 +143,7 @@ CELERY_TIMEZONE = "America/New_York"
 CELERY_BEAT_SCHEDULE = {
     'delete-old-games': {
         'task': 'othello.apps.games.tasks.delete_old_games',
-        'schedule': crontab(),
+        'schedule': crontab(hour=2, minute=30, day_of_week='*/2'),
         'args': (),
     }
 }

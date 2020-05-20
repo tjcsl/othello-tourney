@@ -11,3 +11,4 @@ __pycache__/
 secret.py
 submissions/
 serve/
+celerybeat-schedule
