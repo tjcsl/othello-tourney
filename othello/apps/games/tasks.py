@@ -1,3 +1,4 @@
+from time import sleep
 from datetime import datetime, timedelta
 
 from celery import shared_task
@@ -18,6 +19,15 @@ def send_through_socket(game, event_type):
     async_to_sync(get_channel_layer().group_send)(
         game.channels_group_name, {"type": event_type}
     )
+
+
+def ping(game):
+    game.ping = False
+    game.save(update_fields=["ping"])
+    send_through_socket(game, "game.ping")
+    sleep(0.5)
+    game.refresh_from_db()
+    return game.ping
 
 
 @shared_task
@@ -47,6 +57,12 @@ def run_game(game_id):
         send_through_socket(game, "game.update")
 
         while not mod.is_game_over():
+            if not ping(game):
+                game.playing = False
+                game.outcome = 'T'
+                game.forfeit = False
+                game.save(update_fields=["playing", "outcome", "forfeit"])
+                return
             board, current_player = mod.get_game_state()
 
             try:

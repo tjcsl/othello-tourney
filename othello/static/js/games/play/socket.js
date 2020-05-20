@@ -59,8 +59,12 @@ function add_listeners(socket){
         let data = JSON.parse(message.data);
         console.log(data)
         switch(data.type){
+            case 'game.ping':
+                socket.send(JSON.stringify({"message": "ping"}))
+                break;
             case 'game.log':
                 console.log(`LOG: ${data.message}`);
+                game_log(data.player, data.message);
                 break;
             case 'game.update':
                 console.log(data)
@@ -80,8 +84,8 @@ function add_listeners(socket){
                 break
             case 'game.error':
                 game_error(data.player, data.code, data.message);
-                $("#black-logs-area").append("Disconnected from server");
-                $("#white-logs-area").append("Disconnected from server");
+                $("#black-logs-area").append(`<pre class="err_log">Disconnected from server</pre>`);
+                $("#white-logs-area").append(`<pre class="err_log">Disconnected from server</pre>`);
                 socket.close();
                 break;
             default:

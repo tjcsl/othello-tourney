@@ -63,7 +63,8 @@ def play(request):
                 black=cd['black'],
                 white=cd['white'],
                 time_limit=cd['time_limit'],
-                playing=True
+                playing=True,
+                ping=True,
             )
             return render(request, "games/play.html", {'game': serialize_game_info(g), 'is_watching': False})
         else:

@@ -101,6 +101,7 @@ class Game(models.Model):
     outcome = models.CharField(max_length=1, choices=OUTCOME_CHOICES, default='')
 
     playing = models.BooleanField(default=False)
+    ping = models.BooleanField(default=True)
     is_tournament = models.BooleanField(default=False)
 
     @property

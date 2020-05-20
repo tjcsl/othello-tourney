@@ -67,7 +67,7 @@ class GameConsumer(JsonWebsocketConsumer):
         if self.connected:
             log = self.game.logs.latest()
             has_access = log.game.black.user == self.scope["user"] if log.player == "Black" else log.game.white.user == self.scope["user"]
-            if has_access:
+            if has_access or (log.player == 'X' and self.is_black_yourself) or (log.player == 'O' and self.is_white_yourself):
                 self.send_json(serialize_game_log(log))
 
     def send_error(self):
@@ -82,7 +82,8 @@ class GamePlayingConsumer(GameConsumer):
         run_game.delay(self.game.id)
 
     def receive_json(self, content, **kwargs):
-        self.game.is_active = True
+        self.game.ping = True
+        self.game.save(update_fields=["ping"])
 
         player = content.get('player', False)
         if move := int(content.get('move', False)):

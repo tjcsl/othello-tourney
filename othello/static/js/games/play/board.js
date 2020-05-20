@@ -243,9 +243,14 @@ function place_stone(rCanvas, event, socket){
 
 
 function game_error(player, code, message){
-    let error_area = player === 'x' ? $("#black-logs-area") : $("#white-logs-area")
-    let error = `${message}\nForfeited with error code ${code}`
-    error_area.append(`${error}`);
+    let error_area = player === 'x' ? $("#black-logs-area") : $("#white-logs-area");
+    error_area.append(`<pre class="err_log">${message}</pre>`);
+    error_area.append(`<pre class="err_log">Forfeited with error code ${code}</pre>`);
+}
+
+function game_log(player, message) {
+    let error_area = player === 'x' ? $("#black-logs-area") : $("#white-logs-area");
+    error_area.append(`<pre>${message}</pre>`);
 }
 
 

@@ -130,3 +130,7 @@ textarea {
 .modal-xl {
     max-width: 1300px;
 }
+
+.err_log {
+    color: #ff2600;
+}
