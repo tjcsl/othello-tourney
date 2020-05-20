@@ -17,5 +17,5 @@ To get started:
   6) After the VM has been provisioned the file `othello/settings/secret.py` will be created, copy your Ion OAuth credentials in the appropriate fields
   7) Run `./manage.py runserver <host>:8000` after running `vagrant ssh`
   8) Open the url in a browser on the host computer
-  9) Run the celery worker using `celery --app=othello worker --loglevel=INFO`
+  9) Run the celery worker using `celery --app=othello worker --loglevel=INFO -B`
       * Celery worker needs to be running or games will not be executed
