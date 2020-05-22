@@ -4,8 +4,8 @@ from . import utils
 
 
 class Player(enum.Enum):
-    BLACK = 'X'
-    WHITE = 'O'
+    BLACK = 'x'
+    WHITE = 'o'
 
 
 PLAYERS = {
@@ -89,3 +89,6 @@ class Moderator:
 
     def get_game_state(self):
         return utils.binary_to_string(self.board), PLAYERS[self.current_player]
+
+    def score(self):
+        return utils.hamming_weight(self.board[1]) - utils.hamming_weight(self.board[0])

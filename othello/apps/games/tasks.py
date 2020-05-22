@@ -59,7 +59,8 @@ def run_game(game_id):
         while not mod.is_game_over():
             if not ping(game):
                 game.playing = False
-                game.outcome = 'T'
+                score = mod.score()
+                game.outcome = Player.BLACK.value if score > 0 else Player.WHITE.value if score < 0 else 'T'
                 game.forfeit = False
                 game.save(update_fields=["playing", "outcome", "forfeit"])
                 return
@@ -74,7 +75,6 @@ def run_game(game_id):
                 task_logger.error(str(e))
 
             for log in running_turn:
-                print(f"LOG {log}")
                 game.logs.create(
                     player=current_player.value,
                     message=log,
