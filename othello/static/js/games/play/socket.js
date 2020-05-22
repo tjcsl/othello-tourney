@@ -10,6 +10,13 @@ function add_listeners(socket){
         $(".canvasContainer").width($("#canvas").width());
     });
 
+    setInterval(function () {
+        let black = document.getElementById("black-logs-area");
+        let white = document.getElementById("white-logs-area");
+        black.scrollTop = black.scrollHeight;
+        white.scrollTop = white.scrollHeight;
+    }, 250);
+
     function mouseOver(event){
         highlight_tile(rCanvas, event);
     }
