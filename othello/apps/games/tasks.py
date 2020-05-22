@@ -74,13 +74,14 @@ def run_game(game_id):
                 task_logger.error(str(e))
 
             for log in running_turn:
+                print(f"LOG {log}")
                 game.logs.create(
                     player=current_player.value,
                     message=log,
                 )
                 send_through_socket(game, "game.log")
+                sleep(0.05)
             submitted_move, error = running_turn.return_value
-            print(submitted_move, error)
 
             if error != 0:
                 game.errors.create(
@@ -102,7 +103,6 @@ def run_game(game_id):
             try:
                 if submitted := mod.submit_move(submitted_move):
                     possible = submitted
-                    print("MOVE: " + str(submitted_move) + str(possible))
                 else:
                     game_over = True
             except InvalidMoveError as e:

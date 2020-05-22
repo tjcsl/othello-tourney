@@ -20,6 +20,9 @@ def _save_path(instance, filename):
 
 class SubmissionSet(models.QuerySet):
 
+    def latest(self):
+        return self.order_by('-created_at')[0] if self.exists() else None
+
     def usable(self, user=None):
         return self.filter(user=user, usable=True) if user else self.filter(usable=True)
 
@@ -35,7 +38,7 @@ class Submission(models.Model):
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="user")
     name = models.CharField(max_length=500, default="")
-    submitted_time = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now=True)
     code = models.FileField(upload_to=_save_path, default=None,)
     usable = models.BooleanField(default=True)
 
@@ -43,14 +46,10 @@ class Submission(models.Model):
         return self.user.short_name
 
     def get_submitted_time(self):
-        return self.submitted_time.strftime("%Y-%m-%d %H:%M:%S")
+        return self.created_at.strftime("%Y-%m-%d %H:%M:%S")
 
     def get_submission_name(self):
         return f'{self.name}: <{self.get_submitted_time()}>'
-
-    @property
-    def is_usable(self):
-        return self.usable
 
     def set_usable(self):
         for x in Submission.objects.filter(user=self.user):

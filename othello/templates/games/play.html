@@ -1,9 +1,0 @@
-{% extends 'games/base.html' %}
-{% block title %}Othello: Play{% endblock %}
-{% load js %}
-{% block extra_head %}
-    <script type="text/javascript">
-        const game = JSON.parse('{{ game|store }}');
-        const is_watching = JSON.parse('{{ is_watching|store }}')
-    </script>
-{% endblock %}

@@ -3,7 +3,6 @@ from .secret import *
 from celery.schedules import crontab
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODERATOR_ROOT = os.path.join(BASE_DIR, "moderator")
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
@@ -123,10 +122,6 @@ LOGIN_URL = "auth:login"
 LOGIN_REDIRECT_URL = "games:upload"
 LOGOUT_REDIRECT_URL = "auth:index"
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/2.2/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "America/New_York"
@@ -151,16 +146,16 @@ CELERY_BEAT_SCHEDULE = {
 
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "serve")
-
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
-
 MEDIA_ROOT = os.path.join(BASE_DIR, "submissions")
 
 
 # Othello Settings
+MODERATOR_ROOT = os.path.join(BASE_DIR, "moderator")
 IMPORT_DRIVER = os.path.join(BASE_DIR, "sandboxing", "import_wrapper.py")
-JAILEDRUNNER_DRIVER = os.path.abspath(os.path.join(os.path.dirname(BASE_DIR), "run_ai_jailed.py"))
 FIREJAIL_PROFILE = os.path.join(BASE_DIR, "sandboxing", "sandbox.profile")
-YOURSELF_TIMEOUT = 300  # seconds
+JAILEDRUNNER_DRIVER = os.path.abspath(os.path.join(os.path.dirname(BASE_DIR), "run_ai_jailed.py"))
+
 STALE_GAME = 6  # hours
+YOURSELF_TIMEOUT = 300  # seconds
 

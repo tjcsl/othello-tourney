@@ -1,7 +1,6 @@
 {% extends 'games/base.html' %}
-{% load static %}
+{% block title %}Othello: {{ request.resolver_match.url_name|title }}{% endblock %}
 {% load js %}
-{% block title %}Othello: Watch{% endblock %}
 {% block extra_head %}
     <script type="text/javascript">
         const game = JSON.parse('{{ game|store }}');

@@ -13,7 +13,8 @@ from .forms import SubmissionForm, GameForm, DownloadSubmissionForm
 @login_required
 def upload(request):
     if request.method == "GET":
-        return render(request, "games/upload.html", {'success': False, 'submission_form': SubmissionForm(), 'change_form': DownloadSubmissionForm(request.user)})
+        return render(request, "games/upload.html", {'success': False, 'submission_form': SubmissionForm(),
+                                                     'change_form': DownloadSubmissionForm(request.user)})
     action, success = request.POST.get("action", False), False
     if action == "new_submission":
         form = SubmissionForm(request.POST, request.FILES)
@@ -69,7 +70,8 @@ def play(request):
             )
             cd['black'], cd['white'] = cd['black'].id, cd['white'].id
             request.session["form-data"] = json.dumps(cd)
-            return render(request, "games/play.html", {'game': serialize_game_info(g), 'is_watching': False})
+            return render(request, "games/board.html",
+                          {'game': serialize_game_info(g), 'is_watching': False})
         else:
             messages.error(request, "Unable to start game, try again later", extra_tags="danger")
     initial = json.loads(request.session.get("form-data", "{}"))
@@ -78,5 +80,9 @@ def play(request):
 
 def watch(request, game_id=False):
     if game_id:
-        return render(request, "games/watch.html", {'game': serialize_game_info(Game.objects.get(id=game_id)), 'is_watching': True})
+        return render(
+            request, "games/board.html", {
+                'game': serialize_game_info(Game.objects.get(id=game_id)),
+                'is_watching': True}
+        )
     return render(request, "games/watch_list.html", {'games': Game.objects.running()})

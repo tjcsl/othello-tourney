@@ -65,6 +65,7 @@ class GameConsumer(JsonWebsocketConsumer):
 
     def send_log(self):
         if self.connected:
+            self.game.refresh_from_db()
             log = self.game.logs.latest()
             has_access = log.game.black.user == self.scope["user"] if log.player == "Black" else log.game.white.user == self.scope["user"]
             if has_access or (log.player == 'X' and self.is_black_yourself) or (log.player == 'O' and self.is_white_yourself):
