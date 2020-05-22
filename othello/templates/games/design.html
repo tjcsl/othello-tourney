@@ -13,11 +13,13 @@
                 {% csrf_token %}
                 <div class="form-group">
                     {{ form.black.label_tag }}
+                    <i class="fa fa-question-circle yourself" id="black-help"></i>
                     <br>
                     {{ form.black }}
                 </div>
                 <div class="form-group">
                     {{ form.white.label_tag }}
+                    <i class="fa fa-question-circle yourself" id="white-help"></i>
                     <br>
                     {{ form.white }}
                 </div>

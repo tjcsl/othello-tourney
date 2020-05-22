@@ -18,6 +18,12 @@ tippy("#parseable-help", {
     placement: "top",
 });
 
+tippy(".yourself", {
+    content: "Choosing the \"Yourself\" player will allow you to manually choose a move. \"Yourself\" players will have " +
+        "5 minutes to choose a move regardless of the specified time limit. Other players will adhere to the time limit.",
+    placement: "right"
+})
+
 if (!Array.prototype.last){
     Array.prototype.last = function(){
         return this[this.length - 1];

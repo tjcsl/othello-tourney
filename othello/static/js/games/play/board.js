@@ -246,11 +246,13 @@ function game_error(player, code, message){
     let error_area = player === 'x' ? $("#black-logs-area") : $("#white-logs-area");
     error_area.append(`<pre class="err_log">${message}</pre>`);
     error_area.append(`<pre class="err_log">Forfeited with error code ${code}</pre>`);
+    error_area.scrollTop(error_area.prop('scrollHeight'));
 }
 
 function game_log(player, message) {
-    let error_area = player === 'x' ? $("#black-logs-area") : $("#white-logs-area");
-    error_area.append(`<pre>${message}</pre>`);
+    let log_area = player === 'x' ? $("#black-logs-area") : $("#white-logs-area");
+    log_area.append(`<pre>${message}</pre>`);
+    log_area.scrollTop(log_area.prop('scrollHeight'));
 }
 
 
