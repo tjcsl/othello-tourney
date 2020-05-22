@@ -12,5 +12,4 @@ urlpatterns = [
     path("oauth/", include("social_django.urls", namespace="social")),
 ]
 
-handler404 = handle_404_view
 handler500 = handle_500_view

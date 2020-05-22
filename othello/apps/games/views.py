@@ -1,10 +1,10 @@
 import json
 
 from django.contrib import messages
-from django.http import FileResponse
 from django.shortcuts import render, redirect
+from django.http import FileResponse
 
-from .models import Game, Submission
+from .models import Game
 from .utils import serialize_game_info
 from ..auth.decorators import login_required
 from .forms import SubmissionForm, GameForm, DownloadSubmissionForm
@@ -24,25 +24,24 @@ def upload(request):
                 submission.user = request.user
                 submission.save()
                 success = True
-            except Exception as e:
+            except BaseException as e:
                 messages.error(request, "Unable to upload script at this time, try again later", extra_tags="danger")
+                raise e
         else:
-            for error in form.errors.get_json_data()["__all__"]:
-                messages.error(request, error["message"], extra_tags="danger")
+            for errors in form.errors.get_json_data().values():
+                for error in errors:
+                    messages.error(request, error["message"], extra_tags="danger")
     elif action == "download_submission":
         form = DownloadSubmissionForm(user=request.user, data=request.POST)
         if form.is_valid():
             cd = form.cleaned_data
             submission = cd["script"]
-            if submission in Submission.objects.filter(user=request.user):
-                try:
-                    return FileResponse(submission.code.open('rb'), as_attachment=True,
-                                        filename=f"{submission.get_submission_name()}.py")
-                except BaseException as e:
-                    messages.error(request, "Unable to download script, try again later", extra_tags="danger")
-                    raise e
-            else:
-                messages.error(request, "Cannot access specified submission", extra_tags="danger")
+            try:
+                return FileResponse(submission.code.open('rb'), as_attachment=True,
+                                    filename=f"{submission.get_submission_name()}.py")
+            except BaseException as e:
+                messages.error(request, "Unable to download script, try again later", extra_tags="danger")
+                raise e
         else:
             for errors in form.errors.get_json_data().values():
                 for error in errors:
@@ -50,10 +49,7 @@ def upload(request):
     else:
         messages.error(request, "Received invalid request", extra_tags="danger")
 
-    if not success:
-        return redirect("games:upload")
-    else:
-        return render(request, "games/upload.html", {'success': success})
+    return render(request, "games/upload.html", {'success': success}) if success else redirect("games:upload")
 
 
 def play(request):
@@ -73,7 +69,9 @@ def play(request):
             return render(request, "games/board.html",
                           {'game': serialize_game_info(g), 'is_watching': False})
         else:
-            messages.error(request, "Unable to start game, try again later", extra_tags="danger")
+            for errors in form.errors.get_json_data().values():
+                for error in errors:
+                    messages.error(request, error["message"], extra_tags="danger")
     initial = json.loads(request.session.get("form-data", "{}"))
     return render(request, "games/design.html", {'form': GameForm(initial=initial)})
 
