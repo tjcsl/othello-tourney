@@ -31,4 +31,3 @@ class Tournament(models.Model):
 
     def __repr__(self):
         return "<Tournament @ {}, {}>".format(self.start_time.strftime("%Y-%m-%d %H:%M:%S"), self.finished)
-\
