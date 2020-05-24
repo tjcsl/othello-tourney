@@ -6,7 +6,7 @@ from .forms import TournamentForm
 
 
 @management_only
-def create(request):
+def management(request):
     if request.method == "POST":
         form = TournamentForm(request.POST)
         if form.is_valid():

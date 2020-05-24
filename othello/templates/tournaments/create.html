@@ -7,7 +7,7 @@
 {% endblock %}
 {% block main %}
     <div class="align-content-center playform">
-        <form action="{% url 'tournaments:create' %}" method="post">
+        <form action="{% url 'tournaments:management' %}" method="post">
             {% csrf_token %}
             <p>
                 {{ form.start_time.label }}

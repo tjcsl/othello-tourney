@@ -11,8 +11,8 @@ def default(request):
 
 
 urlpatterns = [
-    path("create/", views.create, name="create"),
-    path("management/", views.create, name="management"),
-    path("previous/", views.create, name="previous"),
-    path("current/", views.create, name="current"),
+    path("management/", views.management, name="management"),
+    path("previous/", views.management, name="previous"),
+    path("current/", views.management, name="current"),
+    path("help/", default, name="help"),
 ]
