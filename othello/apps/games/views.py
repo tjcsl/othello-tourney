@@ -1,8 +1,8 @@
 import json
 
 from django.contrib import messages
-from django.shortcuts import render, redirect
 from django.http import FileResponse
+from django.shortcuts import render, redirect, get_object_or_404
 
 from .models import Game
 from .utils import serialize_game_info
@@ -80,7 +80,7 @@ def watch(request, game_id=False):
     if game_id:
         return render(
             request, "games/board.html", {
-                'game': serialize_game_info(Game.objects.get(id=game_id)),
+                'game': serialize_game_info(get_object_or_404(Game, id=game_id)),
                 'is_watching': True}
         )
     return render(request, "games/watch_list.html", {'games': Game.objects.running()})

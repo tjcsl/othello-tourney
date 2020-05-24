@@ -20,11 +20,12 @@ def _save_path(instance, filename):
 
 class SubmissionSet(models.QuerySet):
 
-    def latest(self):
-        return self.order_by('-created_at')[0] if self.exists() else None
-
-    def usable(self, user=None):
-        return self.filter(user=user, usable=True) if user else self.filter(usable=True)
+    def latest(self, user=None):
+        if user is not None:
+            qs = self.filter(user=user).order_by('-created_at')
+            return qs[0] if qs.exists() else None
+        else:
+            return self.all().order_by('user', '-created_at').distinct('user')
 
     def delete(self):
         for obj in self:
@@ -40,7 +41,6 @@ class Submission(models.Model):
     name = models.CharField(max_length=500, default="")
     created_at = models.DateTimeField(auto_now=True)
     code = models.FileField(upload_to=_save_path, default=None,)
-    usable = models.BooleanField(default=True)
 
     def get_user_name(self):
         return self.user.short_name
@@ -50,22 +50,6 @@ class Submission(models.Model):
 
     def get_submission_name(self):
         return f'{self.name}: <{self.get_submitted_time()}>'
-
-    def set_usable(self):
-        for x in Submission.objects.filter(user=self.user):
-            if x != self:
-                x.usable = False
-            else:
-                x.usable = True
-            x.save()
-
-    def save(self, *args, **kwargs):
-        if self.usable:
-            for x in Submission.objects.filter(user=self.user):
-                if x != self:
-                    x.usable = False
-                    x.save()
-        super(Submission, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         self.code.delete()

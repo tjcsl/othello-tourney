@@ -24,6 +24,11 @@ tippy(".yourself", {
     placement: "right"
 })
 
+tippy("#exclude_users_file_help", {
+    content: "Upload a CSV file with each excluded user in a separate entry. This overrides the above field.",
+    placement: "right"
+})
+
 if (!Array.prototype.last){
     Array.prototype.last = function(){
         return this[this.length - 1];

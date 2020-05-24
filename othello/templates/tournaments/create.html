@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Othello: Tournaments{% endblock %}
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/tournaments/create.css' %}">
+    <script type="text/javascript" src="{% static 'js/tournaments/create.js' %}"></script>
+{% endblock %}
+{% block main %}
+    <div class="align-content-center playform">
+        <form action="{% url 'tournaments:create' %}" method="post">
+            {% csrf_token %}
+            <p>
+                {{ form.start_time.label }}
+                {{ form.start_time }}
+            </p>
+            <p>
+                {{ form.end_time.label }}
+                {{ form.end_time }}
+            </p>
+            <p class="row" style="margin-left: 0; margin-bottom: 0">
+                {{ form.exclude_users.label }}
+                {{ form.exclude_users }}
+            </p>
+            <p>
+                =OR=
+            </p>
+            <p>
+                Exclude Users:
+                <input type="file" id="excludeUsersFile" name="Upload CSV">
+                <i id="exclude_users_file_help" class="fa fa-question-circle"></i>
+            </p>
+            <input type="submit">
+        </form>
+    </div>
+{% endblock %}

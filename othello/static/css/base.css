@@ -37,6 +37,10 @@ html, body {
     color: white
 }
 
+.dropdown-menu a{
+    color: #33a122;
+}
+
 .navbar-nav a:hover {
     text-decoration: underline;
 }

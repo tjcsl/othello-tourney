@@ -16,6 +16,8 @@ CHANNEL_LAYERS = {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
             "hosts": [('127.0.0.1', 6379)],
+            "capacity": 1500,
+            "expiry": 2,
         },
     },
 }
@@ -33,6 +35,7 @@ INSTALLED_APPS = [
     "othello.apps",
     "othello.apps.auth.apps.AuthConfig",
     "othello.apps.games.apps.GamesConfig",
+    "othello.apps.tournaments.apps.TournamentsConfig",
 ]
 
 MIDDLEWARE = [
@@ -128,6 +131,9 @@ TIME_ZONE = "America/New_York"
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+DATE_INPUT_FORMATS = [
+    '%Y-%m-%dT%H:%M',
+]
 
 SESSION_SAVE_EVERY_REQUEST = True
 
@@ -158,4 +164,3 @@ JAILEDRUNNER_DRIVER = os.path.abspath(os.path.join(os.path.dirname(BASE_DIR), "r
 
 STALE_GAME = 6  # hours
 YOURSELF_TIMEOUT = 300  # seconds
-

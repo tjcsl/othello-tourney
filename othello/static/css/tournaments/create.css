@@ -1,0 +1,23 @@
+.selectize-control {
+    width: 50%;
+}
+
+.selectize-input {
+    margin-left: 10px;
+    font-family: 'Roboto Mono', monospace;
+    font-size: 16px;
+    background-color: transparent;
+    color: #805229;
+    border: #a06633 2px solid;
+    width: 75%;
+}
+
+.selectize-dropdown {
+    color: #805229;
+    border: #a06633 2px solid;
+    font-size: 16px;
+}
+
+.form-group input {
+    margin-left: 10px;
+}

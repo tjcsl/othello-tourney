@@ -37,14 +37,14 @@ class DownloadSubmissionForm(forms.Form):
 
     def __init__(self, user, *args, **kwargs):
         super(DownloadSubmissionForm, self).__init__(*args, **kwargs)
-        choices = Submission.objects.filter(user=user)
+        choices = Submission.objects.filter(user=user).order_by('-created_at')
         self.fields["script"].queryset = choices
         self.fields["script"].initial = choices[0] if choices.exists() else None
         self.fields["script"].label_from_instance = lambda obj: obj.get_submission_name()
 
 
 class GameForm(forms.Form):
-    choices = Submission.objects.usable()
+    choices = Submission.objects.latest()
     black = forms.ModelChoiceField(label="Black:", queryset=choices, initial="Yourself")
     white = forms.ModelChoiceField(label="White:", queryset=choices, initial="Yourself")
     time_limit = forms.IntegerField(label="Time Limit (secs):", initial=5, min_value=1, max_value=15)
