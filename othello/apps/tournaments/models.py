@@ -25,3 +25,10 @@ class Tournament(models.Model):
     exclude_users = models.ManyToManyField(get_user_model(), blank=True,)
 
     finished = models.BooleanField(default=False,)
+
+    def __str__(self):
+        return "Tournament at {}".format(self.start_time.strftime("%Y-%m-%d %H:%M:%S"))
+
+    def __repr__(self):
+        return "<Tournament @ {}, {}>".format(self.start_time.strftime("%Y-%m-%d %H:%M:%S"), self.finished)
+\

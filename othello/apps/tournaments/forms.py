@@ -15,7 +15,7 @@ class TournamentForm(forms.ModelForm):
 
     def clean(self):
         cd = self.cleaned_data
-        if not cd["exclude_users"].difference(get_user_model().objects.all()).exists():
+        if not get_user_model().objects.all().difference(cd["exclude_users"]).exists():
             raise ValidationError("Cannot run a tournament with all users excluded!")
 
     class Meta:
