@@ -36,6 +36,7 @@
     .gameContainer-center{
         order: 0;
         justify-content: center;
+        margin-left: 8vw;
     }
     .gameContainer-left {
         order: 1;

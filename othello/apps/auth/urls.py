@@ -10,6 +10,8 @@ def default(request):
 
 
 urlpatterns = [
+    path("error/", default, name="error"),
+
     path("", default, name="index"),
     path("login/", default, name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),

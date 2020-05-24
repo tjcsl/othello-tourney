@@ -25,7 +25,8 @@ tippy(".yourself", {
 })
 
 tippy("#exclude_users_file_help", {
-    content: "Upload a CSV file with each excluded user in a separate entry. This overrides the above field.",
+    content: "Upload a CSV file with each excluded user in a separate entry, users should be split by newline." +
+        " Users read from this file will be added to the above field.",
     placement: "right"
 })
 

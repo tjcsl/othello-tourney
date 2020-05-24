@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Othello: Server Error{% endblock %}
+{% block header %} Home {% endblock %}
+{% block main %}
+    <h3>Something Unexpected Occurred!</h3>
+    <h5>
+        There was a problem when trying to authenticate you.
+    </h5>
+    <p>
+        Please try again later or contact <a href="mailto:othello@tjhsst.edu">othello@tjhsst.edu</a> if this persists.
+    </p>
+    <a href="{% url 'auth:index' %}">Go Home</a>
+    <br>
+{% endblock %}
