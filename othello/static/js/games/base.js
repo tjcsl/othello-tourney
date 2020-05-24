@@ -19,4 +19,11 @@ function on_load() {
             function () {
                 $(this).find("label").css({"text-decoration": "none"});
             });
+
+    $(".area-log-container").on('click', function () {
+        if($(this).children(".area-log").css('display') !== 'none')
+            $(this).children(".area-log").hide();
+        else
+            $(this).children(".area-log").show();
+    });
 }

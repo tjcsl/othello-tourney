@@ -19,7 +19,7 @@
 
 {% block main %}
     <div class="gameContainer" id="gameContainer">
-        <div class="gameContainer-left col" id="black-logs">
+        <div class="gameContainer-left col area-log-container" id="black-logs" data-toggle="tooltip" title="Click to collapse">
             <div id="black-logs-area" class="area-log">
                 <h3 style="text-decoration: underline">Black Logs</h3>
             </div>
@@ -39,7 +39,7 @@
                 <button id="downloadHistoryButton" type="button" data-toggle="modal" data-target="#downloadModal">Download Game</button>
             </div>
         </div>
-        <div class="gameContainer-right col" id="white-logs">
+        <div class="gameContainer-right col area-log-container" id="white-logs" data-toggle="tooltip" title="Click to collapse">
             <div id="white-logs-area" class="area-log">
                 <h3 style="text-decoration: underline">White Logs</h3>
             </div>

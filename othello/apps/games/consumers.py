@@ -61,7 +61,8 @@ class GameConsumer(JsonWebsocketConsumer):
             self.send_json(game)
             if game['game_over']:
                 self.disconnect(code=0)
-                self.game.delete()
+                if not self.game.is_tournament:
+                    self.game.delete()
 
     def send_log(self):
         if self.connected:

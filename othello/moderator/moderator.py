@@ -39,8 +39,8 @@ class Moderator:
 
     def outcome(self):
         if self.is_game_over():
-            black, white = utils.hamming_weight(self.board[utils.BLACK]), utils.hamming_weight(self.board[utils.WHITE])
-            return PLAYERS[utils.BLACK].value if black > white else PLAYERS[utils.WHITE].value if white < black else 'T'
+            score = self.score()
+            return PLAYERS[utils.BLACK].value if score > 0 else PLAYERS[utils.WHITE].value if score < 0 else 'T'
         return False
 
     def possible_moves(self):

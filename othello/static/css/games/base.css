@@ -18,6 +18,15 @@
     align-items: flex-start;
 }
 
+#black-logs {
+    margin-left: 10px;
+}
+
+
+#white-logs {
+    margin-right: 10px;
+}
+
 
 @media (max-width: 1400px) {
     .gameContainer {
@@ -34,6 +43,12 @@
     .gameContainer-right{
         order: 1;
         margin-left: 0;
+    }
+    #black-logs {
+        margin-left: 0;
+    }
+    #white-logs {
+        margin-right: 0;
     }
 }
 

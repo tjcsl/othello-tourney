@@ -124,7 +124,7 @@ def run_game(game_id):
                 possible=possible
             )
             if game_over:
-                game.forfeit, game.playing = False, False
+                game.forfeit = False
                 game.outcome = mod.outcome()
                 game.save(update_fields=["forfeit", "outcome", "playing"])
                 task_logger.error("GAME OVER")
