@@ -5,29 +5,74 @@
         File specification
     </h3>
     <p>
-        A valid Othello AI consists of a Python file, version 3.8.2, with a class called <code>Strategy</code> containing a method called <code>best_strategy</code> taking the arguments <code>board, player, best_move, still_running</code> in that order. <code>best_move</code> and <code>still_running</code> are <code>multiprocessing.Value</code> objects, and can be changed using <code>best_move.value=34</code> for example. <code>still_running</code> is another <code>multiprocessing.Value</code> flag, initially set to 1, then set to 0 by the server when the time limit for the AI is almost up.
+        A valid Othello AI consists of a Python file, version 3+, with a class called <code>Strategy</code> containing a method called <code>best_strategy</code> with the arguments <code>board, player, best_move, still_running</code> in that order. <code>best_move</code> and <code>still_running</code> are <code>multiprocessing.Value</code> objects.
+        They can be accessed and modified by doing <code>best_move.value=34</code> or <code>print(still_running.value)</code>.
+        The <code>still_running</code> variable will start as 1 but will change to 0 when your processing time is about to run out.
     </p>
     <p>
-         Note: Your script will be automatically cut off regardless of whether or not your code uses the <code>still_running</code> variable
+         Note: Your script will be automatically cut off regardless of whether or not your code uses the <code>still_running</code> parameter
     </p>
     <p>
         You do not need to import the <code>multiprocessing</code> library to access these objects
     </p>
     <p>
-        The board will be a length-64 string of characters from the set <code>{'.', 'x', 'o'}</code>. This represents an 8x8 board of blanks <code>'.'</code>. The player strings are <code>'x'</code> for black and <code>'o'</code> for white. A move is an integer representing the index in the board string where the current player will place a piece.
+        The board will be a length-64 string of characters from the set <code>{'.', 'x', 'o'}</code>.
+        An <code>'.'</code> represents an empty space, <code>'x'</code> a black token, and <code>'o'</code> a white token.
+        A valid move is with in the range 0-63, inclusive, and represents an index on the board string where the current player will place a piece.
     </p>
     <h5 style="text-decoration: underline">
         Scripts submitted before the 2020-21 school year are now invalid!
     </h5>
     <p>
-        Students who submitted before the 2020-21 school year must now revise their code to recognize the 8x8 board(instead of the previous 10x10 board) and resubmit their script.
+        Students who submitted before the 2020-21 school year must now revise their code to recognize the 8x8 board(instead of the previous 10x10 board)
+        and modify the set of characters to <code>{'.','x','o'}</code>(instead of the previous <code>{'.','@','o','?'}</code>) and resubmit their script.
+    </p>
+    <h3>
+        Playing Games and Errors
+    </h3>
+    <p>
+        To play a game, go to the <a href="{% url 'games:play' %}">Play</a> page and select two players.
+        To watch a game, go to the <a href="{% url 'games:watch' %}">Watch</a> page and select one of the listed games.
+        If there are no games currently being played, no games will be listed.
+    </p>
+    <p>
+        When playing games, if your script behaves incorrectly, the server will interpret this as an <code>UserError</code>.
+        When the server encounters an <code>UserError</code>, your script will automatically forfeit the game and your opponent will be awarded the win.
+        The <code>UserError</code> will be reported in either log area, regardless if the playing script set the <code>logging</code> variable.
+        The following are the possible <code>UserError</code> codes and their meanings:
+    </p>
+    <ul>
+        <li>
+            An error code of <code>-1</code> is a <code>NO_MOVE_ERROR</code>, meaning your script did not submit any move before the time limit
+        </li>
+        <li>
+            An error code of <code>-2</code> is a <code>READ_INVALID</code> error, meaning your script submitted something to
+            the <code>best_move</code> variable but it was not an integer in the range 0-63, inclusive.
+        </li>
+        <li>
+            An error code of <code>-3</code> is an <code>INVALID_MOVE</code> error, meaning your script submitted an integer
+            in the range 0-63, inclusive, but it was not a valid move given the current board state.
+        </li>
+    </ul>
+    <p>
+        If any other error code is outputted, namely an error code within <code>{-4,-5,-6}</code>, this means the server has
+        encountered an error while running your game. In this case, the game will be marked as a tie between both players, but
+        you should email <a href="mailto:othello@tjhsst.edu">othello@tjhsst.edu</a> a screenshot of the game along with your code
+        so we can investigate and fix this error.
+    </p>
+    <p>
+        Finally, when running a non-tournament game, the server continuously checks if the browser which initiated the game is
+        still watching the game. If not, the game will be terminated and the game will end in a tie. Meaning, if you start
+        a game but then close the window with the game still running, the game will be terminated and end in a tie.
     </p>
     <h3>
         Logging
     </h3>
     <p>
-        In addition to the specifications listed above, your <code>Strategy</code> class may contain a <code>logging</code> variable. This variable, if used, should be defined inside <code>Strategy</code>'s constructor, or outside any class method.
-        For instance, <code>logging</code> cannot be defined in the <code>best_strategy</code> method of your <code>Strategy</code> class.
+        In addition to the specifications listed above, your <code>Strategy</code> class may contain a <code>logging</code> variable.
+        This variable, if used, must be an attribute of the <code>Strategy</code> class.
+        Therefore should be defined within <code>Strategy</code>'s constructor or inside the class but outside a class method.
+        For instance, <code>logging</code> cannot be defined in the <code>best_strategy</code> method of your <code>Strategy</code> class or in a helper method defined outside of <code>Strategy</code>.
     </p>
     <p>
         If set to <code>True</code>, you will see the output of any <code>print</code> statements on either side of the board when playing your script.
@@ -37,7 +82,7 @@
         If you omit the <code>logging</code> variable in your <code>Strategy</code> class, it will be assumed that you do not wish to output any <code>print</code> statements.
     </p>
     <p>
-        Warning: If you set <code>logging = True</code> in your <code>Strategy</code> class, you will only be able to view your logging output only if you are currently logged in. If logged in, you will be able to see your logs whenever your script is being played, including if you are watching your script. Unauthenticated users and users who do not own the running script will not be able to view the logs.
+        <span style="color: red">Warning:</span> If you set <code>logging = True</code> in your <code>Strategy</code> class, you will only be able to view your logging output only if you are currently logged in. If logged in, you will be able to see your logs whenever your script is being played, including if you are watching your script. Unauthenticated users and users who do not own the running script will not be able to view the logs.
     </p>
     <h3>
         Example code
@@ -49,13 +94,15 @@
 import random
 import time
 
-class Strategy():
+class Strategy:
     # implement all the required methods on your own
     logging = True # turns on logging
     def best_strategy(self, board, player, best_move, running):
         time.sleep(1)
         if running.value:
             best_move.value = random.choice(self.legal_moves(board, player))
+            # Note: It is not required for your Strategy class to have a "legal_moves" method,
+            # but you must determine legal moves yourself. The server will NOT accept invalid moves.
         </code>
     </pre>
     </p>

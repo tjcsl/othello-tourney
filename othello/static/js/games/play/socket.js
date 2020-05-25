@@ -85,8 +85,6 @@ function add_listeners(socket){
                 break
             case 'game.error':
                 game_error(data.player, data.code, data.message);
-                $("#black-logs-area").append(`<pre class="err_log">Disconnected from server</pre>`);
-                $("#white-logs-area").append(`<pre class="err_log">Disconnected from server</pre>`);
                 socket.close();
                 break;
             default:

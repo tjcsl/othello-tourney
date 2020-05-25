@@ -30,6 +30,11 @@ def ping(game):
     return game.ping
 
 
+def delete(game):
+    if not game.is_tournament:
+        game.delete()
+
+
 @shared_task
 def run_game(game_id):
     try:
@@ -42,11 +47,36 @@ def run_game(game_id):
 
     mod, time_limit = Moderator(), game.time_limit
     game_over = False
+    file_deleted = None
 
-    black_runner = YourselfRunner(game, settings.YOURSELF_TIMEOUT) \
-        if game.black == yourself else PlayerRunner(game.black.code.path, settings.JAILEDRUNNER_DRIVER, settings.DEBUG)
-    white_runner = YourselfRunner(game, settings.YOURSELF_TIMEOUT) \
-        if game.white == yourself else PlayerRunner(game.white.code.path, settings.JAILEDRUNNER_DRIVER, settings.DEBUG)
+    try:
+        black_runner = YourselfRunner(game, settings.YOURSELF_TIMEOUT) \
+            if game.black == yourself else PlayerRunner(game.black.code.path, settings.JAILEDRUNNER_DRIVER, settings.DEBUG)
+    except OSError:
+        black_runner = None
+        file_deleted = game.errors.create(
+            player=Player.BLACK.value,
+            error_code=ServerError.FILE_DELETED.value[0],
+            error_msg=ServerError.FILE_DELETED.value[1]
+        )
+    try:
+        white_runner = YourselfRunner(game, settings.YOURSELF_TIMEOUT) \
+            if game.white == yourself else PlayerRunner(game.white.code.path, settings.JAILEDRUNNER_DRIVER, settings.DEBUG)
+    except OSError:
+        white_runner = None
+        file_deleted = game.errors.create(
+            player=Player.WHITE.value,
+            error_code=ServerError.FILE_DELETED.value[0],
+            error_msg=ServerError.FILE_DELETED.value[1]
+        )
+
+    if file_deleted is not None:
+        game.forfeit = False
+        game.outcome = 'T'
+        game.playing = False
+        game.save(update_fields=["forfeit", "outcome", "playing"])
+        send_through_socket(game, "game.error")
+        return
 
     with black_runner as player_black, white_runner as player_white:
         last_move = game.moves.create(
@@ -63,6 +93,7 @@ def run_game(game_id):
                 game.outcome = Player.BLACK.value if score > 0 else Player.WHITE.value if score < 0 else 'T'
                 game.forfeit = False
                 game.save(update_fields=["playing", "outcome", "forfeit"])
+                delete(game)
                 return
             board, current_player = mod.get_game_state()
 
@@ -84,6 +115,7 @@ def run_game(game_id):
             submitted_move, error = running_turn.return_value
 
             if error != 0:
+                print(error)
                 game.errors.create(
                     player=current_player.value,
                     error_code=error.value[0],

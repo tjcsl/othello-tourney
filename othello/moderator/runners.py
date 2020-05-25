@@ -38,6 +38,8 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
         try:
             self.strat.best_strategy(*game_args)
             pipe_to_parent.send(None)
+        except TypeError:
+            print('invalid submission')  # printing to stdout from within LocalRunner will automatically give a READ_INVALID error
         except:
             pipe_to_parent.send(traceback.format_exc())
 
@@ -86,6 +88,8 @@ class JailedRunner(LocalRunner):  # Called from subprocess, no access to django 
 class PlayerRunner:
 
     def __init__(self, path, driver, debug):
+        if not os.path.isfile(path):
+            raise OSError("file not found")
         self.path = path
         self.process = None
         self.driver, self.debug = driver, debug
@@ -137,9 +141,11 @@ class PlayerRunner:
                 yield self.process.stderr.read(8192).decode("latin-1")
             if self.process.stdout in files_ready:
                 try:
-                    move = int(self.process.stdout.readline())
+                    tmp = int(self.process.stdout.readline())
+                    print(f"GOT MOVE {tmp}")
+                    move = tmp
                     if move < 0 or move >= 64:
-                        return -1, UserError.NO_MOVE_ERROR
+                        return -1, UserError.READ_INVALID
                 except ValueError:
                     return -1, UserError.READ_INVALID
         return move, 0
