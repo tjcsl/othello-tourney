@@ -20,7 +20,7 @@ function on_load() {
                 $(this).find("label").css({"text-decoration": "none"});
             });
 
-    $(".area-log-container").on('click', function () {
+    $(".area-log-container").dblclick(function() {
         if($(this).children(".area-log").css('display') !== 'none')
             $(this).children(".area-log").hide();
         else

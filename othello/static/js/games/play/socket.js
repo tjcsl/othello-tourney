@@ -58,7 +58,6 @@ function add_listeners(socket){
 
     socket.onmessage = function (message) {
         let data = JSON.parse(message.data);
-        console.log(data)
         switch(data.type){
             case 'game.ping':
                 socket.send(JSON.stringify({"message": "ping"}))
@@ -68,12 +67,10 @@ function add_listeners(socket){
                 game_log(data.player, data.message);
                 break;
             case 'game.update':
-                console.log(data)
                 if(data.moves[0].tile === -10){
                     console.log("starting game");
                     rCanvas.black_name = data.black;
                     rCanvas.white_name = data.white;
-                    console.log(JSON.stringify(data))
                     drawBoard(rCanvas, data.moves[0].board, data.moves[0].possible, BLACK_NM, rCanvas.animArray, 36);
                 }else{
                     rCanvas.black_name = data.black;
@@ -81,6 +78,7 @@ function add_listeners(socket){
                     let player = data.moves[0].player === BLACK_CH ? WHITE_NM : BLACK_NM;
                     drawBoard(rCanvas, data.moves[0].board, data.moves[0].possible, player, rCanvas.animArray, data.moves[0].tile);
                 }
+                rCanvas.tomove = rCanvas.tomove === 1 ? 1 : 0;
                 HISTORY = data.moves;
                 break
             case 'game.error':

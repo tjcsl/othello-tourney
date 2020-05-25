@@ -174,6 +174,7 @@ class YourselfRunner:
             if (time.time() - start) > self.timeout:
                 return -1, UserError.NO_MOVE_ERROR
             if (m := self.game.moves.latest()) != last_move:
-                m.delete()
+                if m is not None:
+                    m.delete()
                 return m.move, 0
 

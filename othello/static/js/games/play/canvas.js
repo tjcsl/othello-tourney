@@ -20,7 +20,6 @@ class RCanvas {
   resize() {
     let nWidth = this.canvas.offsetWidth * window.devicePixelRatio;
     let nHeight = this.canvas.offsetHeight * window.devicePixelRatio;
-    console.log("SETTING",Math.min(nWidth, nHeight * this.rWidth / this.rHeight), Math.min(nHeight, nWidth * this.rHeight / this.rWidth));
     this.canvas.width = Math.min(nWidth, nHeight * this.rWidth / this.rHeight);
     this.canvas.height = Math.min(nHeight, nWidth * this.rHeight / this.rWidth);
     this.wFactor = this.canvas.width / this.rWidth;

@@ -127,9 +127,11 @@ function drawBoard(rCanvas, board_array, possible, tomove, anim_array, move,) {
     rCanvas.white.innerHTML = `${rCanvas.white_name}: ${counts[WHITE_NM].toString()}`;
     if(tomove === BLACK_NM){
         rCanvas.black.innerHTML = ` (*) ${rCanvas.black.innerHTML}`;
+        rCanvas.tomove = 1;
     }
     else if(tomove === WHITE_NM){
         rCanvas.white.innerHTML = `${rCanvas.white.innerHTML} (*) `;
+        rCanvas.tomove = 0 ;
     }
     rCanvas.draw();
     rCanvas.lBSize = DIMENSION;
@@ -177,7 +179,6 @@ function addPieces(rCanvas, board_array, b_and_s, border, square, animArray) {
 }
 
 function addPossibleMoves(rCanvas, possible, b_and_s, border, square) {
-    console.log(possible);
     possible.forEach((index) => {
         let x = index % DIMENSION,
             y = Math.trunc(index/DIMENSION);
