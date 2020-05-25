@@ -6,13 +6,12 @@
 {% block head %}
     <link rel="stylesheet" href="{% static 'css/games/base.css' %}">
     <script type="text/javascript" src="{% static 'js/games/play/canvas.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/games/play/othello.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/play/board.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/base.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/play/socket.js' %}"></script>
     <script type="text/javascript">
         const game = JSON.parse('{{ game|store }}');
-        const is_watching = JSON.parse('{{ is_watching|store }}')
+        const is_watching = JSON.parse('{{ is_watching|store }}');
     </script>
 {% endblock %}
 

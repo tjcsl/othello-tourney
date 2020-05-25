@@ -1,8 +1,27 @@
+from django.http import HttpResponse
 from django.contrib import messages
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
+from django.views.generic.list import ListView
 
+from .models import Tournament
 from ..auth.decorators import *
 from .forms import TournamentForm
+
+
+class TournamentListView(ListView):
+    model = Tournament
+    template_name = 'tournaments/previous.html'
+    paginate_by = 10
+    ordering = ['-start_time']
+
+    def get_queryset(self):
+        return Tournament.objects.finished().order_by(*self.ordering)
+
+
+def detail(request, tournament_id=None):
+    if tournament_id:
+        return HttpResponse(get_object_or_404(Tournament, id=tournament_id))
+    return HttpResponse("current")
 
 
 @management_only
@@ -21,5 +40,3 @@ def management(request):
                 for error in errors:
                     messages.error(request, error["message"], extra_tags="danger")
     return render(request, "tournaments/create.html", {'form': TournamentForm()})
-
-

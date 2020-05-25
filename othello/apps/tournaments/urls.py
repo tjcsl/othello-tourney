@@ -11,8 +11,10 @@ def default(request):
 
 
 urlpatterns = [
+    path("", views.detail, name="current"),
+    path("<int:tournament_id>", views.detail, name="detail"),
+    path("previous/", views.TournamentListView.as_view(), name="previous"),
     path("management/", views.management, name="management"),
-    path("previous/", views.management, name="previous"),
-    path("current/", views.management, name="current"),
+
     path("help/", default, name="help"),
 ]

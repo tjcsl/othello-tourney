@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}Othello: Previous Tournaments{% endblock %}
+{% block head %}
+    <style>
+        .pagination li{
+            margin: 0 5px;
+        }
+    </style>
+{% endblock %}
+{% block main %}
+    {% if not page_obj %}
+        <h5>No Tournaments Have Finished Yet</h5>
+    {% else %}
+        <div class="table-responsive">
+            <table class="table table-hover table-bordered">
+                <thead>
+                    <tr>
+                        <th>Tournament</th>
+                        <th>Start Time</th>
+                        <th>Ranking & Results</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tournament in page_obj %}
+                    <tr>
+                        <td>{{ tournament.id }}</td>
+                        <td>{{ tournament.start_time }}</td>
+                        <td>
+                            <a href="{% url 'tournaments:detail' tournament.id %}">Link</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% if page_obj.has_other_pages %}
+                <ul class="pagination">
+                    <li><a href="?page=1">&laquo;First</a></li>
+                    {% if page_obj.has_previous %}
+                        <li><a href="?page=0">&lsaquo;Previous</a></li>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                        <li><a href="?page={{ page_obj.next_page_number }}">Next&rsaquo;</a></li>
+                    {% endif %}
+                    <li><a href="?page={{ page_obj.paginator.num_pages }}">Last&raquo;</a></li>
+                </ul>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock %}

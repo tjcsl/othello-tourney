@@ -82,6 +82,23 @@ function init(black, white) {
     return rCanvas;
 }
 
+function countPieces(dim, bArray) {
+    let bCount = 0;
+    let wCount = 0;
+    for(let i=0; i<dim*dim; i++){
+        if (bArray[i] === WHITE_CH) {
+            wCount++;
+        }
+        else if (bArray[i] === BLACK_CH) {
+            bCount++;
+        }
+    }
+    let counts = [];
+    counts[BLACK_NM] = bCount;
+    counts[WHITE_NM] = wCount;
+    return counts;
+}
+
 function drawBoard(rCanvas, board_array, possible, tomove, anim_array, move,) {
 
     let row_col_position = Math.min(rCanvas.rWidth, rCanvas.rHeight);
@@ -106,13 +123,13 @@ function drawBoard(rCanvas, board_array, possible, tomove, anim_array, move,) {
     rCanvas.add(rCanvas.select);
 
     let counts = countPieces(DIMENSION, board_array);
-    rCanvas.black.innerHTML = rCanvas.black_name+': '+counts[BLACK_NM].toString();
-    rCanvas.white.innerHTML = rCanvas.white_name+': '+counts[WHITE_NM].toString();
+    rCanvas.black.innerHTML = `${rCanvas.black_name}: ${counts[BLACK_NM].toString()}`;
+    rCanvas.white.innerHTML = `${rCanvas.white_name}: ${counts[WHITE_NM].toString()}`;
     if(tomove === BLACK_NM){
-        rCanvas.black.innerHTML = ' (*) '+rCanvas.black.innerHTML;
+        rCanvas.black.innerHTML = ` (*) ${rCanvas.black.innerHTML}`;
     }
     else if(tomove === WHITE_NM){
-        rCanvas.white.innerHTML = rCanvas.white.innerHTML+' (*) ';
+        rCanvas.white.innerHTML = `${rCanvas.white.innerHTML} (*) `;
     }
     rCanvas.draw();
     rCanvas.lBSize = DIMENSION;
