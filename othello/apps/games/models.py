@@ -76,16 +76,16 @@ class Game(models.Model):
     objects = GameSet.as_manager()
     created_at = models.DateTimeField(auto_now=True)
 
-    black = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="black")
-    white = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="white")
+    black = models.ForeignKey(Submission, on_delete=models.PROTECT, related_name="black")
+    white = models.ForeignKey(Submission, on_delete=models.PROTECT, related_name="white")
     time_limit = models.IntegerField(default=5,)
 
     forfeit = models.BooleanField(default=False)
     outcome = models.CharField(max_length=1, choices=OUTCOME_CHOICES, default='')
 
+    is_tournament = models.BooleanField(default=False)
     playing = models.BooleanField(default=False)
     ping = models.BooleanField(default=True)
-    is_tournament = models.BooleanField(default=False)
 
     @property
     def channels_group_name(self):
