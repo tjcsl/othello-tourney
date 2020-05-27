@@ -20,12 +20,12 @@ def _save_path(instance, filename):
 
 class SubmissionSet(models.QuerySet):
 
-    def latest(self, user=None):
+    def latest(self, user=None, **kwargs):
         if user is not None:
-            qs = self.filter(user=user).order_by('-created_at')
+            qs = self.filter(user=user, **kwargs).order_by('-created_at')
             return qs[0] if qs.exists() else None
         else:
-            return self.all().order_by('user', '-created_at').distinct('user')
+            return self.filter(**kwargs).order_by('user', '-created_at').distinct('user')
 
     def delete(self):
         for obj in self:
@@ -68,8 +68,8 @@ class GameSet(models.QuerySet):
 class Game(models.Model):
 
     OUTCOME_CHOICES = (
-        (Player.BLACK.value, "Black"),
-        (Player.WHITE.value, "White"),
+        (Player.BLACK.value, "black"),
+        (Player.WHITE.value, "white"),
         ('T', "Tie")
     )
 
@@ -81,7 +81,7 @@ class Game(models.Model):
     time_limit = models.IntegerField(default=5,)
 
     forfeit = models.BooleanField(default=False)
-    outcome = models.CharField(max_length=1, choices=OUTCOME_CHOICES, default='')
+    outcome = models.CharField(max_length=1, choices=OUTCOME_CHOICES, default='T')
 
     is_tournament = models.BooleanField(default=False)
     playing = models.BooleanField(default=False)

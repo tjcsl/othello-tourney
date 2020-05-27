@@ -115,7 +115,6 @@ def run_game(game_id):
             submitted_move, error = running_turn.return_value
 
             if error != 0:
-                print(error)
                 game.errors.create(
                     player=current_player.value,
                     error_code=error.value[0],

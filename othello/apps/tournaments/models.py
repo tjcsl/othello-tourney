@@ -24,7 +24,7 @@ class Tournament(models.Model):
     created_at = models.DateTimeField(auto_now=True)
 
     start_time = models.DateTimeField()
-    exclude_users = models.ManyToManyField(get_user_model(), blank=True,)
+    include_users = models.ManyToManyField(get_user_model(), blank=True,)
 
     finished = models.BooleanField(default=False,)
 

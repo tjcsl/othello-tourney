@@ -82,9 +82,9 @@ class GamePlayingConsumer(GameConsumer):
         run_game.delay(self.game.id)
 
     def disconnect(self, code):
+        self.game.playing = False
+        self.game.save(update_fields=["playing"])
         super(GamePlayingConsumer, self).connect()
-        if not self.game.is_tournament:
-            self.game.delete()
 
     def receive_json(self, content, **kwargs):
         self.game.ping = True

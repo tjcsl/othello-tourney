@@ -18,16 +18,16 @@
                 {{ form.end_time }}
             </p>
             <p class="row" style="margin-left: 0; margin-bottom: 0">
-                {{ form.exclude_users.label }}
-                {{ form.exclude_users }}
+                {{ form.include_users.label }}
+                {{ form.include_users }}
             </p>
             <p>
                 =OR=
             </p>
             <p>
                 Exclude Users:
-                <input type="file" id="excludeUsersFile" name="Upload CSV">
-                <i id="exclude_users_file_help" class="fa fa-question-circle"></i>
+                <input type="file" id="includeUsersFile" name="Upload CSV">
+                <i id="inlude_users_file_help" class="fa fa-question-circle"></i>
             </p>
             <input type="submit">
         </form>

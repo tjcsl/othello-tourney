@@ -28,6 +28,25 @@
         and modify the set of characters to <code>{'.','x','o'}</code>(instead of the previous <code>{'.','@','o','?'}</code>) and resubmit their script.
     </p>
     <h3>
+        Logging
+    </h3>
+    <p>
+        In addition to the specifications listed above, your <code>Strategy</code> class may contain a <code>logging</code> variable.
+        This variable, if used, must be an attribute of the <code>Strategy</code> class.
+        Therefore it should be defined within <code>Strategy</code>'s constructor or inside the class but outside a class method.
+        For instance, <code>logging</code> cannot be defined in the <code>best_strategy</code> method of your <code>Strategy</code> class or in a helper method defined outside of <code>Strategy</code>.
+    </p>
+    <p>
+        If set to <code>True</code>, you will see the output of any <code>print</code> statements on either side of the board when playing your script.
+        Output for scripts that are playing as black will appear on the left-hand side of the Othello board while the output for scripts that are playing as white will appear on the right-hand side of the Othello board.
+    </p>
+    <p>
+        If you omit the <code>logging</code> variable in your <code>Strategy</code> class, it will be assumed that you do not wish to output any <code>print</code> statements.
+    </p>
+    <p>
+        <span style="color: red">Warning:</span> If you set <code>logging = True</code> in your <code>Strategy</code> class, you will only be able to view your logging output only if you are currently logged in. If logged in, you will be able to see your logs whenever your script is being played, including if you are watching your script. Unauthenticated users and users who do not own the running script will not be able to view the logs.
+    </p>
+    <h3>
         Playing Games and Errors
     </h3>
     <p>
@@ -55,7 +74,7 @@
         </li>
     </ul>
     <p>
-        If any other error code is outputted, namely an error code within <code>{-4,-5,-6}</code>, this means the server has
+        If any other error code is outputted, namely an error code within <code>{-4,-5,-6, -7, -8}</code>, this means the server has
         encountered an error while running your game. In this case, the game will be marked as a tie between both players, but
         you should email <a href="mailto:othello@tjhsst.edu">othello@tjhsst.edu</a> a screenshot of the game along with your code
         so we can investigate and fix this error.
@@ -64,25 +83,6 @@
         Finally, when running a non-tournament game, the server continuously checks if the browser which initiated the game is
         still watching the game. If not, the game will be terminated and the game will end in a tie. Meaning, if you start
         a game but then close the window with the game still running, the game will be terminated and end in a tie.
-    </p>
-    <h3>
-        Logging
-    </h3>
-    <p>
-        In addition to the specifications listed above, your <code>Strategy</code> class may contain a <code>logging</code> variable.
-        This variable, if used, must be an attribute of the <code>Strategy</code> class.
-        Therefore should be defined within <code>Strategy</code>'s constructor or inside the class but outside a class method.
-        For instance, <code>logging</code> cannot be defined in the <code>best_strategy</code> method of your <code>Strategy</code> class or in a helper method defined outside of <code>Strategy</code>.
-    </p>
-    <p>
-        If set to <code>True</code>, you will see the output of any <code>print</code> statements on either side of the board when playing your script.
-        Output for scripts that are playing as black will appear on the left-hand side of the Othello board while the output for scripts that are playing as white will appear on the right-hand side of the Othello board.
-    </p>
-    <p>
-        If you omit the <code>logging</code> variable in your <code>Strategy</code> class, it will be assumed that you do not wish to output any <code>print</code> statements.
-    </p>
-    <p>
-        <span style="color: red">Warning:</span> If you set <code>logging = True</code> in your <code>Strategy</code> class, you will only be able to view your logging output only if you are currently logged in. If logged in, you will be able to see your logs whenever your script is being played, including if you are watching your script. Unauthenticated users and users who do not own the running script will not be able to view the logs.
     </p>
     <h3>
         Example code
@@ -131,7 +131,7 @@ class Strategy:
         If you do in fact need other files for your code to work, and it is infeasible to include it in one file, contact <a href="mailto:othello@tjhsst.edu">othello@tjhsst.edu</a> or your AI teacher about your situation.
     </p>
     <p>
-        Note: When your code is uploaded, it is stored under a different, randomly-generated filename. Submitting two Python files and expecting to be able to import the other file by name is infeasible.
+        <span style="color: red">Warning:</span> When your code is uploaded, it is stored under a different, randomly-generated filename. Submitting two Python files and expecting to be able to import the other file by name is infeasible.
     </p>
     <h3>
         Other Info
@@ -139,6 +139,6 @@ class Strategy:
     <p>
         If your code fails to return a move, returns an invalid move, or errors for whatever reason, it will be treated as a forfeit.
         As such, make sure you code works on your computer before using this website to test against other AIs.
-        Just as a reminder, if your code is caught cheating during the tournament in any way, you <b>will</b> be caught and given an integrity violation, so just don't do it.
+        Just as a reminder, if your code is cheats during the tournament in any way, you <b>will</b> be caught and given an integrity violation, so just don't do it.
     </p>
 {% endblock %}

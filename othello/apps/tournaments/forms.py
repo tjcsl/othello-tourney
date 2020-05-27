@@ -1,6 +1,5 @@
 from django import forms
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 
 from .models import Tournament
@@ -15,12 +14,12 @@ class TournamentForm(forms.ModelForm):
 
     def clean(self):
         cd = self.cleaned_data
-        if not get_user_model().objects.all().difference(cd["exclude_users"]).exists():
+        if not cd["include_users"].exists():
             raise ValidationError("Cannot run a tournament with all users excluded!")
 
     class Meta:
         model = Tournament
         exclude = ('finished',)
         labels = {
-            "exclude_users": "Exclude Users: "
+            "include_users": "Include Users: "
         }

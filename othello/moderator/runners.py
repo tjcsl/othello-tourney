@@ -171,10 +171,15 @@ class YourselfRunner:
         yield "Choose your move!"
         start = time.time()
         while True:
+            self.game.refresh_from_db()
+            if not self.game.playing:
+                return -1, ServerError.DISCONNECT
             if (time.time() - start) > self.timeout:
                 return -1, UserError.NO_MOVE_ERROR
             if (m := self.game.moves.latest()) != last_move:
                 if m is not None:
                     m.delete()
-                return m.move, 0
+                    return m.move, 0
+                else:
+                    return -1, ServerError.DISCONNECT
 

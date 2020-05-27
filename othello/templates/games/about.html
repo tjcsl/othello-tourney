@@ -1,16 +1,23 @@
 {% extends "base.html" %}
 {% block title %}About{% endblock %}
 {% block main %}
-      <p>
+    <p>
         This is a simple web app to run the TJHSST Othello AI Tournament.
-      </p>
-      <p>
+    </p>
+    <p>
         You can pit AIs against each other, upload your own AI, or even play against an existing AI.
-      </p>
-      <p>
+    </p>
+    <p>
         For more information on the specifics of uploading see <a href="{% url 'games:help' %}">About Uploading</a>
-      </p>
-      <p>
+    </p>
+    <p>
         If you have any questions about the api or the website in general, please email <a href="mailto:othello@tjhsst.edu">othello@tjhsst.edu</a> or your current AI teacher.
-      </p>
+    </p>
+    <p>
+        <h5>Othello Server Developers</h5>
+        <ul>
+            <li>Jack Duvall (2019)</li>
+            <li>Anup Bagali (2021)</li>
+        </ul>
+    </p>
 {% endblock %}

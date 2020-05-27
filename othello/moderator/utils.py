@@ -21,6 +21,7 @@ class ServerError(enum.Enum):
     UNEXPECTED = (-5, "Unexpected error")
     PROCESS_EXITED = (-6, "Process exited unexpectedly")
     FILE_DELETED = (-7, "Player script cannot be found on the server")
+    DISCONNECT = (-8, "Unexpectedly disconnected from socket")
 
 
 class Generator:

@@ -9,7 +9,6 @@ from ...sandboxing import import_strategy_sandboxed
 
 class SubmissionForm(forms.ModelForm):
     name = forms.CharField(required=False)
-    code = forms.FileField(required=True)
 
     class Meta:
         model = Submission
