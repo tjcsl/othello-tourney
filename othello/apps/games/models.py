@@ -2,6 +2,7 @@ import os
 import uuid
 
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 
@@ -9,7 +10,7 @@ from ...moderator.moderator import Player
 
 
 PLAYER_CHOICES = (
-    (Player.BLACK.value, 'Black'),
+    (Player.BLACK.value, "Black"),
     (Player.WHITE.value, "White"),
 )
 
@@ -19,13 +20,12 @@ def _save_path(instance, filename):
 
 
 class SubmissionSet(models.QuerySet):
-
     def latest(self, user=None, **kwargs):
         if user is not None:
-            qs = self.filter(user=user, **kwargs).order_by('-created_at')
+            qs = self.filter(user=user, **kwargs).order_by("-created_at")
             return qs[0] if qs.exists() else None
         else:
-            return self.filter(**kwargs).order_by('user', '-created_at').distinct('user')
+            return self.filter(**kwargs).order_by("user", "-created_at").distinct("user")
 
     def delete(self):
         for obj in self:
@@ -37,7 +37,9 @@ class Submission(models.Model):
 
     objects = SubmissionSet.as_manager()
 
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="user")
+    user = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, related_name="user"
+    )
     name = models.CharField(max_length=500, default="")
     created_at = models.DateTimeField(auto_now=True)
     code = models.FileField(upload_to=_save_path, default=None,)
@@ -49,7 +51,7 @@ class Submission(models.Model):
         return self.created_at.strftime("%Y-%m-%d %H:%M:%S")
 
     def get_submission_name(self):
-        return f'{self.name}: <{self.get_submitted_time()}>'
+        return f"{self.name}: <{self.get_submitted_time()}>"
 
     def delete(self, *args, **kwargs):
         self.code.delete()
@@ -59,10 +61,20 @@ class Submission(models.Model):
         return f"{self.get_user_name()}: {self.get_submission_name()}"
 
 
-class GameSet(models.QuerySet):
+class GameManager(models.Manager):
 
     def running(self):
-        return self.filter(playing=True)
+        return self.get_queryset().filter(playing=True)
+
+    def wins_for_user(self, submission):
+        return (
+            self.get_queryset()
+                .filter(playing=False, is_tournament=True)
+            .filter(
+                Q(white=submission, outcome=Player.WHITE.value) | Q(black=submission, outcome=Player.BLACK.value)
+            )
+            .count()
+        )
 
 
 class Game(models.Model):
@@ -70,10 +82,10 @@ class Game(models.Model):
     OUTCOME_CHOICES = (
         (Player.BLACK.value, "black"),
         (Player.WHITE.value, "white"),
-        ('T', "Tie")
+        ("T", "Tie"),
     )
 
-    objects = GameSet.as_manager()
+    objects = GameManager()
     created_at = models.DateTimeField(auto_now=True)
 
     black = models.ForeignKey(Submission, on_delete=models.PROTECT, related_name="black")
@@ -81,7 +93,8 @@ class Game(models.Model):
     time_limit = models.IntegerField(default=5,)
 
     forfeit = models.BooleanField(default=False)
-    outcome = models.CharField(max_length=1, choices=OUTCOME_CHOICES, default='T')
+    outcome = models.CharField(max_length=1, choices=OUTCOME_CHOICES, default="T")
+    score = models.IntegerField(default=0,)
 
     is_tournament = models.BooleanField(default=False)
     playing = models.BooleanField(default=False)
@@ -96,9 +109,8 @@ class Game(models.Model):
 
 
 class MoveSet(models.QuerySet):
-
     def latest(self, **kwargs):
-        return self.order_by('-created_at')[0] if self.exists() else None
+        return self.order_by("-created_at")[0] if self.exists() else None
 
 
 class Move(models.Model):
@@ -107,7 +119,7 @@ class Move(models.Model):
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="moves")
     created_at = models.DateTimeField(auto_now_add=True)
-    board = models.CharField(max_length=64, default='')
+    board = models.CharField(max_length=64, default="")
     player = models.CharField(max_length=1, choices=PLAYER_CHOICES)
     move = models.IntegerField(default=-10)
 
@@ -118,9 +130,8 @@ class Move(models.Model):
 
 
 class GameObjectSet(models.QuerySet):
-
     def latest(self):
-        return self.order_by('-created_at')[0] if self.exists() else None
+        return self.order_by("-created_at")[0] if self.exists() else None
 
 
 class GameObject(models.Model):
@@ -138,10 +149,10 @@ class GameError(GameObject):
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="errors")
     error_code = models.IntegerField(default=-1)
-    error_msg = models.CharField(max_length=10*1024, default="")
+    error_msg = models.CharField(max_length=10 * 1024, default="")
 
 
 class GameLog(GameObject):
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="logs")
-    message = models.CharField(max_length=10*1024, default="")
+    message = models.CharField(max_length=10 * 1024, default="")

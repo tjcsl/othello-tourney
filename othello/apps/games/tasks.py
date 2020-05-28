@@ -22,6 +22,8 @@ def send_through_socket(game, event_type):
 
 
 def ping(game):
+    if game.is_tournament:
+        return True
     game.ping = False
     game.save(update_fields=["ping"])
     send_through_socket(game, "game.ping")
@@ -89,8 +91,7 @@ def run_game(game_id):
         while not mod.is_game_over():
             if not ping(game):
                 game.playing = False
-                score = mod.score()
-                game.outcome = Player.BLACK.value if score > 0 else Player.WHITE.value if score < 0 else 'T'
+                game.outcome = 'T'
                 game.forfeit = False
                 game.save(update_fields=["playing", "outcome", "forfeit"])
                 delete(game)
@@ -157,7 +158,8 @@ def run_game(game_id):
             if game_over:
                 game.forfeit = False
                 game.outcome = mod.outcome()
-                game.save(update_fields=["forfeit", "outcome", "playing"])
+                game.score = mod.score()
+                game.save(update_fields=["forfeit", "score", "outcome", "playing"])
                 task_logger.error("GAME OVER")
                 break
             send_through_socket(game, "game.update")
