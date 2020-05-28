@@ -37,7 +37,7 @@ class Tournament(models.Model):
 
 class TournamentSubmission(models.Model):
 
-    tournament = models.ForeignKey(Tournament, on_delete=models.PROTECT, related_name="submissions")
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name="submissions")
     submission = models.ForeignKey(Submission, on_delete=models.CASCADE)
     ranking = models.IntegerField(default=0,)
 

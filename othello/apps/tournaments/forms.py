@@ -16,6 +16,8 @@ class TournamentForm(forms.ModelForm):
         cd = self.cleaned_data
         if not cd["include_users"].exists():
             raise ValidationError("Cannot run a tournament with all users excluded!")
+        if cd["include_users"].filter(username="Yourself").exists():
+            raise ValidationError("The \"Yourself\" player cannot participate in Tournaments!")
 
     class Meta:
         model = Tournament

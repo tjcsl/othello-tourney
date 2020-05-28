@@ -100,21 +100,27 @@ function countPieces(dim, bArray) {
 }
 
 function drawBoard(rCanvas, board_array, possible, tomove, anim_array, move,) {
-
+    console.log("MOVE: " + move)
     let row_col_position = Math.min(rCanvas.rWidth, rCanvas.rHeight);
     let border = row_col_position/(11*DIMENSION+1);
     let square = 10*border;
     let border_and_square = border + square;
+    let x = move % DIMENSION,
+        y = Math.trunc(move/DIMENSION);
 
     rCanvas.border = border;
     rCanvas.square = square;
     rCanvas.border_and_square = border_and_square;
 
+    rCanvas.lastmove.x = rCanvas.border_and_square * x + rCanvas.border;
+    rCanvas.lastmove.y = rCanvas.border_and_square * y + rCanvas.border;
+    rCanvas.lastmove.width = rCanvas.square;
+    rCanvas.lastmove.height = rCanvas.square;
+
     rCanvas.objects = [rCanvas.fullbg];
 
     addTiles(rCanvas, DIMENSION, board_array, border_and_square, border, square);
-    let x = move % DIMENSION,
-        y = Math.trunc(move/DIMENSION);
+
     rCanvas.add(new RRect(border_and_square*x+border, border_and_square*y+border, square, square, LASTMOVE_CO, 0.4));
     rCanvas.add(rCanvas.lastmove);
 
