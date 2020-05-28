@@ -2,6 +2,7 @@ from django.urls import path
 from django.shortcuts import render
 
 from . import views
+from ..auth.decorators import management_only
 
 app_name = "tournaments"
 
@@ -14,7 +15,7 @@ urlpatterns = [
     path("", views.detail, name="current"),
     path("<int:tournament_id>", views.detail, name="detail"),
     path("previous/", views.TournamentListView.as_view(), name="previous"),
-    path("management/", views.management, name="management"),
+    path("management/", management_only(views.TournamentCreateView.as_view()), name="management"),
 
     path("help/", default, name="help"),
 ]
