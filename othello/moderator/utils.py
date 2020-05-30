@@ -1,8 +1,7 @@
 import enum
-import operator
-import importlib.util
 import importlib.machinery
-
+import importlib.util
+import operator
 from functools import lru_cache, partial, reduce, wraps
 
 from .constants import *
@@ -37,6 +36,7 @@ def capture_generator_value(f):
     @wraps(f)
     def g(*args, **kwargs):
         return Generator(f(*args, **kwargs))
+
     return g
 
 
@@ -56,7 +56,12 @@ def bit_not(x):
 
 
 def binary_to_string(board):
-    return "".join(['o' if is_on(board[0], 63 - i) else 'x' if is_on(board[1], 63 - i) else '.' for i in range(64)])
+    return "".join(
+        [
+            "o" if is_on(board[0], 63 - i) else "x" if is_on(board[1], 63 - i) else "."
+            for i in range(64)
+        ]
+    )
 
 
 @lru_cache

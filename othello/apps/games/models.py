@@ -1,13 +1,12 @@
 import os
 import uuid
 
-from django.db import models
-from django.db.models import Q
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
+from django.db import models
+from django.db.models import Q
 
 from ...moderator.moderator import Player
-
 
 PLAYER_CHOICES = (
     (Player.BLACK.value, "Black"),
@@ -37,9 +36,7 @@ class Submission(models.Model):
 
     objects = SubmissionSet.as_manager()
 
-    user = models.ForeignKey(
-        get_user_model(), on_delete=models.CASCADE, related_name="user"
-    )
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="user")
     name = models.CharField(max_length=500, default="")
     created_at = models.DateTimeField(auto_now=True)
     code = models.FileField(upload_to=_save_path, default=None,)
@@ -62,16 +59,16 @@ class Submission(models.Model):
 
 
 class GameManager(models.Manager):
-
     def running(self):
         return self.get_queryset().filter(playing=True)
 
     def wins_for_user(self, submission):
         return (
             self.get_queryset()
-                .filter(playing=False, is_tournament=True)
+            .filter(playing=False, is_tournament=True)
             .filter(
-                Q(white=submission, outcome=Player.WHITE.value) | Q(black=submission, outcome=Player.BLACK.value)
+                Q(white=submission, outcome=Player.WHITE.value)
+                | Q(black=submission, outcome=Player.BLACK.value)
             )
             .count()
         )

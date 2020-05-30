@@ -1,13 +1,12 @@
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 
-from .utils import *
-from .tasks import run_game
 from .models import Game, Submission
+from .tasks import run_game
+from .utils import *
 
 
 class GameConsumer(JsonWebsocketConsumer):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.game = None
@@ -59,15 +58,23 @@ class GameConsumer(JsonWebsocketConsumer):
             self.game.refresh_from_db()
             game = serialize_game_info(self.game)
             self.send_json(game)
-            if game['game_over']:
+            if game["game_over"]:
                 self.disconnect(code=0)
 
     def send_log(self):
         if self.connected:
             self.game.refresh_from_db()
             log = self.game.logs.latest()
-            has_access = log.game.black.user == self.scope["user"] if log.player == "Black" else log.game.white.user == self.scope["user"]
-            if has_access or (log.player == 'x' and self.is_black_yourself) or (log.player == 'o' and self.is_white_yourself):
+            has_access = (
+                log.game.black.user == self.scope["user"]
+                if log.player == "Black"
+                else log.game.white.user == self.scope["user"]
+            )
+            if (
+                has_access
+                or (log.player == "x" and self.is_black_yourself)
+                or (log.player == "o" and self.is_white_yourself)
+            ):
                 self.send_json(serialize_game_log(log))
 
     def send_error(self):
@@ -76,7 +83,6 @@ class GameConsumer(JsonWebsocketConsumer):
 
 
 class GamePlayingConsumer(GameConsumer):
-
     def connect(self):
         super(GamePlayingConsumer, self).connect()
         run_game.delay(self.game.id)
@@ -90,9 +96,9 @@ class GamePlayingConsumer(GameConsumer):
         self.game.ping = True
         self.game.save(update_fields=["ping"])
 
-        player = content.get('player', False)
-        if move := int(content.get('move', False)):
-            if player == 'o' and self.is_white_yourself:
+        player = content.get("player", False)
+        if move := int(content.get("move", False)):
+            if player == "o" and self.is_white_yourself:
                 self.game.moves.create(player=player, move=move)
-            elif player == 'x' and self.is_black_yourself:
+            elif player == "x" and self.is_black_yourself:
                 self.game.moves.create(player=player, move=move)

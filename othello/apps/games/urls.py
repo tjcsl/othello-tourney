@@ -1,5 +1,5 @@
-from django.urls import path
 from django.shortcuts import render
+from django.urls import path
 
 from . import views
 
@@ -15,7 +15,6 @@ urlpatterns = [
     path("upload/", views.upload, name="upload"),
     path("watch/", views.watch, name="watch"),
     path("watch/<int:game_id>", views.watch, name="watch"),
-
     path("about/", default, name="about"),
-    path("help/", default, name="help")
+    path("help/", default, name="help"),
 ]

@@ -1,12 +1,12 @@
-from django.http import HttpResponse
 from django.contrib import messages
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
-from django.views.generic.list import ListView
 from django.views.generic.edit import FormView
-from django.shortcuts import render, get_object_or_404
+from django.views.generic.list import ListView
 
-from .models import Tournament
 from .forms import TournamentForm
+from .models import Tournament
 
 
 class TournamentListView(ListView):

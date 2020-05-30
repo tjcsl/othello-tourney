@@ -9,7 +9,7 @@ class TournamentForm(forms.ModelForm):
     start_time = forms.DateTimeField(
         label="Start Time: ",
         input_formats=settings.DATE_INPUT_FORMATS,
-        widget=forms.DateTimeInput(attrs={'type': 'datetime-local'})
+        widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
     )
 
     def clean(self):
@@ -17,11 +17,9 @@ class TournamentForm(forms.ModelForm):
         if not cd["include_users"].exists():
             raise ValidationError("Cannot run a tournament with all users excluded!")
         if cd["include_users"].filter(username="Yourself").exists():
-            raise ValidationError("The \"Yourself\" player cannot participate in Tournaments!")
+            raise ValidationError('The "Yourself" player cannot participate in Tournaments!')
 
     class Meta:
         model = Tournament
-        exclude = ('finished',)
-        labels = {
-            "include_users": "Include Users: "
-        }
+        exclude = ("finished",)
+        labels = {"include_users": "Include Users: "}

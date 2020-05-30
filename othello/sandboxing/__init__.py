@@ -24,8 +24,7 @@ def get_sandbox_args(cmd_args, *, whitelist=None, readonly=None, extra_args=None
     firejail_args = [
         "firejail",
         "--quiet",
-        "--net=none"
-        f"--profile={settings.FIREJAIL_PROFILE}",
+        "--net=none" f"--profile={settings.FIREJAIL_PROFILE}",
     ]
 
     if whitelist:

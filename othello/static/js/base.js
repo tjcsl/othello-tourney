@@ -38,7 +38,7 @@ if (!Array.prototype.last){
 
 function add_error(message){
     $("#messages").append(
-        `                    
+        `
         <div class="alert alert-danger alert-dismissible fade show my-2" role="alert">
             ${message}
             <button type="button" class="close" data-dismiss="alert" aria-label="Close">

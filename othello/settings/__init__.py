@@ -1,24 +1,17 @@
 import os
-from .secret import *
+
 from celery.schedules import crontab
+
+from .secret import *
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-ALLOWED_HOSTS = [
-    "127.0.0.1",
-    "localhost",
-    "0.0.0.0",
-    "192.168.1.21"
-]
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "0.0.0.0", "192.168.1.21"]
 
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
-            "capacity": 1500,
-            "expiry": 2,
-        },
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {"hosts": [("127.0.0.1", 6379)], "capacity": 1500, "expiry": 2, },
     },
 }
 
@@ -46,7 +39,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "social_django.middleware.SocialAuthExceptionMiddleware"
+    "social_django.middleware.SocialAuthExceptionMiddleware",
 ]
 
 ROOT_URLCONF = "othello.urls"
@@ -69,17 +62,17 @@ TEMPLATES = [
     }
 ]
 
-ASGI_APPLICATION = 'othello.routing.application'
+ASGI_APPLICATION = "othello.routing.application"
 WSGI_APPLICATION = "othello.wsgi.application"
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': DB_NAME,
-        'USER': DB_USER,
-        'PASSWORD': DB_PASSWORD,
-        'HOST': DB_HOST,
-        'PORT': DB_PORT
+    "default": {
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": DB_NAME,
+        "USER": DB_USER,
+        "PASSWORD": DB_PASSWORD,
+        "HOST": DB_HOST,
+        "PORT": DB_PORT,
     }
 }
 
@@ -132,7 +125,7 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 DATE_INPUT_FORMATS = [
-    '%Y-%m-%dT%H:%M',
+    "%Y-%m-%dT%H:%M",
 ]
 
 SESSION_SAVE_EVERY_REQUEST = True
@@ -142,10 +135,10 @@ CELERY_RESULT_BACKED = "django-db"
 CELERY_BROKER_URL = "redis://localhost:6379/1"
 CELERY_TIMEZONE = "America/New_York"
 CELERY_BEAT_SCHEDULE = {
-    'delete-old-games': {
-        'task': 'othello.apps.games.tasks.delete_old_games',
-        'schedule': crontab(hour=2, minute=30, day_of_week='*/2'),
-        'args': (),
+    "delete-old-games": {
+        "task": "othello.apps.games.tasks.delete_old_games",
+        "schedule": crontab(hour=2, minute=30, day_of_week="*/2"),
+        "args": (),
     }
 }
 

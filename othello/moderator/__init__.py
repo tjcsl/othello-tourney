@@ -1,2 +1,2 @@
-from .moderator import Moderator, InvalidMoveError, INITIAL_BOARD
-from .runners import PlayerRunner, YourselfRunner, UserError, ServerError
+from .moderator import INITIAL_BOARD, InvalidMoveError, Moderator
+from .runners import PlayerRunner, ServerError, UserError, YourselfRunner

@@ -1,7 +1,7 @@
 from celery import shared_task
 
 from ..games.models import Submission
-from ..games.tasks import run_game, Player
+from ..games.tasks import Player, run_game
 from .models import Tournament, TournamentGame, TournamentSubmission
 
 
@@ -23,11 +23,9 @@ def run_tournament(tournament_id):
     except Tournament.DoesNotExist:
         return
 
-    submissions = TournamentSubmission.objects.bulk_create([
-        TournamentSubmission(tournament=t, submission=s)
-        for s in Submission.objects.latest(user_id__in=t.include_users.all())
-    ])
-
-
-
-
+    submissions = TournamentSubmission.objects.bulk_create(
+        [
+            TournamentSubmission(tournament=t, submission=s)
+            for s in Submission.objects.latest(user_id__in=t.include_users.all())
+        ]
+    )

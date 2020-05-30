@@ -1,15 +1,16 @@
+import multiprocessing as mp
 import os
-import sys
-import time
-import psutil
 import select
 import signal
-import traceback
 import subprocess
-import multiprocessing as mp
+import sys
+import time
+import traceback
+
+import psutil
 
 from ..sandboxing import get_sandbox_args
-from .utils import UserError, ServerError, import_strategy, capture_generator_value
+from .utils import ServerError, UserError, capture_generator_value, import_strategy
 
 
 class PrintLogger:
@@ -21,7 +22,7 @@ class PrintLogger:
         if self.logging:
             sys.stdout = sys.stderr
         else:
-            sys.stdout = open(os.devnull, 'w')
+            sys.stdout = open(os.devnull, "w")
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -39,7 +40,9 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
             self.strat.best_strategy(*game_args)
             pipe_to_parent.send(None)
         except TypeError:
-            print('invalid submission')  # printing to stdout from within LocalRunner will automatically give a READ_INVALID error
+            print(
+                "invalid submission"
+            )  # printing to stdout from within LocalRunner will automatically give a READ_INVALID error
         except:
             pipe_to_parent.send(traceback.format_exc())
 
@@ -48,7 +51,12 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
 
         to_child, to_self = mp.Pipe()
         try:
-            p = mp.Process(target=self.play_wrapper, args=("".join(board), player, best_move, is_running), kwargs={"pipe_to_parent": to_child}, daemon=True)
+            p = mp.Process(
+                target=self.play_wrapper,
+                args=("".join(board), player, best_move, is_running),
+                kwargs={"pipe_to_parent": to_child},
+                daemon=True,
+            )
             p.start()
             p.join(time_limit)
             if p.is_alive():
@@ -62,8 +70,9 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
             return ServerError.UNEXPECTED, "Server Error"
 
 
-class JailedRunner(LocalRunner):  # Called from subprocess, no access to django channels/main application
-
+class JailedRunner(
+    LocalRunner
+):  # Called from subprocess, no access to django channels/main application
     def run(self):
         while True:
             self.handle(sys.stdin, sys.stdout, sys.stderr)
@@ -86,7 +95,6 @@ class JailedRunner(LocalRunner):  # Called from subprocess, no access to django 
 
 
 class PlayerRunner:
-
     def __init__(self, path, driver, debug):
         if not os.path.isfile(path):
             raise OSError("file not found")
@@ -106,8 +114,15 @@ class PlayerRunner:
         if not self.debug:
             cmd_args = get_sandbox_args(cmd_args)
 
-        self.process = subprocess.Popen(cmd_args, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                        bufsize=0, cwd=os.path.dirname(self.path), preexec_fn=os.setpgrp,)
+        self.process = subprocess.Popen(
+            cmd_args,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            bufsize=0,
+            cwd=os.path.dirname(self.path),
+            preexec_fn=os.setpgrp,
+        )
 
     def stop(self):
         if self.process is not None:
@@ -125,18 +140,22 @@ class PlayerRunner:
 
     @capture_generator_value
     def get_move(self, board, player, time_limit, last_move):
-        self.process.stdin.write(f"{str(time_limit)}\n{player}\n{''.join(board)}\n".encode("latin-1"))
+        self.process.stdin.write(
+            f"{str(time_limit)}\n{player}\n{''.join(board)}\n".encode("latin-1")
+        )
         self.process.stdin.flush()
         move = -1
 
-        start, total_timeout = time.time(), time_limit+10
+        start, total_timeout = time.time(), time_limit + 10
         while move == -1:
             if self.process.poll():
                 return -1, ServerError.PROCESS_EXITED
             if (timeout := total_timeout - (time.time() - start)) <= 0:
                 return -1, ServerError.TIMEOUT
 
-            files_ready = select.select([self.process.stdout, self.process.stderr], [], [], timeout)[0]
+            files_ready = select.select(
+                [self.process.stdout, self.process.stderr], [], [], timeout
+            )[0]
             if self.process.stderr in files_ready:
                 yield self.process.stderr.read(8192).decode("latin-1")
             if self.process.stdout in files_ready:
@@ -152,7 +171,6 @@ class PlayerRunner:
 
 
 class YourselfRunner:
-
     def __init__(self, game, timeout):
         self.timeout = timeout
         self.game = game
@@ -182,4 +200,3 @@ class YourselfRunner:
                     return m.move, 0
                 else:
                     return -1, ServerError.DISCONNECT
-

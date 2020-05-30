@@ -1,4 +1,3 @@
-
 def serialize_game_info(game):
     data = {
         "type": "game.update",
@@ -8,10 +7,10 @@ def serialize_game_info(game):
         "white": game.white.get_user_name(),
         "outcome": game.outcome,
         "forfeit": game.forfeit,
-        "moves": None
+        "moves": None,
     }
-    if moves := game.moves.order_by('-created_at'):
-        data['moves'] = [
+    if moves := game.moves.order_by("-created_at"):
+        data["moves"] = [
             {
                 "id": move.id,
                 "tile": move.move,
@@ -22,16 +21,12 @@ def serialize_game_info(game):
             for move in moves
         ]
     if not game.playing:
-        data['moves'][0]["possible"] = data['moves'][0]['flipped'] = []
+        data["moves"][0]["possible"] = data["moves"][0]["flipped"] = []
     return data
 
 
 def serialize_game_log(log):
-    data = {
-        "type": "game.log",
-        "player": log.player.lower(),
-        "message": log.message
-    }
+    data = {"type": "game.log", "player": log.player.lower(), "message": log.message}
     return data
 
 
@@ -40,6 +35,6 @@ def serialize_game_error(error):
         "type": "game.error",
         "player": error.player.lower(),
         "code": error.error_code,
-        "message": error.error_msg
+        "message": error.error_msg,
     }
     return data

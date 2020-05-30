@@ -1,12 +1,11 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.timezone import now
-from django.contrib.auth import get_user_model
 
 from ..games.models import Game, Submission
 
 
 class TournamentSet(models.QuerySet):
-
     def finished(self):
         return self.filter(finished=True)
 
@@ -32,7 +31,9 @@ class Tournament(models.Model):
         return "Tournament at {}".format(self.start_time.strftime("%Y-%m-%d %H:%M:%S"))
 
     def __repr__(self):
-        return "<Tournament @ {}, {}>".format(self.start_time.strftime("%Y-%m-%d %H:%M:%S"), self.finished)
+        return "<Tournament @ {}, {}>".format(
+            self.start_time.strftime("%Y-%m-%d %H:%M:%S"), self.finished
+        )
 
 
 class TournamentSubmission(models.Model):
@@ -44,7 +45,9 @@ class TournamentSubmission(models.Model):
 
 class TournamentGame(models.Model):
 
-    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, null=False, blank=False, related_name="games")
+    tournament = models.ForeignKey(
+        Tournament, on_delete=models.CASCADE, null=False, blank=False, related_name="games"
+    )
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=False, blank=False)
 
