@@ -39,7 +39,7 @@ sed -Ei "s/(^local +all +all +)peer$/\1md5/g" /etc/postgresql/12/main/pg_hba.con
 service postgresql restart
 
 local_pipenv(){
-  sudo -u vagrant env PIPENV_VENV_IN_PROJECT="enabled" pipenv "$@"
+  sudo -u vagrant pipenv "$@"
 }
 # Setup Project
 cd othello
