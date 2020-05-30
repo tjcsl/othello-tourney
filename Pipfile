@@ -54,7 +54,6 @@ txaio = "==20.4.1"
 urllib3 = "==1.25.8"
 vine = "==1.3.0"
 "zope.interface" = "==5.0.2"
-autopep8 = "*"
 
 [dev-packages]
 flake8 = "~=3.8.2"
