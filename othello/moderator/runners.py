@@ -48,7 +48,7 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
 
         to_child, to_self = mp.Pipe()
         try:
-            p = mp.Process(target=self.play_wrapper, args=("".join(board), player, best_move, is_running), kwargs={"pipe_to_parent": to_child})
+            p = mp.Process(target=self.play_wrapper, args=("".join(board), player, best_move, is_running), kwargs={"pipe_to_parent": to_child}, daemon=True)
             p.start()
             p.join(time_limit)
             if p.is_alive():
