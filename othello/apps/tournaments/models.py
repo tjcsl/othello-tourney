@@ -13,7 +13,7 @@ class TournamentSet(models.QuerySet):
         return self.filter(start_time__lte=now(), finished=False)
 
     def future(self):
-        return self.filter(start_time_gt=now())
+        return self.filter(start_time__gt=now())
 
 
 class Tournament(models.Model):

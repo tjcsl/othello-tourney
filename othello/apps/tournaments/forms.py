@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from .models import Tournament
 
 
-class TournamentForm(forms.ModelForm):
+class TournamentCreateForm(forms.ModelForm):
     start_time = forms.DateTimeField(
         label="Start Time: ",
         input_formats=settings.DATE_INPUT_FORMATS,

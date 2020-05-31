@@ -6,30 +6,58 @@
     <script type="text/javascript" src="{% static 'js/tournaments/create.js' %}"></script>
 {% endblock %}
 {% block main %}
-    <div class="align-content-center playform">
-        <form action="{% url 'tournaments:management' %}" method="post">
-            {% csrf_token %}
-            <p>
-                {{ form.start_time.label }}
-                {{ form.start_time }}
-            </p>
-            <p>
-                {{ form.end_time.label }}
-                {{ form.end_time }}
-            </p>
-            <p class="row" style="margin-left: 0; margin-bottom: 0">
-                {{ form.include_users.label }}
-                {{ form.include_users }}
-            </p>
-            <p>
-                =OR=
-            </p>
-            <p>
-                Exclude Users:
-                <input type="file" id="includeUsersFile" name="Upload CSV">
-                <i id="inlude_users_file_help" class="fa fa-question-circle"></i>
-            </p>
-            <input type="submit">
-        </form>
+    <div class="row">
+        <div class="align-content-center col-lg-7">
+            <form action="{% url 'tournaments:create' %}" method="post">
+                {% csrf_token %}
+                <p>
+                    {{ form.start_time.label }}
+                    {{ form.start_time }}
+                </p>
+                <p>
+                    {{ form.end_time.label }}
+                    {{ form.end_time }}
+                </p>
+                <p class="row" style="margin-left: 0; margin-bottom: 0">
+                    {{ form.include_users.label }}
+                    {{ form.include_users }}
+                </p>
+                <p>
+                    =OR=
+                </p>
+                <p>
+                    Include Users:
+                    <input type="file" id="includeUsersFile" name="Upload CSV">
+                    <i id="inlude_users_file_help" class="fa fa-question-circle"></i>
+                </p>
+                <input type="submit">
+            </form>
+        </div>
+        <div class="align-content-center col-lg-5">
+            <div style="height: 50%">
+                <h4>In Progress Tournaments</h4>
+                <ul>
+                    {% if not in_progress %}
+                        <li>No Tournaments Currently Running</li>
+                    {% else %}
+                        {% for tournament in in_progress %}
+                            <li><a href="{% url 'tournaments:manage' tournament.id %}">Tournament #{{ tournament.id }} @ {{ tournament.start_time }}</a></li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+            <div style="height: 50%">
+                <h4>Scheduled Tournaments</h4>
+                <ul>
+                    {% if not future %}
+                        <li>No Tournaments Scheduled</li>
+                    {% else %}
+                        {% for tournament in future %}
+                            <li><a href="{% url 'tournaments:manage' tournament.id %}">Tournament #{{ tournament.id }} @ {{ tournament.start_time }}</a></li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
     </div>
 {% endblock %}

@@ -36,7 +36,7 @@
                 <ul class="pagination">
                     <li><a href="?page=1">&laquo;First</a></li>
                     {% if page_obj.has_previous %}
-                        <li><a href="?page=0">&lsaquo;Previous</a></li>
+                        <li><a href="?page={{ page_obj.previous_page_number }}">&lsaquo;Previous</a></li>
                     {% endif %}
                     {% if page_obj.has_next %}
                         <li><a href="?page={{ page_obj.next_page_number }}">Next&rsaquo;</a></li>
