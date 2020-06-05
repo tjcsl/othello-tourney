@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.http import HttpResponse
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.views.generic.list import ListView
 
 from ..auth.decorators import management_only

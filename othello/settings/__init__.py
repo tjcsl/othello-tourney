@@ -76,7 +76,6 @@ DATABASES = {
     }
 }
 
-
 # Authentication
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
@@ -142,12 +141,10 @@ CELERY_BEAT_SCHEDULE = {
     }
 }
 
-
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "serve")
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 MEDIA_ROOT = os.path.join(BASE_DIR, "submissions")
-
 
 # Othello Settings
 MODERATOR_ROOT = os.path.join(BASE_DIR, "moderator")
@@ -157,3 +154,4 @@ JAILEDRUNNER_DRIVER = os.path.abspath(os.path.join(os.path.dirname(BASE_DIR), "r
 
 STALE_GAME = 6  # hours
 YOURSELF_TIMEOUT = 300  # seconds
+MAX_TIME_LIMIT = 15  # seconds

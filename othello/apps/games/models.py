@@ -1,8 +1,10 @@
 import os
 import uuid
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
 
@@ -87,7 +89,9 @@ class Game(models.Model):
 
     black = models.ForeignKey(Submission, on_delete=models.PROTECT, related_name="black")
     white = models.ForeignKey(Submission, on_delete=models.PROTECT, related_name="white")
-    time_limit = models.IntegerField(default=5,)
+    time_limit = models.IntegerField(
+        default=5, validators=[MaxValueValidator(settings.MAX_TIME_LIMIT), MinValueValidator(1), ]
+    )
 
     forfeit = models.BooleanField(default=False)
     outcome = models.CharField(max_length=1, choices=OUTCOME_CHOICES, default="T")

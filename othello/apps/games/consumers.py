@@ -90,7 +90,7 @@ class GamePlayingConsumer(GameConsumer):
     def disconnect(self, code):
         self.game.playing = False
         self.game.save(update_fields=["playing"])
-        super(GamePlayingConsumer, self).connect()
+        super(GamePlayingConsumer, self).disconnect(code)
 
     def receive_json(self, content, **kwargs):
         self.game.ping = True

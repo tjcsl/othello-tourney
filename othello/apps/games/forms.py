@@ -1,6 +1,7 @@
 from tempfile import NamedTemporaryFile
 
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ValidationError
 
 from ...sandboxing import import_strategy_sandboxed
@@ -47,7 +48,7 @@ class GameForm(forms.Form):
     black = forms.ModelChoiceField(label="Black:", queryset=choices, initial="Yourself")
     white = forms.ModelChoiceField(label="White:", queryset=choices, initial="Yourself")
     time_limit = forms.IntegerField(
-        label="Time Limit (secs):", initial=5, min_value=1, max_value=15
+        label="Time Limit (secs):", initial=5, min_value=1, max_value=settings.MAX_TIME_LIMIT
     )
 
     def __init__(self, *args, **kwargs):

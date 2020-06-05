@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.timezone import now
 
@@ -24,8 +26,12 @@ class Tournament(models.Model):
 
     start_time = models.DateTimeField()
     include_users = models.ManyToManyField(get_user_model(), blank=True,)
+    game_time_limit = models.IntegerField(
+        default=1, validators=[MinValueValidator(1), MaxValueValidator(settings.MAX_TIME_LIMIT)]
+    )
 
     finished = models.BooleanField(default=False,)
+    terminated = models.BooleanField(default=False,)
 
     def __str__(self):
         return "Tournament at {}".format(self.start_time.strftime("%Y-%m-%d %H:%M:%S"))

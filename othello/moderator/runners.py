@@ -160,9 +160,8 @@ class PlayerRunner:
                 yield self.process.stderr.read(8192).decode("latin-1")
             if self.process.stdout in files_ready:
                 try:
-                    tmp = int(self.process.stdout.readline())
-                    print(f"GOT MOVE {tmp}")
-                    move = tmp
+                    move = int(self.process.stdout.readline())
+                    print(f"GOT MOVE {move}")
                     if move < 0 or move >= 64:
                         return -1, UserError.READ_INVALID
                 except ValueError:

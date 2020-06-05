@@ -22,4 +22,4 @@ class TournamentCreateForm(forms.ModelForm):
     class Meta:
         model = Tournament
         exclude = ("finished",)
-        labels = {"include_users": "Include Users: "}
+        labels = {"include_users": "Include Users: ", "game_time_limit": "Game Time Limit: "}
