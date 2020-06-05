@@ -32,6 +32,14 @@ class SubmissionForm(forms.ModelForm):
         return cd
 
 
+def _get_submission_name(obj):
+    return obj.get_submission_name()
+
+
+def _get_user_name(obj):
+    return obj.get_user_name()
+
+
 class DownloadSubmissionForm(forms.Form):
     script = forms.ModelChoiceField(label="Previous Submissions:", queryset=None,)
 
@@ -40,11 +48,7 @@ class DownloadSubmissionForm(forms.Form):
         choices = Submission.objects.filter(user=user).order_by("-created_at")
         self.fields["script"].queryset = choices
         self.fields["script"].initial = choices[0] if choices.exists() else None
-        self.fields["script"].label_from_instance = lambda obj: obj.get_submission_name()
-
-
-def _get_user_name(obj):
-    return obj.get_user_name()
+        self.fields["script"].label_from_instance = _get_submission_name
 
 
 class GameForm(forms.Form):
