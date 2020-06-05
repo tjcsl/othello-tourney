@@ -52,12 +52,12 @@
                             Tournaments
                         </a>
                         <div class="dropdown-menu">
+                            <a class="dropdown-item" href="{% url 'tournaments:help' %}">Tournament Help</a>
                             <a class="dropdown-item" href="{% url 'tournaments:current' %}">Current Rankings</a>
                             <a class="dropdown-item" href="{% url 'tournaments:previous' %}">Previous Tournaments</a>
                             {% if user|has_management_permissions %}
                                 <a class="dropdown-item" href="{% url 'tournaments:create' %}">Tournament Management</a>
                             {% endif %}
-                            <a class="dropdown-item" href="{% url 'tournaments:help' %}">Tournament Help</a>
                         </div>
                     </li>
                     {% if user|has_management_permissions %}

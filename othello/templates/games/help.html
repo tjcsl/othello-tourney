@@ -33,7 +33,7 @@
     <p>
         In addition to the specifications listed above, your <code>Strategy</code> class may contain a <code>logging</code> variable.
         This variable, if used, must be an attribute of the <code>Strategy</code> class.
-        Therefore it should be defined within <code>Strategy</code>'s constructor or inside the class but outside a class method.
+        Therefore it should be defined within <code>Strategy</code>'s constructor (as <code>self.logging</code>) or inside the class but outside a class method (just <code>logging</code>).
         For instance, <code>logging</code> cannot be defined in the <code>best_strategy</code> method of your <code>Strategy</code> class or in a helper method defined outside of <code>Strategy</code>.
     </p>
     <p>
