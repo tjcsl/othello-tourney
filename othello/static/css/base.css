@@ -45,6 +45,10 @@ html, body {
     text-decoration: underline;
 }
 
+.navbar-nav:last-child {
+    margin-right: 55px;
+}
+
 .navbar-brand:hover {
     text-decoration: underline;
     background-color: #33a122;

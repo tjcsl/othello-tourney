@@ -60,11 +60,6 @@
                             {% endif %}
                         </div>
                     </li>
-                    {% if user|has_management_permissions %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
-                        </li>
-                    {% endif %}
                 </ul>
             </div>
         </nav>

@@ -21,3 +21,7 @@
 .form-group input {
     margin-left: 10px;
 }
+
+#id_game_time_limit {
+    width: 25%;
+}

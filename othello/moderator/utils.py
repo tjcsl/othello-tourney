@@ -1,8 +1,7 @@
 import enum
 import importlib.machinery
-import importlib.util
 import operator
-from functools import lru_cache, partial, reduce, wraps
+from functools import partial, reduce, wraps
 
 from .constants import *
 
@@ -64,7 +63,6 @@ def binary_to_string(board):
     )
 
 
-@lru_cache
 def hamming_weight(n):
     c = 0
     while n:
