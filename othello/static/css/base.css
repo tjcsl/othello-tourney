@@ -37,16 +37,17 @@ html, body {
     color: white
 }
 
+.dropdown-menu {
+    right: 0 !important;
+    left: auto !important;
+}
+
 .dropdown-menu a{
     color: #33a122;
 }
 
 .navbar-nav a:hover {
     text-decoration: underline;
-}
-
-.navbar-nav:last-child {
-    margin-right: 55px;
 }
 
 .navbar-brand:hover {
