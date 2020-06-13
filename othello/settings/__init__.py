@@ -87,6 +87,11 @@ AUTH_USER_MODEL = "authentication.User"
 
 AUTHENTICATION_BACKENDS = ("othello.apps.auth.oauth.IonOauth2",)
 
+if DEBUG:
+    AUTH_PASSWORD_VALIDATORS = []
+    AUTHENTICATION_BACKENDS += ("django.contrib.auth.backends.ModelBackend",)
+
+
 SOCIAL_AUTH_USER_FIELDS = ["username", "first_name", "last_name", "email", "id"]
 SOCIAL_AUTH_URL_NAMESPACE = "social"
 SOCIAL_AUTH_PIPELINE = (
@@ -150,3 +155,4 @@ MAX_TIME_LIMIT = 15  # seconds
 
 # Tournament settings
 MAX_ROUND_NUM = 75  # amount of rounds
+CONCURRENT_GAME_LIMIT = 5  # max amount of games that can be played at any time

@@ -16,13 +16,15 @@ class TournamentCreateForm(forms.ModelForm):
 
     def clean(self):
         cd = self.cleaned_data
-        if cd["include_users"].count() >= 2:
+        if cd["include_users"].count() < 2:
             raise ValidationError("A Tournament must include at least 2 players!")
         if (
             cd["include_users"].filter(username="Yourself").exists()
             or cd["bye_player"].username == "Yourself"
         ):
             raise ValidationError('The "Yourself" player cannot participate in Tournaments!')
+        if cd["include_users"].filter(username=cd["bye_player"].username).exists():
+            raise ValidationError("The bye player cannot participate in the Tournament!")
 
     class Meta:
         model = Tournament

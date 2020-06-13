@@ -15,7 +15,11 @@
             </h6>
             {% if games %}
                 {% for game in games %}
-                    <a href="{% url 'games:watch' game_id=game.id %}">{{ game }}</a><br>
+                    {% if game.is_tournament %}
+                        <a href="{% url 'games:watch' game_id=game.id %}">Tournament: {{ game }}</a><br>
+                    {% else %}
+                        <a href="{% url 'games:watch' game_id=game.id %}">{{ game }}</a><br>
+                    {% endif %}
                 {% endfor %}
             {% else %}
                 <p>There are no games currently playing</p>

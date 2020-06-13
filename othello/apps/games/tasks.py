@@ -181,3 +181,8 @@ def delete_old_games():
     Game.objects.filter(is_tournament=False).filter(
         Q(playing=False) | Q(created_at__lt=datetime.now() - timedelta(hours=settings.STALE_GAME))
     ).delete()
+
+
+@shared_task
+def test():
+    return 1 + 1
