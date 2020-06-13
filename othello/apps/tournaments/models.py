@@ -32,6 +32,9 @@ class Tournament(models.Model):
     num_rounds = models.IntegerField(
         default=15, validators=[MinValueValidator(15), MaxValueValidator(settings.MAX_ROUND_NUM)]
     )
+    played = models.IntegerField(
+        default=0, validators=[MinValueValidator(0), MaxValueValidator(settings.MAX_ROUND_NUM)]
+    )
     bye_player = models.ForeignKey(
         get_user_model(),
         blank=False,

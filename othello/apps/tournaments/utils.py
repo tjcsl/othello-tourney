@@ -8,7 +8,7 @@ def chunks(v, n):
 
 def make_pairings(players, bye_player):
     matches = []
-    players = sorted(players, key=lambda x: x.ranking)
+    players = sorted(players, key=lambda x: -x.ranking)
 
     for i in range(0, len(players), 2):
         if i + 1 > len(players):

@@ -36,7 +36,9 @@ def run_tournament(tournament_id):
     )
 
     matches = make_pairings(submissions, t.bye_player)
-    for _ in range(t.num_rounds):
+    for round_num in range(t.num_rounds):
+        t.played = round_num + 1
+        t.save(update_fields=["played"])
         for round_matches in chunks(matches, settings.CONCURRENT_GAME_LIMIT):
             games = [
                 t.games.create(

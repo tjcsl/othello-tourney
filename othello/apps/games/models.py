@@ -43,8 +43,17 @@ class Submission(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     code = models.FileField(upload_to=_save_path, default=None,)
 
+    tournament_win_year = models.IntegerField(default=-1,)
+
     def get_user_name(self):
         return self.user.short_name
+
+    def get_game_name(self):
+        return (
+            f"T-{self.tournament_win_year} {self.get_user_name()}"
+            if self.tournament_win_year != -1
+            else self.get_user_name()
+        )
 
     def get_submitted_time(self):
         return self.created_at.strftime("%Y-%m-%d %H:%M:%S")

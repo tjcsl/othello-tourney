@@ -36,8 +36,8 @@ def _get_submission_name(obj):
     return obj.get_submission_name()
 
 
-def _get_user_name(obj):
-    return obj.get_user_name()
+def _get_game_name(obj):
+    return obj.get_game_name()
 
 
 class DownloadSubmissionForm(forms.Form):
@@ -61,5 +61,5 @@ class GameForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields["black"].label_from_instance = _get_user_name
-        self.fields["white"].label_from_instance = _get_user_name
+        self.fields["black"].label_from_instance = _get_game_name
+        self.fields["white"].label_from_instance = _get_game_name

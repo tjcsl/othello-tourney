@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.http import HttpResponse
+from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, render
 from django.views.generic.list import ListView
 
@@ -19,9 +20,20 @@ class TournamentListView(ListView):
 
 
 def detail(request, tournament_id=None):
-    if tournament_id:
-        return HttpResponse(get_object_or_404(Tournament, id=tournament_id))
-    return HttpResponse("current")
+    t = Tournament.objects.in_progress()
+    t = t[0] if t.exists() else None
+
+    if tournament_id is not None:
+        t = get_object_or_404(Tournament, id=tournament_id)
+
+    players = list(enumerate(sorted(t.players.all(), key=lambda x: -x.ranking))) if t is not None else None
+
+    page_obj = None
+    if players is not None:
+        paginator = Paginator(players, 15)
+        page_obj = paginator.get_page(request.GET.get('page'))
+
+    return render(request, "tournaments/detail.html", {"tournament": t, "players": players, "page_obj": page_obj})
 
 
 @management_only
