@@ -2,7 +2,7 @@
 {% load static %}
 {% block title %}Othello: Tournaments{% endblock %}
 {% block head %}
-    <link rel="stylesheet" href="{% static 'css/tournaments/management.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tournaments/create.css' %}">
     <script type="text/javascript" src="{% static 'js/tournaments/create.js' %}"></script>
 {% endblock %}
 {% block main %}
@@ -43,7 +43,7 @@
                 <input type="submit">
             </form>
         </div>
-        <div class="align-content-center col-lg-5">
+        <div class="align-content-center col-lg-5" id="right-side">
             <div style="height: 50%">
                 <h4>In Progress Tournaments</h4>
                 <ul>

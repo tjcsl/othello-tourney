@@ -7,7 +7,7 @@
     <script type="text/javascript" src="{% static 'js/tournaments/manage.js' %}"></script>
 {% endblock %}
 {% block main %}
-    <div class="row-cols-2 row">
+    <div class="row" style="display: flex">
         <div class="col-lg-8">
             <h4 style="text-decoration: underline">Tournament #{{ tournament.id }}</h4>
             <h6>Started at: {{ tournament.start_time }}</h6>
@@ -57,7 +57,7 @@
             </form>
             </div>
         </div>
-        <div class="col-lg-4">
+        <div class="col-lg-4" id="right-side">
             {{ form.remove_users }}
             <p>
                 {{ form.terminate.label }}
