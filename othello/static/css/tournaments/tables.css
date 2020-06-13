@@ -1,0 +1,11 @@
+.pagination li{
+    margin: 0 5px;
+}
+thead {
+    background-color: #33a122;
+    color: white;
+}
+
+tbody {
+    color: #805229;
+}

@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Othello: View Rankings{% endblock %}
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/tournaments/management.css' %}">
+    <link href="{% static 'css/tournaments/tables.css' %}" rel="stylesheet">
+    <script type="text/javascript" src="{% static 'js/tournaments/manage.js' %}"></script>
+{% endblock %}
+{% block main %}
+    <div class="row-cols-2 row">
+        <div class="col-lg-8">
+            <h4 style="text-decoration: underline">Tournament #{{ tournament.id }}</h4>
+            <h6>Started at: {{ tournament.start_time }}</h6>
+            <h6>{{ players|length }} Players Participating</h6>
+            <h6>Rounds (Played/Remaining): {{ tournament.played }}/{{ tournament.num_rounds }}</h6>
+            <h6>Game Time Limit: {{ tournament.game_time_limit }}s</h6>
+            <h6></h6>
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Ranking</th>
+                            <th>User</th>
+                            <th>Points</th>
+                            {% if future %}
+                                <th>Remove?</th>
+                            {% else %}
+                                <th>Disqualify?</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for player in players %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>{{ player }}</td>
+                                <td>{{ player.ranking }}</td>
+                                <td><input type="checkbox" class="user-remove" id="{{ player.id }}"></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if page_obj.has_other_pages %}
+                    <ul class="pagination">
+                        <li><a href="?page=1">&laquo;First</a></li>
+                        {% if page_obj.has_previous %}
+                            <li><a href="?page={{ page_obj.previous_page_number }}">&lsaquo;Previous</a></li>
+                        {% endif %}
+                        {% if page_obj.has_next %}
+                            <li><a href="?page={{ page_obj.next_page_number }}">Next&rsaquo;</a></li>
+                        {% endif %}
+                        <li><a href="?page={{ page_obj.paginator.num_pages }}">Last&raquo;</a></li>
+                    </ul>
+                {% endif %}
+            <form method="post" action="{% url "tournaments:manage" tournament.id%}">
+                <input type="submit" value="Save Changes" id="manage_submit">
+            </form>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            {{ form.remove_users }}
+            <p>
+                {{ form.terminate.label }}
+                {{ form.terminate }}
+            </p>
+            <p>
+                {{ form.reschedule.label }}
+                {{ form.reschedule }}
+            </p>
+            <p>
+                {{ form.num_rounds.label }}
+                {{ form.num_rounds }}
+            </p>
+            <p>
+                {{ form.game_time_limit.label }}
+                {{ form.game_time_limit }}
+            </p>
+            <p class="row" style="margin-left: 0; margin-bottom: 0">
+                {{ form.bye_user.label }}
+                {{ form.bye_user }}
+            </p>
+            <p class="row" style="margin-left: 0; margin-bottom: 0">
+                {{ form.add_users.label }}
+                {{ form.add_users }}
+            </p>
+        </div>
+    </div>
+{% endblock %}

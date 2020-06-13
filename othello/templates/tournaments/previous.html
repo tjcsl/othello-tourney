@@ -1,11 +1,8 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Othello: Previous Tournaments{% endblock %}
 {% block head %}
-    <style>
-        .pagination li{
-            margin: 0 5px;
-        }
-    </style>
+    <link href="{% static 'css/tournaments/tables.css' %}" type="text/css" rel="stylesheet">
 {% endblock %}
 {% block main %}
     {% if not page_obj %}

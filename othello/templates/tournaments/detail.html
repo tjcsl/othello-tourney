@@ -1,9 +1,16 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Othello: View Rankings{% endblock %}
+{% block head %}
+    <link href="{% static 'css/tournaments/tables.css' %}" type="text/css" rel="stylesheet">
+{% endblock %}
 {% block main %}
     {% if not tournament %}
         <h5>No Tournaments Are Currently Running</h5>
     {% else %}
+        {% if tournament.terminated %}
+            <h4 style="color: red">This Tournament was Terminated before Completion</h4>
+        {% endif %}
         <h4 style="text-decoration: underline">Tournament #{{ tournament.id }}</h4>
         <h6>Started at: {{ tournament.start_time }}</h6>
         <h6>{{ players|length }} Players Participating</h6>
@@ -22,9 +29,9 @@
                 <tbody>
                     {% for player in page_obj %}
                     <tr>
-                        <td>{{ player.0|add:1 }}</td>
-                        <td>{{ player.1 }}</td>
-                        <td>{{ player.1.ranking }}</td>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ player }}</td>
+                        <td>{{ player.ranking }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
