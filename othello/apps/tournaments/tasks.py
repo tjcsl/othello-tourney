@@ -32,4 +32,3 @@ def run_tournament(tournament_id):
     )
 
     matches = make_pairings(submissions, t.bye_player)
-
