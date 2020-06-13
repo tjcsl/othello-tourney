@@ -18,12 +18,13 @@ class TournamentCreateForm(forms.ModelForm):
         cd = self.cleaned_data
         if cd["include_users"].count() >= 2:
             raise ValidationError("A Tournament must include at least 2 players!")
-        if cd["include_users"].filter(username="Yourself").exists():
+        if (
+            cd["include_users"].filter(username="Yourself").exists()
+            or cd["bye_player"].username == "Yourself"
+        ):
             raise ValidationError('The "Yourself" player cannot participate in Tournaments!')
 
     class Meta:
         model = Tournament
         exclude = ("finished",)
-        labels = {
-            "include_users": "Include Users: ",
-        }
+        labels = {"include_users": "Include Users: ", "bye_player": "Bye Player: "}

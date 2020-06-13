@@ -118,6 +118,8 @@ class Move(models.Model):
 
     objects = MoveSet.as_manager()
 
+    id = models.BigAutoField(primary_key=True)
+
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="moves")
     created_at = models.DateTimeField(auto_now_add=True)
     board = models.CharField(max_length=64, default="")
@@ -138,6 +140,8 @@ class GameObjectSet(models.QuerySet):
 class GameObject(models.Model):
 
     objects = GameObjectSet.as_manager()
+
+    id = models.BigAutoField(primary_key=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     player = models.CharField(max_length=1, choices=PLAYER_CHOICES)

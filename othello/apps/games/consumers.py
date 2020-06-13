@@ -1,6 +1,7 @@
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 
+from ...moderator.moderator import Player
 from .models import Game, Submission
 from .tasks import run_game
 from .utils import *
@@ -98,7 +99,7 @@ class GamePlayingConsumer(GameConsumer):
 
         player = content.get("player", False)
         if move := int(content.get("move", False)):
-            if player == "o" and self.is_white_yourself:
+            if player == Player.WHITE.value and self.is_white_yourself:
                 self.game.moves.create(player=player, move=move)
-            elif player == "x" and self.is_black_yourself:
+            elif player == Player.BLACK.value and self.is_black_yourself:
                 self.game.moves.create(player=player, move=move)

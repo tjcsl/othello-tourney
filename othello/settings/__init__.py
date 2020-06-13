@@ -83,17 +83,12 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+AUTH_USER_MODEL = "authentication.User"
 
 AUTHENTICATION_BACKENDS = ("othello.apps.auth.oauth.IonOauth2",)
 
-if DEBUG:
-    AUTH_PASSWORD_VALIDATORS = []
-    AUTHENTICATION_BACKENDS += ("django.contrib.auth.backends.ModelBackend",)
-
 SOCIAL_AUTH_USER_FIELDS = ["username", "first_name", "last_name", "email", "id"]
-
 SOCIAL_AUTH_URL_NAMESPACE = "social"
-
 SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.social_details",
     "social_core.pipeline.social_auth.social_uid",
@@ -105,13 +100,10 @@ SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.associate_user",
     "social_core.pipeline.social_auth.load_extra_data",
 )
-
 SOCIAL_AUTH_ALWAYS_ASSOCIATE = True
-
-AUTH_USER_MODEL = "authentication.User"
-
 SOCIAL_AUTH_LOGIN_ERROR_URL = "auth:error"
 SOCIAL_AUTH_RAISE_EXCEPTIONS = False
+
 
 LOGIN_URL = "auth:login"
 LOGIN_REDIRECT_URL = "games:upload"
@@ -130,7 +122,7 @@ DATE_INPUT_FORMATS = [
 SESSION_SAVE_EVERY_REQUEST = True
 
 # Celery
-CELERY_RESULT_BACKED = "django-db"
+CELERY_RESULT_BACKEND = "django-db"
 CELERY_BROKER_URL = "redis://localhost:6379/1"
 CELERY_TIMEZONE = "America/New_York"
 CELERY_BEAT_SCHEDULE = {
@@ -155,3 +147,6 @@ JAILEDRUNNER_DRIVER = os.path.abspath(os.path.join(os.path.dirname(BASE_DIR), "r
 STALE_GAME = 6  # hours
 YOURSELF_TIMEOUT = 300  # seconds
 MAX_TIME_LIMIT = 15  # seconds
+
+# Tournament settings
+MAX_ROUND_NUM = 75  # amount of rounds

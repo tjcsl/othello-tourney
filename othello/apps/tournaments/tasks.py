@@ -2,7 +2,8 @@ from celery import shared_task
 
 from ..games.models import Submission
 from ..games.tasks import Player, run_game
-from .models import Tournament, TournamentGame, TournamentSubmission
+from .models import Tournament, TournamentGame, TournamentPlayer
+from .utils import make_pairings
 
 
 @shared_task
@@ -23,9 +24,12 @@ def run_tournament(tournament_id):
     except Tournament.DoesNotExist:
         return
 
-    submissions = TournamentSubmission.objects.bulk_create(
+    submissions = TournamentPlayer.objects.bulk_create(
         [
-            TournamentSubmission(tournament=t, submission=s)
+            TournamentPlayer(tournament=t, submission=s)
             for s in Submission.objects.latest(user_id__in=t.include_users.all())
         ]
     )
+
+    round_num = 1
+    matches = make_pairings(submissions, round_num, t.bye_player)

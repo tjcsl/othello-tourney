@@ -29,6 +29,17 @@ class Tournament(models.Model):
     game_time_limit = models.IntegerField(
         default=1, validators=[MinValueValidator(1), MaxValueValidator(settings.MAX_TIME_LIMIT)]
     )
+    num_rounds = models.IntegerField(
+        default=15, validators=[MinValueValidator(15), MaxValueValidator(settings.MAX_ROUND_NUM)]
+    )
+    bye_player = models.ForeignKey(
+        get_user_model(),
+        blank=False,
+        null=False,
+        on_delete=models.PROTECT,
+        related_name="bye",
+        default=None,
+    )
 
     finished = models.BooleanField(default=False,)
     terminated = models.BooleanField(default=False,)
@@ -42,11 +53,11 @@ class Tournament(models.Model):
         )
 
 
-class TournamentSubmission(models.Model):
+class TournamentPlayer(models.Model):
 
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name="submissions")
     submission = models.ForeignKey(Submission, on_delete=models.CASCADE)
-    ranking = models.IntegerField(default=0,)
+    ranking = models.DecimalField(default=0, decimal_places=1, max_digits=15)
 
 
 class TournamentGame(models.Model):
@@ -57,9 +68,5 @@ class TournamentGame(models.Model):
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=False, blank=False)
 
-    win_successor = models.ForeignKey(
-        "self", null=False, blank=False, on_delete=models.CASCADE, related_name="win_predecessors",
-    )
-    lose_successor = models.ForeignKey(
-        "self", null=False, blank=False, on_delete=models.CASCADE, related_name="lose_predecessors",
-    )
+    def __str__(self):
+        return f"{str(self.tournament)} - {self.game.black.get_user_name()} v. {self.game.white.get_user_name()}"

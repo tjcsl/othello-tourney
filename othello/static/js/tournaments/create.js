@@ -20,6 +20,7 @@ window.onload = function () {
     })
 
     $("#id_include_users").selectize();
+    $("#id_bye_player").selectize();
 
     $("#includeUsersFile").on('change', function () {
         let reader = new FileReader();
