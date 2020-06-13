@@ -38,8 +38,10 @@ class TournamentCreateForm(forms.ModelForm):
 
 class TournamentManagementForm(forms.Form):
 
-    terminate = forms.BooleanField()
-    remove_users = forms.ModelMultipleChoiceField(queryset=None, widget=forms.HiddenInput())
+    terminate = forms.BooleanField(required=False)
+    remove_users = forms.ModelMultipleChoiceField(
+        queryset=None, widget=forms.HiddenInput(), required=False
+    )
 
     def __init__(self, tournament, *args, **kwargs):
         super(TournamentManagementForm, self).__init__(*args, **kwargs)
@@ -54,15 +56,32 @@ class TournamentManagementForm(forms.Form):
                 label="Reschedule: ",
                 input_formats=settings.DATE_INPUT_FORMATS,
                 widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
+                required=False,
             )
 
             self.fields["num_rounds"] = forms.IntegerField(
-                min_value=15, max_value=settings.MAX_ROUND_NUM
+                max_value=settings.MAX_ROUND_NUM, required=False
             )
-            self.fields["game_time_limit"] = forms.IntegerField(min_value=1, max_value=15)
-            self.fields["bye_user"] = forms.ModelChoiceField(queryset=players)
+            self.fields["game_time_limit"] = forms.IntegerField(
+                min_value=1, max_value=15, required=False
+            )
+            self.fields["bye_user"] = forms.ModelChoiceField(queryset=players, required=False)
             self.fields["add_users"] = forms.ModelMultipleChoiceField(
-                queryset=get_user_model().objects.all()
+                queryset=get_user_model().objects.all(), required=False
             )
         else:
             self.fields["terminate"].label = "Terminate Tournament: "
+
+    def clean(self):
+        cd = self.cleaned_data
+        if cd["reschedule"] < timezone.now():
+            raise ValidationError("A Tournament cannot take place in the past!")
+        if cd["num_rounds"] < 15 or cd["num_rounds"] > 60:
+            raise ValidationError("Number of rounds must be within 15-60 rounds")
+        if (
+            cd["add_users"].filter(username="Yourself").exists()
+            or cd["bye_user"].username == "Yourself"
+        ):
+            raise ValidationError('The "Yourself" player cannot participate in Tournaments!')
+        if cd["add_users"].filter(id=cd["bye_user"].id).exists():
+            raise ValidationError("The bye player cannot participate in the Tournament!")

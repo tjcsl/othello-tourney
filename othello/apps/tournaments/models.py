@@ -72,7 +72,7 @@ class TournamentGame(models.Model):
         Tournament, on_delete=models.CASCADE, null=False, blank=False, related_name="games"
     )
 
-    game = models.ForeignKey(Game, on_delete=models.PROTECT, null=False, blank=False)
+    game = models.ForeignKey(Game, on_delete=models.CASCADE, null=False, blank=False)
 
     def __str__(self):
         return f"{str(self.tournament)} - {self.game.black.get_user_name()} v. {self.game.white.get_user_name()}"

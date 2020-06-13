@@ -1,7 +1,6 @@
 from django.contrib import messages
 from django.core.paginator import Paginator
-from django.shortcuts import get_object_or_404, render
-from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic.list import ListView
 
 from ..auth.decorators import management_only
@@ -76,18 +75,51 @@ def create(request):
 def management(request, tournament_id=None):
     tournament = get_object_or_404(Tournament, id=tournament_id)
     if request.method == "POST":
-        pass
-    else:
-        page_obj = Paginator(
-            sorted(tournament.players.all(), key=lambda x: -x.ranking), 10
-        ).get_page(request.GET.get("page"))
-        return render(
-            request,
-            "tournaments/manage.html",
-            {
-                "tournament": tournament,
-                "players": page_obj,
-                "form": TournamentManagementForm(tournament),
-                "future": tournament in Tournament.objects.future(),
-            },
-        )
+        form = TournamentManagementForm(tournament, request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+
+            if cd.get("terminate", False):
+                if tournament in Tournament.objects.in_progress():
+                    tournament.terminated = False
+                    tournament.save(update_fields=["terminated"])
+                else:
+                    tournament.delete()
+                messages.success(
+                    request,
+                    f"Tournament #{tournament.id} has successfully been terminated",
+                    extra_tags="success",
+                )
+                return redirect("tournaments:create")
+
+            if time := cd.get("reschedule", False):
+                tournament.start_time = time
+            if num_rounds := cd.get("num_rounds", False):
+                tournament.num_rounds = num_rounds
+            if tl := cd.get("game_time_limit", False):
+                tournament.game_time_limit = tl
+            if bye_user := cd.get("bye_user", False):
+                tournament.bye_player = bye_user
+            if added_users := cd.get("add_users", False):
+                tournament.include_users.add(added_users)
+            if removed_users := cd.get("remove_users", False):
+                tournament.include_users.remove(removed_users)
+            tournament.save()
+        else:
+            for errors in form.errors.get_json_data().values():
+                for error in errors:
+                    messages.error(request, error["message"], extra_tags="danger")
+
+    page_obj = Paginator(sorted(tournament.players.all(), key=lambda x: -x.ranking), 10).get_page(
+        request.GET.get("page")
+    )
+    return render(
+        request,
+        "tournaments/manage.html",
+        {
+            "tournament": tournament,
+            "players": page_obj,
+            "form": TournamentManagementForm(tournament),
+            "future": tournament in Tournament.objects.future(),
+        },
+    )

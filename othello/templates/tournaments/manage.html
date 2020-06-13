@@ -53,6 +53,7 @@
                     </ul>
                 {% endif %}
             <form method="post" action="{% url "tournaments:manage" tournament.id%}">
+                {% csrf_token %}
                 <input type="submit" value="Save Changes" id="manage_submit">
             </form>
             </div>

@@ -1,5 +1,5 @@
 .selectize-control {
-    width: 100%;
+    width: 75%;
 }
 
 .selectize-input {
@@ -29,5 +29,8 @@
 @media (max-width: 1400px) {
     #right-side{
         margin-top: 45px;
+    }
+    .selectize-control {
+        width: 50%;
     }
 }
