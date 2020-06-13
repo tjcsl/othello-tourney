@@ -31,5 +31,5 @@ def run_tournament(tournament_id):
         ]
     )
 
-    round_num = 1
-    matches = make_pairings(submissions, round_num, t.bye_player)
+    matches = make_pairings(submissions, t.bye_player)
+
