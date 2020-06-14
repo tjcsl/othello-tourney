@@ -139,9 +139,13 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "serve")
+STATIC_ROOT = "/var/www/othello/static"
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 MEDIA_ROOT = os.path.join(BASE_DIR, "submissions")
+
+if DEBUG:
+    STATIC_ROOT = os.path.join(BASE_DIR, "serve")
+
 
 # Othello Settings
 MODERATOR_ROOT = os.path.join(BASE_DIR, "moderator")
