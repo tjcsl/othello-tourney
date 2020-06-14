@@ -28,7 +28,13 @@ def run_tournament(tournament_id):
     except Tournament.DoesNotExist:
         return
 
-    submissions = t.players.all()
+    submissions = TournamentPlayer.objects.bulk_create(
+        [
+            TournamentPlayer(tournament=t, submission=s)
+            for s in Submission.objects.latest(user_id__in=t.include_users.all())
+        ]
+    )
+
     matches = make_pairings(submissions, t.bye_player)
     for round_num in range(t.num_rounds):
         t.refresh_from_db()

@@ -26,6 +26,10 @@
     width: 25%;
 }
 
+#id_remove_users {
+    display: none;
+}
+
 @media (max-width: 1400px) {
     #right-side{
         margin-top: 45px;

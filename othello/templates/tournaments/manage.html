@@ -34,7 +34,11 @@
                             <tr>
                                 <td>{{ forloop.counter }}</td>
                                 <td>{{ player }}</td>
-                                <td>{{ player.ranking }}</td>
+                                {% if future %}
+                                    <td>0</td>
+                                {% else %}
+                                    <td>{{ player.ranking }}</td>
+                                {% endif %}
                                 <td><input type="checkbox" class="user-remove" id="{{ player.id }}"></td>
                             </tr>
                         {% endfor %}
@@ -52,38 +56,38 @@
                         <li><a href="?page={{ page_obj.paginator.num_pages }}">Last&raquo;</a></li>
                     </ul>
                 {% endif %}
-            <form method="post" action="{% url "tournaments:manage" tournament.id%}">
-                {% csrf_token %}
-                <input type="submit" value="Save Changes" id="manage_submit">
-            </form>
+                <input type="submit" value="Save Changes" id="manage_submit" form="manage-form">
             </div>
         </div>
         <div class="col-lg-4" id="right-side">
-            {{ form.remove_users }}
-            <p>
-                {{ form.terminate.label }}
-                {{ form.terminate }}
-            </p>
-            <p>
-                {{ form.reschedule.label }}
-                {{ form.reschedule }}
-            </p>
-            <p>
-                {{ form.num_rounds.label }}
-                {{ form.num_rounds }}
-            </p>
-            <p>
-                {{ form.game_time_limit.label }}
-                {{ form.game_time_limit }}
-            </p>
-            <p class="row" style="margin-left: 0; margin-bottom: 0">
-                {{ form.bye_user.label }}
-                {{ form.bye_user }}
-            </p>
-            <p class="row" style="margin-left: 0; margin-bottom: 0">
-                {{ form.add_users.label }}
-                {{ form.add_users }}
-            </p>
+            <form action="{% url "tournaments:manage" tournament.id %}" method="post" id="manage-form">
+                {% csrf_token %}
+                {{ form.remove_users }}
+                <p>
+                    {{ form.terminate.label }}
+                    {{ form.terminate }}
+                </p>
+                <p>
+                    {{ form.reschedule.label }}
+                    {{ form.reschedule }}
+                </p>
+                <p>
+                    {{ form.num_rounds.label }}
+                    {{ form.num_rounds }}
+                </p>
+                <p>
+                    {{ form.game_time_limit.label }}
+                    {{ form.game_time_limit }}
+                </p>
+                <p class="row" style="margin-left: 0; margin-bottom: 0">
+                    {{ form.bye_user.label }}
+                    {{ form.bye_user }}
+                </p>
+                <p class="row" style="margin-left: 0; margin-bottom: 0">
+                    {{ form.add_users.label }}
+                    {{ form.add_users }}
+                </p>
+            </form>
         </div>
     </div>
 {% endblock %}

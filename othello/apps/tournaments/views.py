@@ -78,8 +78,9 @@ def management(request, tournament_id=None):
         form = TournamentManagementForm(tournament, request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-
+            print(cd)
             if cd.get("terminate", False):
+                tid = tournament.id
                 if tournament in Tournament.objects.in_progress():
                     tournament.terminated = False
                     tournament.save(update_fields=["terminated"])
@@ -87,7 +88,7 @@ def management(request, tournament_id=None):
                     tournament.delete()
                 messages.success(
                     request,
-                    f"Tournament #{tournament.id} has successfully been terminated",
+                    f"Tournament #{tid} has successfully been terminated",
                     extra_tags="success",
                 )
                 return redirect("tournaments:create")
@@ -101,18 +102,23 @@ def management(request, tournament_id=None):
             if bye_user := cd.get("bye_user", False):
                 tournament.bye_player = bye_user
             if added_users := cd.get("add_users", False):
-                tournament.include_users.add(added_users)
+                tournament.include_users.set(tournament.include_users.all().union(added_users))
             if removed_users := cd.get("remove_users", False):
-                tournament.include_users.remove(removed_users)
+                tournament.include_users.set(
+                    tournament.include_users.all().exclude(id__in=removed_users)
+                )
             tournament.save()
         else:
             for errors in form.errors.get_json_data().values():
                 for error in errors:
                     messages.error(request, error["message"], extra_tags="danger")
 
-    page_obj = Paginator(sorted(tournament.players.all(), key=lambda x: -x.ranking), 10).get_page(
-        request.GET.get("page")
-    )
+    if tournament in Tournament.objects.future():
+        page_obj = Paginator(tournament.include_users.all(), 10).get_page(request.GET.get("page"))
+    else:
+        page_obj = Paginator(
+            sorted(tournament.players.all(), key=lambda x: -x.ranking), 10
+        ).get_page(request.GET.get("page"))
     return render(
         request,
         "tournaments/manage.html",
