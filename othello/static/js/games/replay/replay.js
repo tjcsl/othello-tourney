@@ -37,13 +37,41 @@ function add_listeners(){
             download(`${rCanvas.black_name}_${rCanvas.white_name}_formatted.txt`, $("#parseableHistory").text());
         });
 
-    $("#replayForm").submit(function (e) {
-        if($("#replayFile").val() !== ""){
-            $("#uploadModal").modal('hide');
-        }
-        e.preventDefault();
-        e.stopPropagation();
+    $("#replayFile").on('change', function (e) {
+        let reader = new FileReader();
+        reader.onload = function () {
+            try{
+                parseReplay(reader.result);
+            }catch (e) {
+                alert("Could not parse replay file, are you sure this file is parseable?")
+            }
+        };
+        reader.readAsText($(this).prop('files')[0], "UTF-8");
+        $("#uploadModal").modal('hide');
     })
+}
+
+function parseReplay(file){
+    let moves = file.trim().split('\n');
+    let players = moves[0].split(",")
+    for(let i=1;i<moves.length;i++) {
+        let parts = moves[i].split(" ");
+        let possible = [];
+        let board = parts[0];
+        for(let j=0;j<parts[0].length;j++){
+            if(parts[0][j] === "*") {
+                possible.push(j);
+                board = board.replaceAt(j, ".")
+            }
+        }
+        HISTORY.unshift({
+            board: board,
+            player: parts[1],
+            tile: parts[2],
+            possible: possible
+        })
+    }
+    return players;
 }
 
 

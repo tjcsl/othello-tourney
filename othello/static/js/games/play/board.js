@@ -295,7 +295,11 @@ function prettyPrint(board) {
 function generate_pretty_history() {
     let out = `${RCANVAS.black_name},${RCANVAS.white_name}\n`;
     for(let i=HISTORY.length-1;i>=0;i--){
-        out += prettyPrint(HISTORY[i].board);
+        let board = HISTORY[i].board;
+        for(let j=0;j<HISTORY[i].possible.length;j++){
+            board = board.replaceAt(HISTORY[i].possible[j], '*')
+        }
+        out += prettyPrint(board);
         out += `${HISTORY[i].board.split(BLACK_CH).length - 1}-${HISTORY[i].board.split(WHITE_CH).length - 1} ${HISTORY[i].player}\n\n`;
     }
     $("#prettyHistory").text(out);
@@ -305,6 +309,9 @@ function generate_parseable_history() {
     let out = `${RCANVAS.black_name},${RCANVAS.white_name}\n`;
     for(let i=HISTORY.length-1;i>=0;i--){
         let board = HISTORY[i].board;
+        for(let j=0;j<HISTORY[i].possible.length;j++){
+            board = board.replaceAt(HISTORY[i].possible[j], '*')
+        }
         out += `${board} ${HISTORY[i].player} ${HISTORY[i].tile} ${board.split(BLACK_CH).length - 1} ${board.split(WHITE_CH).length - 1}\n`
     }
     $("#parseableHistory").text(out);

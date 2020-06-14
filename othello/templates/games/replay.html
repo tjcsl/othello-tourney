@@ -82,11 +82,11 @@
                     <p>If you downloaded a game file with the "parseable" format, upload it here to watch a replay of the game.</p>
                     <p>You can adjust the speed of the playback using the slider on the right side or manually step through moves.</p>
                     <p>Logs that may have been displayed when the game was playing are not saved in the parseable file and therefore will not be shown.</p>
-                    <form id="replayForm">
-                        <input type="file" id="replayFile" name="Replay File" required>
-                        <br><br>
-                        <input type="submit" value="Replay" class="btn" id="submitReplay">
-                    </form>
+                    <p>Upload a file to get started</p>
+                    <input type="file" id="replayFile" name="Replay File" required>
+                </div>
+                <div class="modal-footer">
+                   <button class="btn" onclick="window.location.href={% url "games:play" %}">Cancel</button>
                 </div>
             </div>
         </div>
