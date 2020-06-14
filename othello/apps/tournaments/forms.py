@@ -38,9 +38,7 @@ class TournamentCreateForm(forms.ModelForm):
 
 class TournamentManagementForm(forms.Form):
     terminate = forms.BooleanField(required=False)
-    remove_users = forms.ModelMultipleChoiceField(
-        queryset=None, required=False
-    )
+    remove_users = forms.ModelMultipleChoiceField(queryset=None, required=False)
 
     def __init__(self, tournament, *args, **kwargs):
         super(TournamentManagementForm, self).__init__(*args, **kwargs)
@@ -65,7 +63,9 @@ class TournamentManagementForm(forms.Form):
             self.fields["game_time_limit"] = forms.IntegerField(
                 min_value=1, max_value=15, required=False
             )
-            self.fields["bye_user"] = forms.ModelChoiceField(queryset=players, required=False)
+            self.fields["bye_user"] = forms.ModelChoiceField(
+                queryset=get_user_model().objects.all(), required=False
+            )
             self.fields["add_users"] = forms.ModelMultipleChoiceField(
                 queryset=get_user_model().objects.all(), required=False
             )

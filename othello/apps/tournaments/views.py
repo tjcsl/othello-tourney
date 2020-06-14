@@ -78,7 +78,6 @@ def management(request, tournament_id=None):
         form = TournamentManagementForm(tournament, request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            print(cd)
             if cd.get("terminate", False):
                 tid = tournament.id
                 if tournament in Tournament.objects.in_progress():
