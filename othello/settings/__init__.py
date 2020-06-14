@@ -11,7 +11,7 @@ ALLOWED_HOSTS = ["127.0.0.1", "localhost", "0.0.0.0", "192.168.1.21"]
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": [("127.0.0.1", 6379)], "capacity": 1500, "expiry": 2, },
+        "CONFIG": {"hosts": REDIS_HOST, "capacity": 1500, "expiry": 2, },
     },
 }
 
@@ -128,7 +128,7 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 # Celery
 CELERY_RESULT_BACKEND = "django-db"
-CELERY_BROKER_URL = "redis://localhost:6379/1"
+CELERY_BROKER_URL = REDIS_CELERY_HOST
 CELERY_TIMEZONE = "America/New_York"
 CELERY_BEAT_SCHEDULE = {
     "delete-old-games": {
