@@ -6,6 +6,7 @@ from django.views.generic.list import ListView
 from ..auth.decorators import management_only
 from .forms import TournamentCreateForm, TournamentManagementForm
 from .models import *
+from .tasks import run_tournament
 
 
 class TournamentListView(ListView):
@@ -45,12 +46,7 @@ def create(request):
         form = TournamentCreateForm(request.POST)
         if form.is_valid():
             t = form.save()
-            TournamentPlayer.objects.bulk_create(
-                [
-                    TournamentPlayer(tournament=t, submission=s)
-                    for s in Submission.objects.latest(user_id__in=t.include_users.all())
-                ]
-            )
+            run_tournament.apply_async([t.id], eta=t.start_time)
             messages.success(
                 request,
                 f"Successfully created tournament! Tournament is scheduled to run at {t.start_time}",
