@@ -95,3 +95,12 @@ Note: You will need to keep this command running in the foreground until you nee
 
 Note: If using `vagrant` this command must be run inside the Vagrant VM.
 
+
+
+## Formatting
+
+Keep the code pretty :) 
+
+Run this command once in a while to clean up the code:
+
+  * `pipenv run ./scripts/format.sh`
