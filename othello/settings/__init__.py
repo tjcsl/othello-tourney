@@ -11,7 +11,7 @@ ALLOWED_HOSTS = ["127.0.0.1", "localhost", "0.0.0.0", "192.168.1.21"]
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": REDIS_HOST, "capacity": 1500, "expiry": 2, },
+        "CONFIG": {"hosts": REDIS_CHANNELS_HOST, "capacity": 1500, "expiry": 2, },
     },
 }
 
