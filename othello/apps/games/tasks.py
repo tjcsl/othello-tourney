@@ -6,10 +6,10 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from channels.layers import get_channel_layer
 
-from django.conf import settings
 from django.db.models import Q
 
 from ...moderator import *
+from ...moderator.runners import *
 from ..games.models import Game, Player, Submission
 
 task_logger = get_task_logger(__name__)
@@ -54,7 +54,7 @@ def run_game(game_id):
         black_runner = (
             YourselfRunner(game, settings.YOURSELF_TIMEOUT)
             if game.black == yourself
-            else PlayerRunner(game.black.code.path, settings.JAILEDRUNNER_DRIVER, settings.DEBUG)
+            else PlayerRunner(game.black.code.path, settings.JAILEDRUNNER_DRIVER)
         )
     except OSError:
         black_runner = None
@@ -67,7 +67,7 @@ def run_game(game_id):
         white_runner = (
             YourselfRunner(game, settings.YOURSELF_TIMEOUT)
             if game.white == yourself
-            else PlayerRunner(game.white.code.path, settings.JAILEDRUNNER_DRIVER, settings.DEBUG)
+            else PlayerRunner(game.white.code.path, settings.JAILEDRUNNER_DRIVER)
         )
     except OSError:
         white_runner = None

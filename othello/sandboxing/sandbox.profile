@@ -45,3 +45,18 @@ read-only /lib64
 read-only /bin
 read-only /sbin
 read-only /sys
+
+
+# Runner files
+whitelist /home/abagali1/Testing/Syslab/othello-tourney/run_ai_jailed.py
+read-only /home/abagali1/Testing/Syslab/othello-tourney/run_ai_jailed.py
+whitelist /home/abagali1/Testing/Syslab/othello-tourney/othello/moderator/
+read-only /home/abagali1/Testing/Syslab/othello-tourney/othello/moderator/
+whitelist /home/abagali1/Testing/Syslab/othello-tourney/othello/moderator/__init__.py
+read-only /home/abagali1/Testing/Syslab/othello-tourney/othello/moderator/__init__.py
+whitelist /home/abagali1/Testing/Syslab/othello-tourney/othello/moderator/runners.py
+read-only /home/abagali1/Testing/Syslab/othello-tourney/othello/moderator/runners.py
+whitelist /home/abagali1/Testing/Syslab/othello-tourney/othello/moderator/utils.py
+read-only /home/abagali1/Testing/Syslab/othello-tourney/othello/moderator/utils.py
+whitelist /home/abagali1/Testing/Syslab/othello-tourney/othello/moderator/constants.py
+read-only /home/abagali1/Testing/Syslab/othello-tourney/othello/moderator/constants.py

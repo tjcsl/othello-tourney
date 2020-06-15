@@ -34,7 +34,7 @@ def get_sandbox_args(cmd_args, *, whitelist=None, readonly=None, extra_args=None
 
     if readonly:
         for path in readonly:
-            firejail_args.append(f"--readonly={path}")
+            firejail_args.append(f"--read-only={path}")
 
     if extra_args:
         firejail_args.extend(extra_args)

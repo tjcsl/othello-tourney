@@ -1,6 +1,7 @@
 import enum
 import importlib.machinery
 import operator
+import traceback
 from functools import partial, reduce, wraps
 
 from .constants import *
@@ -30,8 +31,10 @@ class Generator:
     def __iter__(self):
         try:
             self.return_value = yield from self.gen
-        except:
+        except Exception as e:
+            print(traceback.format_exc())
             self.return_value = -1, ServerError.PROCESS_EXITED
+            raise e
 
 
 def capture_generator_value(f):

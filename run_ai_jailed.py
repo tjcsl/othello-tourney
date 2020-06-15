@@ -1,6 +1,6 @@
 import sys
 
-from othello.moderator.runners import JailedRunner
+from othello.moderator.jailed_runners import JailedRunner
 
 if __name__ == "__main__":
     path = sys.argv[-1]
