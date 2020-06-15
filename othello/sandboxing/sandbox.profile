@@ -44,5 +44,4 @@ read-only /lib
 read-only /lib64
 read-only /bin
 read-only /sbin
-read-only /dev
 read-only /sys
