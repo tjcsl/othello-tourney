@@ -26,6 +26,12 @@ def get_sandbox_args(cmd_args, *, whitelist=None, readonly=None, extra_args=None
         "--quiet",
         "--net=none",
         f"--profile={settings.FIREJAIL_PROFILE}",
+        f"--whitelist={settings.JAILEDRUNNER_DRIVER}",
+        f"--read-only={settings.JAILEDRUNNER_DRIVER}",
+        f"--whitelist={settings.MODERATOR_ROOT}",
+        f"--read-only={settings.MODERATOR_ROOT}",
+        f"--whitelist={settings.SANDBOXING_ROOT}",
+        f"--read-only={settings.SANDBOXING_ROOT}",
     ]
 
     if whitelist:

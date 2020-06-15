@@ -141,9 +141,10 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 MEDIA_ROOT = os.path.join(BASE_DIR, "submissions")
 
 # Othello Settings
+SANDBOXING_ROOT = os.path.join(BASE_DIR, "sandboxing")
 MODERATOR_ROOT = os.path.join(BASE_DIR, "moderator")
-IMPORT_DRIVER = os.path.join(BASE_DIR, "sandboxing", "import_wrapper.py")
-FIREJAIL_PROFILE = os.path.join(BASE_DIR, "sandboxing", "sandbox.profile")
+IMPORT_DRIVER = os.path.join(SANDBOXING_ROOT, "import_wrapper.py")
+FIREJAIL_PROFILE = os.path.join(SANDBOXING_ROOT, "sandbox.profile")
 JAILEDRUNNER_DRIVER = os.path.abspath(os.path.join(os.path.dirname(BASE_DIR), "run_ai_jailed.py"))
 
 STALE_GAME = 6  # hours
