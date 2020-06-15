@@ -2,16 +2,15 @@ import os
 
 from celery.schedules import crontab
 
-from .secret import *
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+SECRET_KEY = 'y_xy)s%b_0h=#=y#3le5wfk!iy_+w#3#2j_&g@k^u-^qbrhxl2'
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost", "0.0.0.0", "192.168.1.21"]
 
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": REDIS_CHANNELS_HOST, "capacity": 1500, "expiry": 2, },
+        "CONFIG": {"hosts": [("localhost", 6379)], "capacity": 1500, "expiry": 2, },
     },
 }
 
@@ -67,14 +66,11 @@ WSGI_APPLICATION = "othello.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
-        "NAME": DB_NAME,
-        "USER": DB_USER,
-        "PASSWORD": DB_PASSWORD,
-        "HOST": DB_HOST,
-        "PORT": DB_PORT,
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.path.join(BASE_DIR, "db.sqlite3"),
     }
 }
+
 
 # Authentication
 AUTH_PASSWORD_VALIDATORS = [
@@ -128,7 +124,7 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 # Celery
 CELERY_RESULT_BACKEND = "django-db"
-CELERY_BROKER_URL = REDIS_CELERY_HOST
+CELERY_BROKER_URL = "redis://localhost:6379/1"
 CELERY_TIMEZONE = "America/New_York"
 CELERY_BEAT_SCHEDULE = {
     "delete-old-games": {
@@ -160,3 +156,8 @@ MAX_TIME_LIMIT = 15  # seconds
 # Tournament settings
 MAX_ROUND_NUM = 75  # amount of rounds
 CONCURRENT_GAME_LIMIT = 5  # max amount of games that can be played at any time
+
+try:
+    from .secret import *
+except ImportError:
+    pass
