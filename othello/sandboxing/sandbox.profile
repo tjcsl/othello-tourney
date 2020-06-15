@@ -26,6 +26,7 @@ private-dev
 
 # /mnt, /media, /run/mount, /run/media
 disable-mnt
+blacklist /var
 blacklist /srv
 blacklist /root
 blacklist /lost+found
@@ -34,14 +35,13 @@ blacklist /lib/systemd
 
 # localtime for the time, nsswitch.conf for network configuration, and
 # profile/skel/bash.bashrc in case they want to start a shell or something
-private-etc localtime,nsswitch.conf,profile,skel,bash.bashrc,ssl,lsb-release,arch-release,debian_version,redhat-release,ca-certificates
+private-etc passwd,localtime,nsswitch.conf,profile,skel,bash.bashrc,ssl,lsb-release,arch-release,debian_version,redhat-release,ca-certificates
 
 read-only /etc
 read-only /opt
 read-only /usr
 read-only /lib
 read-only /lib64
-read-only /var
 read-only /bin
 read-only /sbin
 read-only /dev
