@@ -31,7 +31,6 @@ class Generator:
         self.return_value = yield from self.gen
 
 
-
 def capture_generator_value(f):
     @wraps(f)
     def g(*args, **kwargs):

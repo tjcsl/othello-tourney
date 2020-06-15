@@ -3,6 +3,7 @@ import select
 import signal
 import subprocess
 import time
+
 import psutil
 
 from django.conf import settings
@@ -32,8 +33,6 @@ class PlayerRunner:
             cmd_args = get_sandbox_args(
                 cmd_args, whitelist=[os.path.dirname(self.path)], readonly=[self.path]
             )
-        print(os.getcwd())
-        print(" ".join(cmd_args))
 
         self.process = subprocess.Popen(
             cmd_args,
