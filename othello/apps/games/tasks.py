@@ -88,6 +88,7 @@ def run_game(game_id):
     with black_runner as player_black, white_runner as player_white:
         last_move = game.moves.create(board=INITIAL_BOARD, player="-", possible=[26, 19, 44, 37])
         send_through_socket(game, "game.update")
+        exception = None
 
         while not mod.is_game_over():
             if not ping(game):
@@ -110,6 +111,7 @@ def run_game(game_id):
                     )
             except BaseException as e:
                 task_logger.error(str(e))
+                exception = e
 
             for log in running_turn:
                 game.logs.create(
@@ -118,6 +120,9 @@ def run_game(game_id):
                 send_through_socket(game, "game.log")
                 sleep(0.05)
             submitted_move, error = running_turn.return_value
+
+            if exception is not None:
+                error = ServerError.UNEXPECTED
 
             if error != 0:
                 game.errors.create(

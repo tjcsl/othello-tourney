@@ -28,7 +28,10 @@ class Generator:
         self.return_value = None
 
     def __iter__(self):
-        self.return_value = yield from self.gen
+        try:
+            self.return_value = yield from self.gen
+        except:
+            self.return_value = -1, ServerError.PROCESS_EXITED
 
 
 def capture_generator_value(f):

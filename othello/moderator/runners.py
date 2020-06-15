@@ -111,8 +111,8 @@ class PlayerRunner:
 
     def start(self):
         cmd_args = ["python3", "-u", self.driver, self.path]
-        if not self.debug:
-            cmd_args = get_sandbox_args(cmd_args)
+        if self.debug:
+            cmd_args = get_sandbox_args(cmd_args, whitelist=os.path.dirname(self.path), readonly=self.path)
 
         self.process = subprocess.Popen(
             cmd_args,
