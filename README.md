@@ -64,8 +64,13 @@ After you have setup your dev environment and configured Ion OAuth, you will nee
 This project uses [Pipenv](https://pipenv.pypa.io/en/latest/) to manage dependencies, to install the dependencies run:
   * `pipenv install --rm`
 
+After the dependencies are installed you will need to load the "Yourself" player through its fixture:
+  * `pipenv run ./manage.py loaddata othello/fixtures/yourself.json`
 
-After the dependencies have been installed, you can run the django server by running:
+Note: Failure to do this will cause the game code to fail.
+
+
+You can run the django server by running:
   * `pipenv run ./manage.py runserver <host>:<port>`
 
 Note: If you are using `vagrant`, host should be `0.0.0.0` and port should be `8000`. Vagrant on Linux has some issues forwarding traffic if the host is `127.0.0.1` or `localhost`, so `0.0.0.0` will have the most success. The only port forwarded from the vagrant VM is `8000` so no other port will work (unless you change the Vagrant config). 
