@@ -83,11 +83,6 @@ AUTH_USER_MODEL = "authentication.User"
 
 AUTHENTICATION_BACKENDS = ("othello.apps.auth.oauth.IonOauth2",)
 
-if DEBUG:
-    AUTH_PASSWORD_VALIDATORS = []
-    AUTHENTICATION_BACKENDS += ("django.contrib.auth.backends.ModelBackend",)
-
-
 SOCIAL_AUTH_USER_FIELDS = ["username", "first_name", "last_name", "email", "id"]
 SOCIAL_AUTH_URL_NAMESPACE = "social"
 SOCIAL_AUTH_PIPELINE = (
@@ -135,13 +130,9 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 STATIC_URL = "/static/"
-STATIC_ROOT = "/var/www/othello/static"
+STATIC_ROOT = os.path.join(BASE_DIR, "serve")
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 MEDIA_ROOT = os.path.join(BASE_DIR, "submissions")
-
-if DEBUG:
-    STATIC_ROOT = os.path.join(BASE_DIR, "serve")
-
 
 # Othello Settings
 MODERATOR_ROOT = os.path.join(BASE_DIR, "moderator")
