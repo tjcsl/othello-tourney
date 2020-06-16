@@ -21,7 +21,7 @@ def serialize_game_info(game):
             for move in moves
         ]
     if not game.playing:
-        data["moves"][0]["possible"] = data["moves"][0]["flipped"] = []
+        data["moves"][0]["possible"] = []
     return data
 
 
