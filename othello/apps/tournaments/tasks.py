@@ -1,14 +1,14 @@
 from celery import shared_task
 
 from django.conf import settings
-from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
+from django.urls import reverse_lazy
 
-from .emails import email_send
 from ..games.models import Game, Submission
 from ..games.tasks import Player, run_game
+from .emails import email_send
 from .models import Tournament, TournamentGame, TournamentPlayer
-from .utils import chunks, make_pairings, get_winners
+from .utils import chunks, get_winners, make_pairings
 
 
 @shared_task
@@ -99,7 +99,7 @@ def run_tournament(tournament_id):
                 "ranking_url": reverse_lazy("tournaments:current"),
             },
             " Congratulations!",
-            [winner.email]
+            [winner.email],
         )
     email_send(
         "emails/tournament_finished.txt",
@@ -112,5 +112,5 @@ def run_tournament(tournament_id):
             "ranking_url": reverse_lazy("tournaments:current"),
         },
         " Tournament Completed",
-        [x.email for x in get_user_model().objects.filter(is_teacher=True)]
+        [x.email for x in get_user_model().objects.filter(is_teacher=True)],
     )

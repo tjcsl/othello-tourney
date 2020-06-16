@@ -15,7 +15,6 @@ urlpatterns = [
     path("upload/", views.upload, name="upload"),
     path("watch/", views.watch, name="watch"),
     path("watch/<int:game_id>", views.watch, name="watch"),
-    path("replay/", default, name="replay"),
     path("about/", default, name="about"),
     path("help/", default, name="help"),
 ]

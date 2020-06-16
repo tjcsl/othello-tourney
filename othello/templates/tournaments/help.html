@@ -4,4 +4,26 @@
     <h3>
         How are tournaments run?
     </h3>
+    <p>
+        Othello Tournaments follow a modified <a href="https://en.wikipedia.org/wiki/Swiss-system_tournament">Swiss Tournament</a> model.
+    </p>
+    <p>
+        In the very first round, each player is randomly matched with another player. The players who win their respective matches will have a ranking of "1".
+        Every subsequent round players will be sorted by ranking and matched with another player with the most similar ranking.
+        Every time a player wins a game the player's ranking will increase by 1, or 0.5 if the game ends in a tie.
+    </p>
+    <p>
+        There is no penalty for losing a game.
+    </p>
+    <p>
+        Tournament games are started automatically in batches and can only be watched. Games started through the <a href="{% url 'games:play' %}">Play</a> page are not tournament games.
+        You can view currently playing tournament games on the <a href="{% url 'games:watch' %}">Watch</a> page. Tournament games will be prepended with a "Tournament: ".
+    </p>
+    <h3>
+        Viewing Tournament Rankings
+    </h3>
+    <p>
+        If there is a tournament currently playing you will be able to view current rankings on the <a href="{% url 'tournaments:current' %}">Current Rankings</a> page.
+        You can also view the rankings of previously run tournaments on the <a href="{% url 'tournaments:previous' %}">Previous Ranking</a> pages.
+    </p>
 {% endblock %}

@@ -2,13 +2,13 @@ import os
 
 from celery.schedules import crontab
 
+DEBUG = True
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = "y_xy)s%b_0h=#=y#3le5wfk!iy_+w#3#2j_&g@k^u-^qbrhxl2"
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
-    "0.0.0.0",
     "othello.csl.tjhsst.edu",
     "othello.tjhsst.edu",
 ]
