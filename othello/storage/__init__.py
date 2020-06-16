@@ -14,10 +14,10 @@ class MinifiedStaticFilesStorage(StaticFilesStorage):
         super(MinifiedStaticFilesStorage, self)._open(name, mode)
 
     def _save(self, name, content):
-        super(MinifiedStaticFilesStorage, self)._save(name, content)
-        path, extension = os.path.splitext(content.name)
+        filename = super(MinifiedStaticFilesStorage, self)._save(name, content)
+        path, extension = os.path.splitext(filename)
         if self.minify:
             if "css" in extension:
-                process_single_css_file(content.name)
+                process_single_css_file(os.path.join(self.location, filename), overwrite=True)
             elif "js" in extension:
-                process_single_js_file(content.name)
+                process_single_js_file(os.path.join(self.location, filename), overwrite=True)

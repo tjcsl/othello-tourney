@@ -138,6 +138,7 @@ CELERY_BEAT_SCHEDULE = {
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "serve")
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
+STATICFILES_STORAGE = "othello.storage.MinifiedStaticFilesStorage"
 MEDIA_ROOT = os.path.join(BASE_DIR, "submissions")
 
 # Othello Settings
