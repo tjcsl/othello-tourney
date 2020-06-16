@@ -135,10 +135,21 @@ CELERY_BEAT_SCHEDULE = {
     }
 }
 
+# Static
 STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "serve")
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 MEDIA_ROOT = os.path.join(BASE_DIR, "submissions")
+
+# Mail
+MAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "mail.tjhsst.edu"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_SUBJECT_PREFIX = "[Othello]"
+EMAIL_FROM = "othello-noreply@tjhsst.edu"
+FORCE_EMAIL_SEND = False
 
 # Othello Settings
 SANDBOXING_ROOT = os.path.join(BASE_DIR, "sandboxing")
@@ -147,6 +158,7 @@ IMPORT_DRIVER = os.path.join(SANDBOXING_ROOT, "import_wrapper.py")
 FIREJAIL_PROFILE = os.path.join(SANDBOXING_ROOT, "sandbox.profile")
 JAILEDRUNNER_DRIVER = os.path.abspath(os.path.join(os.path.dirname(BASE_DIR), "run_ai_jailed.py"))
 
+# Game settings
 STALE_GAME = 6  # hours
 YOURSELF_TIMEOUT = 300  # seconds
 MAX_TIME_LIMIT = 15  # seconds

@@ -18,3 +18,17 @@ def make_pairings(players, bye_player):
         matches.append((black, white))
 
     return matches
+
+
+def get_winners(players):
+    first, second, third = (-1, None), (-1, None), (-1, None)
+    for player in players:
+        r = player.ranking
+        if r > first:
+            first = (r, player)
+        elif r > second:
+            second = (r, player)
+        elif r > third:
+            third = (r, player)
+
+    return first[1], second[1], third[1]

@@ -1,11 +1,13 @@
 from celery import shared_task
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
+from .emails import email_send
 from ..games.models import Game, Submission
 from ..games.tasks import Player, run_game
 from .models import Tournament, TournamentGame, TournamentPlayer
-from .utils import chunks, make_pairings
+from .utils import chunks, make_pairings, get_winners
 
 
 @shared_task
@@ -57,7 +59,6 @@ def run_tournament(tournament_id):
                 for game in round_matches
             ]
             tasks = {game: run_tournament_game.delay(game.id) for game in games}
-            print(tasks)
             while len(tasks) != 0:
                 finished_games = []
                 for game, task in tasks.items():
@@ -84,3 +85,27 @@ def run_tournament(tournament_id):
                 for game in finished_games:
                     del tasks[game]
         matches = make_pairings(submissions, t.bye_player)
+
+    winners = [x.submission.user for x in get_winners(submissions)]
+    for pos, winner in enumerate(winners):
+        email_send(
+            "emails/winner.txt",
+            "emails/winner.html",
+            {
+                "name": winner.short_name,
+                "rank": "1st" if pos == 0 else "2nd" if pos == 1 else "3rd"
+            },
+            "Congratulation!",
+            [winner.email]
+        )
+    email_send(
+        "emails/tournament_finished.txt",
+        "emails/tournament_finished.html",
+        {
+            "tournament_id": tournament_id,
+            "start_time": t.start_time,
+            "winners": [f"{x.full_name} ({x.short_name})" for x in winners],
+        },
+        "Tournament Completed",
+        [x.email for x in get_user_model().objects.filter(is_teacher=True)]
+    )

@@ -1,0 +1,3 @@
+Congratulation {{ name }}! You have placed {{ rank }} in the past Othello AI Tournament!
+You can view your rankings and those of your classmates here: {% url 'tournaments:current' }
+If you have any questions email your AI teacher or othello@tjhsst.edu
