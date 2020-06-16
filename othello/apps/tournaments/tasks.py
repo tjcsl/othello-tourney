@@ -1,6 +1,7 @@
 from celery import shared_task
 
 from django.conf import settings
+from django.urls import reverse_lazy
 from django.contrib.auth import get_user_model
 
 from .emails import email_send
@@ -93,9 +94,11 @@ def run_tournament(tournament_id):
             "emails/winner.html",
             {
                 "name": winner.short_name,
-                "rank": "1st" if pos == 0 else "2nd" if pos == 1 else "3rd"
+                "rank": "1st" if pos == 0 else "2nd" if pos == 1 else "3rd",
+                "base_url": "https://othello.tjhsst.edu",
+                "ranking_url": reverse_lazy("tournaments:current"),
             },
-            "Congratulation!",
+            " Congratulations!",
             [winner.email]
         )
     email_send(
@@ -104,8 +107,10 @@ def run_tournament(tournament_id):
         {
             "tournament_id": tournament_id,
             "start_time": t.start_time,
-            "winners": [f"{x.full_name} ({x.short_name})" for x in winners],
+            "winners": [f"{x.get_full_name()} ({x.short_name})" for x in winners],
+            "base_url": "https://othello.tjhsst.edu",
+            "ranking_url": reverse_lazy("tournaments:current"),
         },
-        "Tournament Completed",
+        " Tournament Completed",
         [x.email for x in get_user_model().objects.filter(is_teacher=True)]
     )

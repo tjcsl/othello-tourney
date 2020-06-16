@@ -149,7 +149,7 @@ EMAIL_USE_TLS = True
 
 EMAIL_SUBJECT_PREFIX = "[Othello]"
 EMAIL_FROM = "othello-noreply@tjhsst.edu"
-FORCE_EMAIL_SEND = False
+FORCE_EMAIL_SEND = True
 
 # Othello Settings
 SANDBOXING_ROOT = os.path.join(BASE_DIR, "sandboxing")

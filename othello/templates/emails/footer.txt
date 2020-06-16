@@ -1,0 +1,8 @@
+--
+This is an automated message sent from the TJ Othello Tournament Server ({{ base_url }}).
+
+
+Thomas Jefferson High School for Science and Technology
+6560 Braddock Road
+Alexandria, VA, 22312
+(703) 750-8300

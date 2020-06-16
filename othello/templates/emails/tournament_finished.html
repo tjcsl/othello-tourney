@@ -1,17 +1,21 @@
-<p>
+<h3 style="color: #33a122">
     Hello! This is an automated message from the Othello Tournament Server.
-</p>
-<p>
+</h3>
+<h4>
     Tournament #{{ tournament_id }} that was scheduled to start at {{ start_time }} has now completed.
-</p>
-<p>
+</h4>
+<h5>
     The following students placed in the Top 3:
-</p>
+</h5>
 <ol>
     {% for player in winners %}
         <li>{{ player }}</li>
     {% endfor %}
 </ol>
-<p>
-    If you have any questions feel free to email <a href="mailto:othello@tjhsst.edu">othello@tjhsst.edu</a>.
-</p>
+<h5>
+    You can view the full rankings <a style="color: #a06633" href="{{ base_url }}/{{ ranking_url }}">here</a>
+</h5>
+<h5>
+    If you have any questions feel free to email <a style="color: #a06633" href="mailto:othello@tjhsst.edu">othello@tjhsst.edu</a>.
+</h5>
+{% include "emails/footer.html" %}
