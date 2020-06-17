@@ -18,7 +18,7 @@ task_logger = get_task_logger(__name__)
 
 
 def send_through_socket(game, event_type):
-    task_logger.error(f"sending {event_type}")
+    task_logger.debug(f"sending {event_type}")
     async_to_sync(get_channel_layer().group_send)(game.channels_group_name, {"type": event_type})
 
 
@@ -178,7 +178,7 @@ def run_game(game_id):
                 game.outcome = mod.outcome()
                 game.score = mod.score()
                 game.save(update_fields=["forfeit", "score", "outcome", "playing"])
-                task_logger.error("GAME OVER")
+                task_logger.debug("GAME OVER")
                 break
             send_through_socket(game, "game.update")
     game.playing = False
