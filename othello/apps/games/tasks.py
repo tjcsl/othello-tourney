@@ -90,6 +90,7 @@ def run_game(game_id):
         send_through_socket(game, "game.error")
         raise RuntimeError("Cannot find a submission code file!")
 
+    error = 0
     with black_runner as player_black, white_runner as player_white:
         last_move = game.moves.create(board=INITIAL_BOARD, player="-", possible=[26, 19, 44, 37])
         send_through_socket(game, "game.update")
@@ -185,6 +186,11 @@ def run_game(game_id):
     send_through_socket(game, "game.update")
     black_runner.stop()
     white_runner.stop()
+
+    if error != 0 and isinstance(error, ServerError):
+        raise RuntimeError(
+            f"Game {game_id} encountered a ServerError of value {error.value}"
+        )
 
 
 @shared_task
