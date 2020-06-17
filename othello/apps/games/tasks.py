@@ -188,9 +188,10 @@ def run_game(game_id):
     white_runner.stop()
 
     if error != 0 and isinstance(error, ServerError):
-        raise RuntimeError(
-            f"Game {game_id} encountered a ServerError of value {error.value}"
-        )
+        if error.value[0] != -8:
+            raise RuntimeError(
+                f"Game {game_id} encountered a ServerError of value {error.value}"
+            )
 
 
 @shared_task
