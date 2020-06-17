@@ -16,6 +16,10 @@
         You do not need to import the <code>multiprocessing</code> library to access these objects
     </p>
     <p>
+        <span style="color: red">Warning: </span> All user code will be run in a daemonized <code>multiprocessing.Process</code>. This means your script
+        cannot spawn any Processes of its own. If your code does spawn any <code>multiprocessing.Process</code> instances, it will error out.
+    </p>
+    <p>
         The board will be a length-64 string of characters from the set <code>{'.', 'x', 'o'}</code>.
         An <code>'.'</code> represents an empty space, <code>'x'</code> a black token, and <code>'o'</code> a white token.
         A valid move is with in the range 0-63, inclusive, and represents an index on the board string where the current player will place a piece.
@@ -111,6 +115,7 @@ class Strategy:
     </h3>
     <p>
         You may submit code any amount of times, and the Othello server will record and store all your submissions. If you wish, you may retrieve any previously submitted script from the upload page.
+        However, the Othello Server will only run your most recent submission.
     </p>
     <p>
         All your code submissions will persist on the Othello server, and you can retrieve previous submissions through the <a href="{% url 'games:upload' %}">Upload Page</a>. The Othello server will always
@@ -125,7 +130,7 @@ class Strategy:
         Running Multiple Files
     </h3>
     <p>
-        As of now the Othello server will only run the script that is set to "running".
+        As of now the Othello server will only run the most recently uploaded script.
         You should try to put all your code in a single file and upload that file.
         Any files created by your code will persist between runs and games.
         If you do in fact need other files for your code to work, and it is infeasible to include it in one file, contact <a href="mailto:othello@tjhsst.edu">othello@tjhsst.edu</a> or your AI teacher about your situation.
