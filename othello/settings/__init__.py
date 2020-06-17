@@ -198,12 +198,12 @@ try:
     from .secret import *
 except ImportError:
     DEBUG = True
-    SENTRY_PUBLIC_DSN = ""
+    SENTRY_DSN = ""
 
 
 if not DEBUG:
     sentry_sdk.init(
-        SENTRY_PUBLIC_DSN,
+        SENTRY_DSN,
         integrations=[DjangoIntegration(), CeleryIntegration()],
         send_default_pii=True,
     )
