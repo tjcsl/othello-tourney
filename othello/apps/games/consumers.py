@@ -22,7 +22,8 @@ class GameConsumer(JsonWebsocketConsumer):
         try:
             yourself = Submission.objects.get(user__username="Yourself")
         except Submission.DoesNotExist:
-            return self.close()
+            self.close()
+            raise RuntimeError("Cannot find Yourself submission!")
 
         if not self.game.playing:
             return self.close()

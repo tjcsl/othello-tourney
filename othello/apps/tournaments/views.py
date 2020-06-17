@@ -45,13 +45,21 @@ def create(request):
     if request.method == "POST":
         form = TournamentCreateForm(request.POST)
         if form.is_valid():
-            t = form.save()
-            run_tournament.apply_async([t.id], eta=t.start_time)
-            messages.success(
-                request,
-                f"Successfully created tournament! Tournament is scheduled to run at {t.start_time}",
-                extra_tags="success",
-            )
+            try:
+                t = form.save()
+                run_tournament.apply_async([t.id], eta=t.start_time)
+                messages.success(
+                    request,
+                    f"Successfully created tournament! Tournament is scheduled to run at {t.start_time}",
+                    extra_tags="success",
+                )
+            except Exception as e:
+                messages.error(
+                    request,
+                    "An unexpected error occured when trying to create a tournament, try again later",
+                    extra_tags="danger",
+                )
+                raise e
         else:
             for errors in form.errors.get_json_data().values():
                 for error in errors:

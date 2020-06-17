@@ -1,7 +1,11 @@
 import json
+import logging
 import subprocess
+import traceback
 
 from django.conf import settings
+
+logger = logging.getLogger("othello")
 
 
 def import_strategy_sandboxed(path):
@@ -15,8 +19,9 @@ def import_strategy_sandboxed(path):
         return 0
     else:
         try:
-            return json.loads(error.decode())
-        except Exception as e:
+            return json.loads(error.decode("latin-1"))
+        except:
+            logger.error(f"Failed to import/load strategy file {traceback.format_exc()}")
             return {"message": error.decode()}
 
 

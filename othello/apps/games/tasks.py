@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta
 from time import sleep
 
@@ -12,6 +13,7 @@ from ...moderator import *
 from ...moderator.runners import *
 from ..games.models import Game, Player, Submission
 
+logger = logging.getLogger("othello")
 task_logger = get_task_logger(__name__)
 
 
@@ -42,9 +44,10 @@ def run_game(game_id):
         game = Game.objects.get(id=game_id)
         yourself = Submission.objects.get(user__username="Yourself")
     except Game.DoesNotExist:
+        logger.error(f"Trying to play nonexistent game ({game_id}")
         return
     except Submission.DoesNotExist:
-        return
+        raise RuntimeError("Cannot find Yourself submission!")
 
     mod, time_limit = Moderator(), game.time_limit
     game_over = False
@@ -57,6 +60,7 @@ def run_game(game_id):
             else PlayerRunner(game.black.code.path, settings.JAILEDRUNNER_DRIVER)
         )
     except OSError:
+        logger.error(f"Cannot find submission code file! {game.black.code.path}")
         black_runner = None
         file_deleted = game.errors.create(
             player=Player.BLACK.value,
@@ -70,6 +74,7 @@ def run_game(game_id):
             else PlayerRunner(game.white.code.path, settings.JAILEDRUNNER_DRIVER)
         )
     except OSError:
+        logger.error(f"Cannot find submission code file! {game.white.code.path}")
         white_runner = None
         file_deleted = game.errors.create(
             player=Player.WHITE.value,
@@ -83,7 +88,7 @@ def run_game(game_id):
         game.playing = False
         game.save(update_fields=["forfeit", "outcome", "playing"])
         send_through_socket(game, "game.error")
-        return
+        raise RuntimeError("Cannot find a submission code file!")
 
     with black_runner as player_black, white_runner as player_white:
         last_move = game.moves.create(board=INITIAL_BOARD, player="-", possible=[26, 19, 44, 37])
@@ -110,6 +115,7 @@ def run_game(game_id):
                         board, current_player.value, time_limit, last_move
                     )
             except BaseException as e:
+                logger.error(f"Error when getting move {game_id}, {current_player}, {str(e)}")
                 task_logger.error(str(e))
                 exception = e
 
@@ -183,11 +189,7 @@ def run_game(game_id):
 
 @shared_task
 def delete_old_games():
+    logger.info("Deleting stale games")
     Game.objects.filter(is_tournament=False).filter(
         Q(playing=False) | Q(created_at__lt=datetime.now() - timedelta(hours=settings.STALE_GAME))
     ).delete()
-
-
-@shared_task
-def test():
-    return 1 + 1

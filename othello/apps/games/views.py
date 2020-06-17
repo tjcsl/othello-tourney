@@ -1,4 +1,5 @@
 import json
+import logging
 
 from django.contrib import messages
 from django.http import FileResponse
@@ -8,6 +9,8 @@ from ..auth.decorators import login_required
 from .forms import DownloadSubmissionForm, GameForm, SubmissionForm
 from .models import Game
 from .utils import serialize_game_info
+
+logger = logging.getLogger("othello")
 
 
 @login_required
@@ -84,6 +87,7 @@ def play(request):
                 playing=True,
                 ping=True,
             )
+            logger.info(f"Created game with id: {g.id}")
             cd["black"], cd["white"] = cd["black"].id, cd["white"].id
             request.session["form-data"] = json.dumps(cd)
             return render(

@@ -145,6 +145,29 @@ STATIC_ROOT = os.path.join(BASE_DIR, "serve")
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 MEDIA_ROOT = os.path.join(BASE_DIR, "submissions")
 
+# Logging
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": True,
+    "formatters": {
+        "verbose": {"format": "{asctime}:{module}:{levelname} {message}", "style": "{"},
+        "simple": {"format": "{levelname} {message}", "style": "{"},
+    },
+    "handlers": {
+        "file": {
+            "class": "logging.FileHandler",
+            "filename": os.path.join(BASE_DIR, "logs/info.log"),
+            "formatter": "verbose",
+        },
+        "console": {"class": "logging.StreamHandler", "formatter": "simple", },
+    },
+    "loggers": {
+        "django": {"handlers": ["console", "file"], "level": "INFO", "propagate": True, },
+        "othello": {"handlers": ["console", "file"], "level": "INFO", "propagate": True, },
+    },
+}
+
+
 # Mail
 MAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "mail.tjhsst.edu"
