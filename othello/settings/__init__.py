@@ -1,6 +1,10 @@
 import os
 
+import sentry_sdk
 from celery.schedules import crontab
+from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.logging import LoggingIntegration
 
 DEBUG = True
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -170,4 +174,13 @@ CONCURRENT_GAME_LIMIT = 5  # max amount of games that can be played at any time
 try:
     from .secret import *
 except ImportError:
-    pass
+    DEBUG = True
+    SENTRY_PUBLIC_DSN = ""
+
+
+if not DEBUG:
+    sentry_sdk.init(
+        SENTRY_PUBLIC_DSN,
+        integrations=[DjangoIntegration(), CeleryIntegration()],
+        send_default_pii=True,
+    )
