@@ -21,23 +21,28 @@ def _save_path(instance, filename):
     return os.path.join(instance.user.short_name, f"{uuid.uuid4()}.py")
 
 
-class SubmissionSet(models.QuerySet):
+class SubmissionQuerySet(models.QuerySet):
     def latest(self, user=None, **kwargs):
+        """
+        Return the latest submission for a user, or a set of the most recent submission
+        for all users.
+
+        @param user User to get latest submission for
+        """
         if user is not None:
-            qs = self.filter(user=user, **kwargs).order_by("-created_at")
-            return qs[0] if qs.exists() else None
+            return self.filter(user=user, **kwargs).order_by("-created_at").first()
         else:
             return self.filter(**kwargs).order_by("user", "-created_at").distinct("user")
 
     def delete(self):
         for obj in self:
-            obj.code.delete()
-        super(SubmissionSet, self).delete()
+            obj.code.delete_game()
+        super(SubmissionQuerySet, self).delete()
 
 
 class Submission(models.Model):
 
-    objects = SubmissionSet.as_manager()
+    objects = SubmissionQuerySet.as_manager()
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="user")
     name = models.CharField(max_length=500, default="")
@@ -121,7 +126,7 @@ class Game(models.Model):
 
 class MoveSet(models.QuerySet):
     def latest(self, **kwargs):
-        return self.order_by("-created_at")[0] if self.exists() else None
+        return self.order_by("-created_at").get()
 
 
 class Move(models.Model):

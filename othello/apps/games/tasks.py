@@ -19,7 +19,7 @@ logger = logging.getLogger("othello")
 task_logger = get_task_logger(__name__)
 
 
-def send_through_socket(game, event_type):
+def send_through_game_channel(game, event_type):
     task_logger.debug(f"sending {event_type}")
     async_to_sync(get_channel_layer().group_send)(game.channels_group_name, {"type": event_type})
 
@@ -31,9 +31,9 @@ def ping(game):
     return (timezone.now() - game.last_heartbeat).seconds < settings.CLIENT_HEARTBEAT_INTERVAL * 2
 
 
-def delete(game):
+def delete_game(game):
     if not game.is_tournament:
-        game.delete()
+        game.delete_game()
 
 
 @shared_task
@@ -44,8 +44,6 @@ def run_game(game_id):
     except Game.DoesNotExist:
         logger.error(f"Trying to play nonexistent game ({game_id}")
         return "game not found"
-    except Submission.DoesNotExist:
-        raise RuntimeError("Cannot find Yourself submission!")
 
     mod, time_limit = Moderator(), game.time_limit
     game_over = False
@@ -85,13 +83,13 @@ def run_game(game_id):
         game.outcome = "T"
         game.playing = False
         game.save(update_fields=["forfeit", "outcome", "playing"])
-        send_through_socket(game, "game.error")
+        send_through_game_channel(game, "game.error")
         raise RuntimeError("Cannot find a submission code file!")
 
     error = 0
     with black_runner as player_black, white_runner as player_white:
         last_move = game.moves.create(board=INITIAL_BOARD, player="-", possible=[26, 19, 44, 37])
-        send_through_socket(game, "game.update")
+        send_through_game_channel(game, "game.update")
         exception = None
 
         while not mod.is_game_over():
@@ -100,7 +98,7 @@ def run_game(game_id):
                 game.outcome = "T"
                 game.forfeit = False
                 game.save(update_fields=["playing", "outcome", "forfeit"])
-                delete(game)
+                delete_game(game)
                 return "no ping"
             board, current_player = mod.get_game_state()
 
@@ -122,7 +120,7 @@ def run_game(game_id):
                 game.logs.create(
                     player=current_player.value, message=log,
                 )
-                send_through_socket(game, "game.log")
+                send_through_game_channel(game, "game.log")
                 sleep(0.05)
             submitted_move, error = running_turn.return_value
 
@@ -145,7 +143,7 @@ def run_game(game_id):
                     )
                 game.playing = False
                 game.save(update_fields=["forfeit", "outcome", "playing"])
-                send_through_socket(game, "game.error")
+                send_through_game_channel(game, "game.error")
                 break
 
             try:
@@ -162,7 +160,7 @@ def run_game(game_id):
                     Player.BLACK.value if current_player == Player.WHITE else Player.WHITE.value
                 )
                 game.save(update_fields=["forfeit", "outcome", "playing"])
-                send_through_socket(game, "game.error")
+                send_through_game_channel(game, "game.error")
                 task_logger.info(
                     f"{game_id}: {current_player.value} submitted invalid move {submitted}"
                 )
@@ -181,10 +179,10 @@ def run_game(game_id):
                 game.save(update_fields=["forfeit", "score", "outcome", "playing"])
                 task_logger.info(f"GAME {game_id} OVER")
                 break
-            send_through_socket(game, "game.update")
+            send_through_game_channel(game, "game.update")
     game.playing = False
     game.save(update_fields=["playing"])
-    send_through_socket(game, "game.update")
+    send_through_game_channel(game, "game.update")
     black_runner.stop()
     white_runner.stop()
 
@@ -198,4 +196,4 @@ def delete_old_games():
     logger.info("Deleting stale games")
     Game.objects.filter(is_tournament=False).filter(
         Q(playing=False) | Q(created_at__lt=datetime.now() - timedelta(hours=settings.STALE_GAME))
-    ).delete()
+    ).delete_game()

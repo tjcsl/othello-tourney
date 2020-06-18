@@ -19,16 +19,14 @@ class GameConsumer(JsonWebsocketConsumer):
         try:
             self.game = Game.objects.get(id=self.scope["url_route"]["kwargs"]["game_id"])
         except Game.DoesNotExist:
-            return self.close()
-
-        try:
-            yourself = Submission.objects.get(user__username="Yourself")
-        except Submission.DoesNotExist:
             self.close()
-            raise RuntimeError("Cannot find Yourself submission!")
+            return
+
+        yourself = Submission.objects.get(user__username="Yourself")
 
         if not self.game.playing:
-            return self.close()
+            self.close()
+            return
 
         self.is_black_yourself = self.game.black == yourself
         self.is_white_yourself = self.game.white == yourself

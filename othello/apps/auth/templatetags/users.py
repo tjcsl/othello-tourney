@@ -5,4 +5,4 @@ register = template.Library()
 
 @register.filter
 def has_management_permissions(user):
-    return not user.is_anonymous and user.has_management_permission
+    return user.is_authenticated and user.has_management_permission

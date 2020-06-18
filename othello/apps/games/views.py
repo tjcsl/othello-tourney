@@ -3,11 +3,11 @@ import logging
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
-from ..auth.decorators import login_required
 from .forms import DownloadSubmissionForm, GameForm, SubmissionForm
 from .models import Game
 from .utils import serialize_game_info
@@ -117,3 +117,11 @@ def watch(request, game_id=False):
             {"game": serialize_game_info(get_object_or_404(Game, id=game_id)), "is_watching": True},
         )
     return render(request, "games/watch_list.html", {"games": Game.objects.running()})
+
+
+def about(request):
+    return render(request, "games/about.html")
+
+
+def help(request):
+    return render(request, "games/help.html")

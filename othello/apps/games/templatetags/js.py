@@ -7,5 +7,5 @@ register = Library()
 
 
 @register.filter(is_safe=True)
-def store(obj):
+def safe_json(obj):
     return mark_safe(json.dumps(obj))

@@ -132,3 +132,7 @@ def management(request, tournament_id=None):
             "future": tournament in Tournament.objects.future(),
         },
     )
+
+
+def help(request):
+    return render(request, "tournaments/help.html")
