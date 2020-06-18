@@ -143,14 +143,7 @@ class Move(models.Model):
         return f"{self.game}, {self.player}, {self.move}, {self.created_at}"
 
 
-class GameObjectSet(models.QuerySet):
-    def latest(self):
-        return self.order_by("-created_at").first()
-
-
 class GameObject(models.Model):
-
-    objects = GameObjectSet.as_manager()
 
     id = models.BigAutoField(primary_key=True)
 
