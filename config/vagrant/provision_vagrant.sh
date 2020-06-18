@@ -49,6 +49,4 @@ cp -n othello/settings/secret.sample.py othello/settings/secret.py
 
 # Setup Django DB Tables
 local_pipenv run python3 manage.py migrate
-local_pipenv run python3 manage.py loaddata othello/fixtures/yourself.json
 local_pipenv run python3 manage.py collectstatic --noinput
-
