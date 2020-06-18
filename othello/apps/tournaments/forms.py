@@ -7,8 +7,6 @@ from django.utils import timezone
 from ..games.models import Submission
 from .models import Tournament
 
-User = get_user_model()
-
 
 class TournamentCreateForm(forms.ModelForm):
     start_time = forms.DateTimeField(
@@ -69,10 +67,10 @@ class TournamentManagementForm(forms.Form):
                 min_value=1, max_value=15, required=False
             )
             self.fields["bye_user"] = forms.ModelChoiceField(
-                queryset=User.objects.all(), required=False
+                queryset=get_user_model().objects.all(), required=False
             )
             self.fields["add_users"] = forms.ModelMultipleChoiceField(
-                queryset=User.objects.all(), required=False
+                queryset=get_user_model().objects.all(), required=False
             )
         else:
             self.fields["terminate"].label = "Terminate Tournament: "
