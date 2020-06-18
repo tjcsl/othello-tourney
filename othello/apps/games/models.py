@@ -22,11 +22,9 @@ def _save_path(instance, filename):
 
 
 class SubmissionQuerySet(models.QuerySet):
-    def latest(self, user=None, **kwargs):
+    def latest(self, **kwargs):
         """
         Returns a set of all the latest submissions for all users
-
-        @param user User to get latest submission for
         """
         return self.filter(**kwargs).order_by("user", "-created_at").distinct("user")
 
