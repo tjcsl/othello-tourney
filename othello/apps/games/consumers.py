@@ -47,10 +47,10 @@ class GameConsumer(JsonWebsocketConsumer):
         self.update_game()
 
     def game_log(self, event):
-        self.send_log()
+        self.send_log(event["object_id"])
 
     def game_error(self, event):
-        self.send_error()
+        self.send_error(event["object_id"])
 
     def game_ping(self, event):
         self.send_json({"type": "game.ping"})
@@ -63,10 +63,10 @@ class GameConsumer(JsonWebsocketConsumer):
             if game["game_over"]:
                 self.disconnect(code=0)
 
-    def send_log(self):
+    def send_log(self, object_id):
         if self.connected:
             self.game.refresh_from_db()
-            log = self.game.logs.latest()
+            log = self.game.logs.get(id=object_id)
             has_access = (
                 log.game.black.user == self.scope["user"]
                 if log.player == Player.BLACK.value
@@ -79,9 +79,9 @@ class GameConsumer(JsonWebsocketConsumer):
             ):
                 self.send_json(serialize_game_log(log))
 
-    def send_error(self):
+    def send_error(self, object_id):
         if self.connected:
-            self.send_json(serialize_game_error(self.game.errors.latest()))
+            self.send_json(serialize_game_error(self.game.errors.get(id=object_id)))
 
 
 class GamePlayingConsumer(GameConsumer):

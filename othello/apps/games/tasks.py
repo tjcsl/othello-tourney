@@ -19,10 +19,10 @@ logger = logging.getLogger("othello")
 task_logger = get_task_logger(__name__)
 
 
-def send_through_game_channel(game, event_type):
+def send_through_game_channel(game, event_type, object_id):
     print('sending' + event_type)
     task_logger.debug(f"sending {event_type}")
-    async_to_sync(get_channel_layer().group_send)(game.channels_group_name, {"type": event_type})
+    async_to_sync(get_channel_layer().group_send)(game.channels_group_name, {"type": event_type, "object_id": object_id})
 
 
 def ping(game):
@@ -84,13 +84,13 @@ def run_game(game_id):
         game.outcome = "T"
         game.playing = False
         game.save(update_fields=["forfeit", "outcome", "playing"])
-        send_through_game_channel(game, "game.error")
+        send_through_game_channel(game, "game.error", file_deleted.id)
         raise RuntimeError("Cannot find a submission code file!")
 
     error = 0
     with black_runner as player_black, white_runner as player_white:
         last_move = game.moves.create(board=INITIAL_BOARD, player="-", possible=[26, 19, 44, 37])
-        send_through_game_channel(game, "game.update")
+        send_through_game_channel(game, "game.update", game_id)
         exception = None
 
         while not mod.is_game_over():
@@ -119,18 +119,17 @@ def run_game(game_id):
 
             for log in running_turn:
                 print(log)
-                game.logs.create(
+                game_log = game.logs.create(
                     player=current_player.value, message=log,
                 )
-                send_through_game_channel(game, "game.log")
-                sleep(1)
+                send_through_game_channel(game, "game.log", game_log.id)
             submitted_move, error = running_turn.return_value
 
             if exception is not None:
                 error = ServerError.UNEXPECTED
 
             if error != 0:
-                game.errors.create(
+                game_err = game.errors.create(
                     player=current_player.value,
                     error_code=error.value[0],
                     error_msg=error.value[1],
@@ -145,7 +144,7 @@ def run_game(game_id):
                     )
                 game.playing = False
                 game.save(update_fields=["forfeit", "outcome", "playing"])
-                send_through_game_channel(game, "game.error")
+                send_through_game_channel(game, "game.error", game_err.id)
                 break
 
             try:
@@ -154,7 +153,7 @@ def run_game(game_id):
                 else:
                     game_over = True
             except InvalidMoveError as e:
-                game.errors.create(
+                game_err = game.errors.create(
                     player=current_player.value, error_code=e.code, error_msg=e.message,
                 )
                 game.forfeit, game.playing = True, False
@@ -162,7 +161,7 @@ def run_game(game_id):
                     Player.BLACK.value if current_player == Player.WHITE else Player.WHITE.value
                 )
                 game.save(update_fields=["forfeit", "outcome", "playing"])
-                send_through_game_channel(game, "game.error")
+                send_through_game_channel(game, "game.error", game_err.id)
                 task_logger.info(
                     f"{game_id}: {current_player.value} submitted invalid move {submitted}"
                 )
@@ -181,10 +180,10 @@ def run_game(game_id):
                 game.save(update_fields=["forfeit", "score", "outcome", "playing"])
                 task_logger.info(f"GAME {game_id} OVER")
                 break
-            send_through_game_channel(game, "game.update")
+            send_through_game_channel(game, "game.update", game_id)
     game.playing = False
     game.save(update_fields=["playing"])
-    send_through_game_channel(game, "game.update")
+    send_through_game_channel(game, "game.update", game_id)
     black_runner.stop()
     white_runner.stop()
 
