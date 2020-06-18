@@ -113,7 +113,7 @@ class PlayerRunner:
                             return -1, UserError.READ_INVALID
                 except ValueError:
                     return -1, UserError.READ_INVALID
-        return move, 0
+        return move, 0 if not self.is_legacy else LEGACY_MOVES[move], 0
 
 
 class YourselfRunner:
