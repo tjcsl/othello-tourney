@@ -12,6 +12,7 @@
     <script type="text/javascript">
         const game = JSON.parse('{{ game|store }}');
         const is_watching = JSON.parse('{{ is_watching|store }}');
+        const heartbeat_interval = {{ heartbeat_interval }};
     </script>
 {% endblock %}
 

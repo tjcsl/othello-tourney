@@ -185,6 +185,7 @@ MODERATOR_ROOT = os.path.join(BASE_DIR, "moderator")
 IMPORT_DRIVER = os.path.join(SANDBOXING_ROOT, "import_wrapper.py")
 FIREJAIL_PROFILE = os.path.join(SANDBOXING_ROOT, "sandbox.profile")
 JAILEDRUNNER_DRIVER = os.path.abspath(os.path.join(os.path.dirname(BASE_DIR), "run_ai_jailed.py"))
+CLIENT_HEARTBEAT_INTERVAL = 5  # seconds
 
 # Game settings
 STALE_GAME = 6  # hours
@@ -204,7 +205,5 @@ except ImportError:
 
 if not DEBUG:
     sentry_sdk.init(
-        SENTRY_DSN,
-        integrations=[DjangoIntegration(), CeleryIntegration()],
-        send_default_pii=True,
+        SENTRY_DSN, integrations=[DjangoIntegration(), CeleryIntegration()], send_default_pii=True,
     )

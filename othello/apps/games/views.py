@@ -1,9 +1,11 @@
 import json
 import logging
 
+from django.conf import settings
 from django.contrib import messages
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from ..auth.decorators import login_required
 from .forms import DownloadSubmissionForm, GameForm, SubmissionForm
@@ -85,20 +87,26 @@ def play(request):
                 white=cd["white"],
                 time_limit=cd["time_limit"],
                 playing=True,
-                ping=True,
+                last_heartbeat=timezone.now(),
             )
             logger.info(f"Created game with id: {g.id}")
             cd["black"], cd["white"] = cd["black"].id, cd["white"].id
             request.session["form-data"] = json.dumps(cd)
             return render(
-                request, "games/board.html", {"game": serialize_game_info(g), "is_watching": False}
+                request,
+                "games/board.html",
+                {
+                    "game": serialize_game_info(g),
+                    "is_watching": False,
+                    "heartbeat_interval": settings.CLIENT_HEARTBEAT_INTERVAL,
+                },
             )
         else:
             for errors in form.errors.get_json_data().values():
                 for error in errors:
                     messages.error(request, error["message"], extra_tags="danger")
     initial = json.loads(request.session.get("form-data", "{}"))
-    return render(request, "games/design.html", {"form": GameForm(initial=initial)})
+    return render(request, "games/design.html", {"form": GameForm(initial=initial), },)
 
 
 def watch(request, game_id=False):

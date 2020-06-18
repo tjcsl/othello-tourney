@@ -7,10 +7,12 @@ from celery import shared_task
 from celery.utils.log import get_task_logger
 from channels.layers import get_channel_layer
 
+from django.conf import settings
 from django.db.models import Q
+from django.utils import timezone
 
 from ...moderator import *
-from ...moderator.runners import *
+from ...moderator.runners import PlayerRunner, ServerError, UserError, YourselfRunner
 from ..games.models import Game, Player, Submission
 
 logger = logging.getLogger("othello")
@@ -25,12 +27,8 @@ def send_through_socket(game, event_type):
 def ping(game):
     if game.is_tournament:
         return True
-    game.ping = False
-    game.save(update_fields=["ping"])
-    send_through_socket(game, "game.ping")
-    sleep(0.5)
     game.refresh_from_db()
-    return game.ping
+    return (timezone.now() - game.last_heartbeat).seconds < settings.CLIENT_HEARTBEAT_INTERVAL * 2
 
 
 def delete(game):
@@ -45,7 +43,7 @@ def run_game(game_id):
         yourself = Submission.objects.get(user__username="Yourself")
     except Game.DoesNotExist:
         logger.error(f"Trying to play nonexistent game ({game_id}")
-        return
+        return "game not found"
     except Submission.DoesNotExist:
         raise RuntimeError("Cannot find Yourself submission!")
 
@@ -103,7 +101,7 @@ def run_game(game_id):
                 game.forfeit = False
                 game.save(update_fields=["playing", "outcome", "forfeit"])
                 delete(game)
-                return
+                return "no ping"
             board, current_player = mod.get_game_state()
 
             try:
@@ -165,6 +163,9 @@ def run_game(game_id):
                 )
                 game.save(update_fields=["forfeit", "outcome", "playing"])
                 send_through_socket(game, "game.error")
+                task_logger.info(
+                    f"{game_id}: {current_player.value} submitted invalid move {submitted}"
+                )
                 break
 
             last_move = game.moves.create(
@@ -178,7 +179,7 @@ def run_game(game_id):
                 game.outcome = mod.outcome()
                 game.score = mod.score()
                 game.save(update_fields=["forfeit", "score", "outcome", "playing"])
-                task_logger.debug("GAME OVER")
+                task_logger.info(f"GAME {game_id} OVER")
                 break
             send_through_socket(game, "game.update")
     game.playing = False
@@ -189,9 +190,7 @@ def run_game(game_id):
 
     if error != 0 and isinstance(error, ServerError):
         if error.value[0] != -8:
-            raise RuntimeError(
-                f"Game {game_id} encountered a ServerError of value {error.value}"
-            )
+            raise RuntimeError(f"Game {game_id} encountered a ServerError of value {error.value}")
 
 
 @shared_task

@@ -7,6 +7,7 @@ from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
+from django.utils import timezone
 
 from ...moderator.moderator import Player
 
@@ -108,7 +109,7 @@ class Game(models.Model):
 
     is_tournament = models.BooleanField(default=False)
     playing = models.BooleanField(default=False)
-    ping = models.BooleanField(default=True)
+    last_heartbeat = models.DateTimeField(default=timezone.now)
 
     @property
     def channels_group_name(self):

@@ -46,6 +46,10 @@ function add_listeners(socket){
             download(`${rCanvas.black_name}_${rCanvas.white_name}_formatted.txt`, $("#parseableHistory").text());
         });
 
+    setInterval(function () {
+        socket.send(JSON.stringify({"message": "ping"}))
+    }, heartbeat_interval*1000)
+
     socket.onopen = () => {
         console.log("socket is connected");
         $(document).on('click', clickHandler);
@@ -59,9 +63,6 @@ function add_listeners(socket){
     socket.onmessage = function (message) {
         let data = JSON.parse(message.data);
         switch(data.type){
-            case 'game.ping':
-                socket.send(JSON.stringify({"message": "ping"}))
-                break;
             case 'game.log':
                 console.log(`LOG: ${data.message}`);
                 game_log(data.player, data.message);

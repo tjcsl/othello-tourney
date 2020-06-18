@@ -1,6 +1,8 @@
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 
+from django.utils import timezone
+
 from ...moderator.moderator import Player
 from .models import Game, Submission
 from .tasks import run_game
@@ -95,8 +97,8 @@ class GamePlayingConsumer(GameConsumer):
         super(GamePlayingConsumer, self).disconnect(code)
 
     def receive_json(self, content, **kwargs):
-        self.game.ping = True
-        self.game.save(update_fields=["ping"])
+        self.game.last_heartbeat = timezone.now()
+        self.game.save(update_fields=["last_heartbeat"])
 
         player = content.get("player", False)
         if move := int(content.get("move", False)):
