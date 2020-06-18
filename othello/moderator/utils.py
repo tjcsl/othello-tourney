@@ -3,7 +3,7 @@ import importlib.machinery
 import operator
 from functools import partial, reduce, wraps
 
-from .constants import *
+from . import constants
 
 
 class UserError(enum.Enum):
@@ -51,7 +51,7 @@ def is_on(x, pos):
 
 
 def bit_not(x):
-    return FULL_BOARD ^ x
+    return constants.FULL_BOARD ^ x
 
 
 def binary_to_string(board):
@@ -72,7 +72,7 @@ def hamming_weight(n):
 
 
 def fill(current, opponent, direction):
-    mask = MASKS[direction]
+    mask = constants.MASKS[direction]
     if direction > 0:
         w = ((current & mask) << direction) & opponent
         w |= ((w & mask) << direction) & opponent
@@ -94,5 +94,5 @@ def fill(current, opponent, direction):
 def isolate_bits(x):
     while x:
         b = -x & x
-        yield POS[b]
+        yield constants.POS[b]
         x -= b

@@ -24,15 +24,11 @@ def _save_path(instance, filename):
 class SubmissionQuerySet(models.QuerySet):
     def latest(self, user=None, **kwargs):
         """
-        Return the latest submission for a user, or a set of the most recent submission
-        for all users.
+        Returns a set of all the latest submissions for all users
 
         @param user User to get latest submission for
         """
-        if user is not None:
-            return self.filter(user=user, **kwargs).order_by("-created_at").first()
-        else:
-            return self.filter(**kwargs).order_by("user", "-created_at").distinct("user")
+        return self.filter(**kwargs).order_by("user", "-created_at").distinct("user")
 
     def delete(self):
         for obj in self:
@@ -75,14 +71,13 @@ class Submission(models.Model):
         return f"{self.get_user_name()}: {self.get_submission_name()}"
 
 
-class GameManager(models.Manager):
+class GameQuerySet(models.QuerySet):
     def running(self):
-        return self.get_queryset().filter(playing=True)
+        return self.filter(playing=True)
 
     def wins_for_user(self, submission):
         return (
-            self.get_queryset()
-            .filter(playing=False, is_tournament=True)
+            self.filter(playing=False, is_tournament=True)
             .filter(
                 Q(white=submission, outcome=Player.WHITE.value)
                 | Q(black=submission, outcome=Player.BLACK.value)
@@ -99,7 +94,7 @@ class Game(models.Model):
         ("T", "Tie"),
     )
 
-    objects = GameManager()
+    objects = GameQuerySet.as_manager()
     created_at = models.DateTimeField(auto_now=True)
 
     black = models.ForeignKey(Submission, on_delete=models.PROTECT, related_name="black")
