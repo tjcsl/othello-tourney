@@ -20,6 +20,8 @@ class SubmissionForm(forms.ModelForm):
 
     def clean(self):
         cd = self.cleaned_data
+        if "code" not in cd:
+            raise ValidationError("Please upload a non-empty Python file!")
         if not cd["name"]:
             cd["name"] = cd["code"].name
         with NamedTemporaryFile("wb+") as f:
