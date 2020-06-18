@@ -76,7 +76,7 @@ def create(request):
         "tournaments/create.html",
         {
             "form": TournamentCreateForm(),
-            "in_progress": Tournament.objects.in_progress(),
+            "in_progress": Tournament.objects.in_progress(terminated=False),
             "future": Tournament.objects.future(),
         },
     )
@@ -114,9 +114,12 @@ def management(request, tournament_id=None):
             if added_users := cd.get("add_users", False):
                 tournament.include_users.set(tournament.include_users.all().union(added_users))
             if removed_users := cd.get("remove_users", False):
-                tournament.include_users.set(
-                    tournament.include_users.all().exclude(id__in=removed_users)
-                )
+                if tournament in Tournament.objects.in_progress():
+                    tournament.players.filter(id__in=removed_users).delete()
+                else:
+                    tournament.include_users.set(
+                        tournament.include_users.all().exclude(id__in=removed_users)
+                    )
             tournament.save()
             messages.success(
                 request, "Successfully made changes to tournament!", extra_tags="success",

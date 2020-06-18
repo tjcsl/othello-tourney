@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
 
-from ..games.models import Game, Submission
+from ..games.models import Game
 from ..games.tasks import Player, run_game
 from .emails import email_send
 from .models import Tournament, TournamentGame, TournamentPlayer
@@ -38,14 +38,11 @@ def run_tournament(tournament_id):
         raise e
 
     submissions = TournamentPlayer.objects.bulk_create(
-        [
-            TournamentPlayer(tournament=t, submission=s)
-            for s in t.include_users.all()
-        ]
+        [TournamentPlayer(tournament=t, submission=s) for s in t.include_users.all()]
     )
 
-    matches = make_pairings(submissions, t.bye_player)
     for round_num in range(t.num_rounds):
+        matches = make_pairings(submissions, t.bye_player)
         t.refresh_from_db()
         if t.terminated:
             t.delete()
@@ -92,7 +89,6 @@ def run_tournament(tournament_id):
 
                 for game in finished_games:
                     del tasks[game]
-        matches = make_pairings(submissions, t.bye_player)
     logger.info(f"Tournament {tournament_id} has now finished, sending emails")
 
     winners = [x.submission.user for x in get_winners(submissions)]
