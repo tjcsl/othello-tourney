@@ -33,7 +33,7 @@ def ping(game):
 
 def delete_game(game):
     if not game.is_tournament:
-        game.delete_game()
+        game.delete()
 
 
 @shared_task
@@ -196,4 +196,4 @@ def delete_old_games():
     logger.info("Deleting stale games")
     Game.objects.filter(is_tournament=False).filter(
         Q(playing=False) | Q(created_at__lt=datetime.now() - timedelta(hours=settings.STALE_GAME))
-    ).delete_game()
+    ).delete()
