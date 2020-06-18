@@ -269,7 +269,7 @@ function place_stone(rCanvas, event, socket){
 function game_error(player, code, message){
     let error_area = player === 'x' ? $("#black-logs-area") : $("#white-logs-area");
     error_area.append(`<pre class="err_log">${message}</pre>`);
-    error_area.append(`<pre class="err_log">Forfeited with error code ${code}</pre>`);
+    error_area.append(`<pre class="err_log">Terminated with error code ${code}</pre>`);
     error_area.scrollTop(error_area.prop('scrollHeight'));
 }
 
