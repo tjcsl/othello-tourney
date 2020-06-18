@@ -96,7 +96,7 @@ class GamePlayingConsumer(GameConsumer):
 
     def receive_json(self, content, **kwargs):
         self.game.last_heartbeat = timezone.now()
-        self.game.save(update_fields=["last_heartbeat"])
+        self.game.save()
 
         player = content.get("player", False)
         if move := int(content.get("move", False)):

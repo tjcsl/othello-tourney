@@ -20,6 +20,7 @@ task_logger = get_task_logger(__name__)
 
 
 def send_through_game_channel(game, event_type):
+    print('sending' + event_type)
     task_logger.debug(f"sending {event_type}")
     async_to_sync(get_channel_layer().group_send)(game.channels_group_name, {"type": event_type})
 
@@ -117,11 +118,12 @@ def run_game(game_id):
                 exception = e
 
             for log in running_turn:
+                print(log)
                 game.logs.create(
                     player=current_player.value, message=log,
                 )
                 send_through_game_channel(game, "game.log")
-                sleep(0.05)
+                sleep(1)
             submitted_move, error = running_turn.return_value
 
             if exception is not None:

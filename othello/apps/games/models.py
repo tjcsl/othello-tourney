@@ -122,7 +122,7 @@ class Game(models.Model):
 
 class MoveSet(models.QuerySet):
     def latest(self, **kwargs):
-        return self.order_by("-created_at").get()
+        return self.order_by("-created_at").first()
 
 
 class Move(models.Model):
@@ -145,7 +145,7 @@ class Move(models.Model):
 
 class GameObjectSet(models.QuerySet):
     def latest(self):
-        return self.order_by("-created_at")[0] if self.exists() else None
+        return self.order_by("-created_at").first()
 
 
 class GameObject(models.Model):
