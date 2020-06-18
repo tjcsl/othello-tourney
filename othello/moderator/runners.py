@@ -10,13 +10,27 @@ from django.conf import settings
 
 from ..sandboxing import get_sandbox_args
 from .utils import ServerError, UserError, capture_generator_value
+from .moderator import Player
+
+LEGACY_MOVES = {11: 0, 12: 1, 13: 2, 14: 3, 15: 4, 16: 5, 17: 6, 18: 7, 21: 8, 22: 9, 23: 10, 24: 11, 25: 12, 26: 13, 27: 14, 28: 15, 31: 16, 32: 17, 33: 18, 34: 19, 35: 20, 36: 21, 37: 22, 38: 23, 41: 24, 42: 25, 43: 26, 44: 27, 45: 28, 46: 29, 47: 30, 48: 31, 51: 32, 52: 33, 53: 34, 54: 35, 55: 36, 56: 37, 57: 38, 58: 39, 61: 40, 62: 41, 63: 42, 64: 43, 65: 44, 66: 45, 67: 46, 68: 47, 71: 48, 72: 49, 73: 50, 74: 51, 75: 52, 76: 53, 77: 54, 78: 55, 81: 56, 82: 57, 83: 58, 84: 59, 85: 60, 86: 61, 87: 62, 88: 63}
+
+
+def legacy_board_convert(board):
+    legacy_board = ""
+    for i in range(100):
+        if i in LEGACY_MOVES:
+            legacy_board += board[LEGACY_MOVES[i]]
+        else:
+            legacy_board += "?"
+    return legacy_board.replace(Player.BLACK.value, "@")
 
 
 class PlayerRunner:
-    def __init__(self, path, driver):
-        if not os.path.isfile(path):
+    def __init__(self, submission, driver):
+        if not os.path.isfile(submission.code.path):
             raise OSError("file not found")
-        self.path = path
+        self.path = submission.code.path
+        self.is_legacy = submission.is_legacy
         self.process = None
         self.driver = driver
 
@@ -63,6 +77,11 @@ class PlayerRunner:
         if self.process.poll():
             print(self.process.communicate())
             return -1, ServerError.PROCESS_EXITED
+
+        if self.is_legacy:
+            board = legacy_board_convert(board)
+            player = "@" if player == Player.BLACK.value else "o"
+
         self.process.stdin.write(
             f"{str(time_limit)}\n{player}\n{''.join(board)}\n".encode("latin-1")
         )
@@ -86,8 +105,12 @@ class PlayerRunner:
                 try:
                     move = int(self.process.stdout.readline())
                     print(f"GOT MOVE {move}")
-                    if move < 0 or move >= 64:
-                        return -1, UserError.READ_INVALID
+                    if self.is_legacy:
+                        if move not in LEGACY_MOVES:
+                            return -1, UserError.READ_INVALID
+                    else:
+                        if move < 0 or move >= 64:
+                            return -1, UserError.READ_INVALID
                 except ValueError:
                     return -1, UserError.READ_INVALID
         return move, 0

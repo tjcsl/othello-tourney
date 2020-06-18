@@ -53,7 +53,7 @@ def run_game(game_id):
         black_runner = (
             YourselfRunner(game, settings.YOURSELF_TIMEOUT)
             if game.black == yourself
-            else PlayerRunner(game.black.code.path, settings.JAILEDRUNNER_DRIVER)
+            else PlayerRunner(game.black, settings.JAILEDRUNNER_DRIVER)
         )
     except OSError:
         logger.error(f"Cannot find submission code file! {game.black.code.path}")
@@ -67,7 +67,7 @@ def run_game(game_id):
         white_runner = (
             YourselfRunner(game, settings.YOURSELF_TIMEOUT)
             if game.white == yourself
-            else PlayerRunner(game.white.code.path, settings.JAILEDRUNNER_DRIVER)
+            else PlayerRunner(game.white, settings.JAILEDRUNNER_DRIVER)
         )
     except OSError:
         logger.error(f"Cannot find submission code file! {game.white.code.path}")

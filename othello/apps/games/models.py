@@ -45,6 +45,7 @@ class Submission(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     code = models.FileField(upload_to=_save_path, default=None,)
 
+    is_legacy = models.BooleanField(default=False)
     tournament_win_year = models.IntegerField(default=-1,)
 
     def get_user_name(self):
