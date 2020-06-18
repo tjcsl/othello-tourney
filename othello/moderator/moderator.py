@@ -1,7 +1,6 @@
 import enum
 
-from . import utils
-from . import constants
+from . import constants, utils
 
 
 class Player(enum.Enum):
@@ -72,7 +71,11 @@ class Moderator:
         for i in constants.MASKS:
             c = utils.fill(move, board[opponent], i)
             if c & board[self.current_player] != 0:
-                c = (c & constants.MASKS[i * -1]) << i * -1 if i < 0 else (c & constants.MASKS[i * -1]) >> i
+                c = (
+                    (c & constants.MASKS[i * -1]) << i * -1
+                    if i < 0
+                    else (c & constants.MASKS[i * -1]) >> i
+                )
                 board[self.current_player] |= c
                 board[opponent] &= utils.bit_not(c)
         self.board, self.current_player = board, opponent

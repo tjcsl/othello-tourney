@@ -4,8 +4,8 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from .models import Tournament
 from ..games.models import Submission
+from .models import Tournament
 
 User = get_user_model()
 

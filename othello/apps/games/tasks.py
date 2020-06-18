@@ -20,9 +20,11 @@ task_logger = get_task_logger(__name__)
 
 
 def send_through_game_channel(game, event_type, object_id):
-    print('sending' + event_type)
+    print("sending" + event_type)
     task_logger.debug(f"sending {event_type}")
-    async_to_sync(get_channel_layer().group_send)(game.channels_group_name, {"type": event_type, "object_id": object_id})
+    async_to_sync(get_channel_layer().group_send)(
+        game.channels_group_name, {"type": event_type, "object_id": object_id}
+    )
 
 
 def ping(game):
@@ -119,9 +121,7 @@ def run_game(game_id):
 
             for log in running_turn:
                 print(log)
-                game_log = game.logs.create(
-                    player=current_player.value, message=log,
-                )
+                game_log = game.logs.create(player=current_player.value, message=log,)
                 send_through_game_channel(game, "game.log", game_log.id)
             submitted_move, error = running_turn.return_value
 

@@ -119,9 +119,7 @@ def management(request, tournament_id=None):
                 )
             tournament.save()
             messages.success(
-                request,
-                "Successfully made changes to tournament!",
-                extra_tags="success",
+                request, "Successfully made changes to tournament!", extra_tags="success",
             )
             if cd.get("using_legacy", False):
                 messages.warning(
