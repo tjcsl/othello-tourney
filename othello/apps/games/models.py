@@ -32,7 +32,7 @@ class SubmissionQuerySet(models.QuerySet):
 
     def delete(self):
         for obj in self:
-            obj.code.delete_game()
+            obj.code.delete()
         super(SubmissionQuerySet, self).delete()
 
 

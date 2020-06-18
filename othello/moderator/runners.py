@@ -119,7 +119,7 @@ class YourselfRunner:
                 return -1, UserError.NO_MOVE_ERROR
             if (m := self.game.moves.latest()) != last_move:
                 if m is not None:
-                    m.delete_game()
+                    m.delete()
                     return m.move, 0
                 else:
                     return -1, ServerError.DISCONNECT

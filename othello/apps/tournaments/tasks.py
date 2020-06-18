@@ -48,7 +48,7 @@ def run_tournament(tournament_id):
     for round_num in range(t.num_rounds):
         t.refresh_from_db()
         if t.terminated:
-            t.delete_game()
+            t.delete()
             logger.info(f"Tounament {tournament_id} has been terminated")
             return
         t.played = round_num + 1
