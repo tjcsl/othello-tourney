@@ -47,12 +47,19 @@ def create(request):
         if form.is_valid():
             try:
                 t = form.save()
+                cd = form.cleaned_data
                 run_tournament.apply_async([t.id], eta=t.start_time)
                 messages.success(
                     request,
                     f"Successfully created tournament! Tournament is scheduled to run at {t.start_time}",
                     extra_tags="success",
                 )
+                if cd.get("using_legacy", False):
+                    messages.warning(
+                        request,
+                        "Warning: One of more participating users is using legacy code! If this was a mistake, you can delete the Tournament and recreate it.",
+                        extra_tags="warning",
+                    )
             except Exception as e:
                 messages.error(
                     request,

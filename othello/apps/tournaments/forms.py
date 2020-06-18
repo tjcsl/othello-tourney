@@ -5,6 +5,7 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from .models import Tournament
+from ..games.models import Submission
 
 
 class TournamentCreateForm(forms.ModelForm):
@@ -29,6 +30,8 @@ class TournamentCreateForm(forms.ModelForm):
             raise ValidationError('The "Yourself" player cannot participate in Tournaments!')
         if cd["include_users"].filter(username=cd["bye_player"].username).exists():
             raise ValidationError("The bye player cannot participate in the Tournament!")
+        if Submission.objects.latest(user_id__in=cd["include_users"], is_legacy=True).exists():
+            cd["using_legacy"] = True
 
     class Meta:
         model = Tournament
