@@ -11,7 +11,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.utils import timezone
 
-from ...moderator import *
+from ...moderator.moderator import INITIAL_BOARD, InvalidMoveError, Moderator
 from ...moderator.runners import PlayerRunner, ServerError, UserError, YourselfRunner
 from ..games.models import Game, Player, Submission
 

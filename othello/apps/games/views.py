@@ -123,5 +123,5 @@ def about(request):
     return render(request, "games/about.html")
 
 
-def help(request):
+def help_view(request):
     return render(request, "games/help.html")

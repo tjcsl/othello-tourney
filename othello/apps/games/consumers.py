@@ -6,7 +6,7 @@ from django.utils import timezone
 from ...moderator.moderator import Player
 from .models import Game, Submission
 from .tasks import run_game
-from .utils import *
+from .utils import serialize_game_error, serialize_game_info, serialize_game_log
 
 
 class GameConsumer(JsonWebsocketConsumer):

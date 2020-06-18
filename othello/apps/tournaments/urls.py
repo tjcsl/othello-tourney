@@ -10,5 +10,5 @@ urlpatterns = [
     path("previous/", views.TournamentListView.as_view(), name="previous"),
     path("create/", views.create, name="create"),
     path("manage/<int:tournament_id>", views.management, name="manage"),
-    path("help/", views.help, name="help"),
+    path("help/", views.help_view, name="help"),
 ]

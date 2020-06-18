@@ -5,7 +5,7 @@ from django.views.generic.list import ListView
 
 from ..auth.decorators import management_only
 from .forms import TournamentCreateForm, TournamentManagementForm
-from .models import *
+from .models import Tournament
 from .tasks import run_tournament
 
 
@@ -134,5 +134,5 @@ def management(request, tournament_id=None):
     )
 
 
-def help(request):
+def help_view(request):
     return render(request, "tournaments/help.html")
