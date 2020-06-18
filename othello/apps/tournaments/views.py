@@ -118,6 +118,17 @@ def management(request, tournament_id=None):
                     tournament.include_users.all().exclude(id__in=removed_users)
                 )
             tournament.save()
+            messages.success(
+                request,
+                "Successfully made changes to tournament!",
+                extra_tags="success",
+            )
+            if cd.get("using_legacy", False):
+                messages.warning(
+                    request,
+                    "Warning: One of more participating users is using legacy code! If this was a mistake, you can delete the Tournament and recreate it.",
+                    extra_tags="warning",
+                )
         else:
             for errors in form.errors.get_json_data().values():
                 for error in errors:
