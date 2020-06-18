@@ -21,9 +21,6 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder ".", "/home/vagrant/othello"
 
   config.vm.provision "shell", path: "config/vagrant/provision_vagrant.sh"
-  config.vm.provision "docker" do |d|
-    d.run "redis", image: "redis:5", args: "-p 6379:6379", daemonize: true
-  end
   config.ssh.username = "vagrant"
 
 end

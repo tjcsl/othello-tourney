@@ -19,11 +19,9 @@ apt -y install python3-pip python3-venv python3-virtualenv pipenv
 # Install firejail
 apt install -y firejail
 
-# Install Docker
-apt -y install docker.io
-systemctl enable docker containerd
-systemctl start docker containerd
-usermod -aG docker vagrant
+# Install Redis
+apt install -y redis-server
+systemctl enable --now redis-server
 
 # PostsgreSQL
 apt -y install postgresql
