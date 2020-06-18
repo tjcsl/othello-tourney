@@ -40,7 +40,7 @@ def run_tournament(tournament_id):
     submissions = TournamentPlayer.objects.bulk_create(
         [
             TournamentPlayer(tournament=t, submission=s)
-            for s in Submission.objects.latest(user_id__in=t.include_users.all())
+            for s in t.include_users.all()
         ]
     )
 
@@ -49,7 +49,7 @@ def run_tournament(tournament_id):
         t.refresh_from_db()
         if t.terminated:
             t.delete()
-            logger.info(f"Tounament {tournament_id} has been terminated")
+            logger.info(f"Tournament {tournament_id} has been terminated")
             return
         t.played = round_num + 1
         t.save(update_fields=["played"])

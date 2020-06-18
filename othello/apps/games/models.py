@@ -67,7 +67,7 @@ class Submission(models.Model):
         super(Submission, self).delete(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.get_user_name()}: {self.get_submission_name()}"
+        return self.get_game_name()
 
 
 class GameQuerySet(models.QuerySet):

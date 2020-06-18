@@ -25,7 +25,7 @@ class Tournament(models.Model):
     created_at = models.DateTimeField(auto_now=True)
 
     start_time = models.DateTimeField()
-    include_users = models.ManyToManyField(get_user_model(), blank=True,)
+    include_users = models.ManyToManyField(Submission, blank=True,)
     game_time_limit = models.IntegerField(
         default=1, validators=[MinValueValidator(1), MaxValueValidator(settings.MAX_TIME_LIMIT)]
     )
@@ -36,7 +36,7 @@ class Tournament(models.Model):
         default=0, validators=[MinValueValidator(0), MaxValueValidator(settings.MAX_ROUND_NUM)]
     )
     bye_player = models.ForeignKey(
-        get_user_model(),
+        Submission,
         blank=False,
         null=False,
         on_delete=models.PROTECT,
@@ -63,7 +63,7 @@ class TournamentPlayer(models.Model):
     ranking = models.DecimalField(default=0, decimal_places=1, max_digits=15)
 
     def __str__(self):
-        return self.submission.get_user_name()
+        return self.submission.get_game_name()
 
 
 class TournamentGame(models.Model):

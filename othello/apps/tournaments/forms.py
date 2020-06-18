@@ -8,6 +8,10 @@ from ..games.models import Submission
 from .models import Tournament
 
 
+def _get_game_name(obj):
+    return obj.get_game_name()
+
+
 class TournamentCreateForm(forms.ModelForm):
     start_time = forms.DateTimeField(
         label="Start Time: ",
@@ -16,6 +20,13 @@ class TournamentCreateForm(forms.ModelForm):
     )
 
     game_time_limit = forms.IntegerField(label="Game Time Limit: ", min_value=1, max_value=15,)
+    include_users = forms.ModelMultipleChoiceField(label="Include Users: ", queryset=Submission.objects.latest())
+    bye_player = forms.ModelChoiceField(label="Bye Player: ", queryset=Submission.objects.latest(),)
+
+    def __init__(self, *args, **kwargs):
+        super(TournamentCreateForm, self).__init__(*args, **kwargs)
+        self.fields["include_users"].label_from_instance = _get_game_name
+        self.fields["bye_player"].label_from_instance = _get_game_name
 
     def clean(self):
         cd = self.cleaned_data
@@ -24,13 +35,13 @@ class TournamentCreateForm(forms.ModelForm):
         if cd["include_users"].count() < 2:
             raise ValidationError("A Tournament must include at least 2 players!")
         if (
-            cd["include_users"].filter(username="Yourself").exists()
-            or cd["bye_player"].username == "Yourself"
+            cd["include_users"].filter(user__username="Yourself").exists()
+            or cd["bye_player"].user.username == "Yourself"
         ):
             raise ValidationError('The "Yourself" player cannot participate in Tournaments!')
-        if cd["include_users"].filter(username=cd["bye_player"].username).exists():
+        if cd["include_users"].filter(id=cd["bye_player"].id).exists():
             raise ValidationError("The bye player cannot participate in the Tournament!")
-        if Submission.objects.latest(user_id__in=cd["include_users"], is_legacy=True).exists():
+        if cd["include_users"].filter(is_legacy=True).exists():
             cd["using_legacy"] = True
 
     class Meta:
@@ -67,11 +78,13 @@ class TournamentManagementForm(forms.Form):
                 min_value=1, max_value=15, required=False
             )
             self.fields["bye_user"] = forms.ModelChoiceField(
-                queryset=get_user_model().objects.all(), required=False
+                queryset=Submission.objects.latest(), required=False
             )
             self.fields["add_users"] = forms.ModelMultipleChoiceField(
-                queryset=get_user_model().objects.all(), required=False
+                queryset=Submission.objects.latest(), required=False
             )
+            self.fields["bye_user"].label_from_instance = _get_game_name
+            self.fields["add_users"].label_from_instance = _get_game_name
         else:
             self.fields["terminate"].label = "Terminate Tournament: "
 
@@ -85,7 +98,7 @@ class TournamentManagementForm(forms.Form):
                 raise ValidationError("Number of rounds must be within 15-60 rounds")
 
             if cd.get("add_users", False):
-                if cd["add_users"].filter(username="Yourself").exists():
+                if cd["add_users"].filter(user__username="Yourself").exists():
                     raise ValidationError(
                         'The "Yourself" player cannot participate in Tournaments!'
                     )
@@ -96,7 +109,7 @@ class TournamentManagementForm(forms.Form):
                             "The bye player cannot participate in the Tournament!"
                         )
 
-                if Submission.objects.latest(user_id__in=cd["add_users"], is_legacy=True).exists():
+                if cd["add_users"].filter(is_legacy=True).exists():
                     cd["using_legacy"] = True
 
             if cd.get("bye_player", False):
@@ -104,9 +117,9 @@ class TournamentManagementForm(forms.Form):
                     raise ValidationError(
                         "Cannot set a bye player that is already participating in the Tournament"
                     )
-                if cd["bye_user"].username == "Yourself":
+                if cd["bye_user"].user.username == "Yourself":
                     raise ValidationError(
                         'The "Yourself" player cannot participate in Tournaments!'
                     )
-                if Submission.objects.latest(user_id__in=cd["bye_player"], is_legacy=True).exists():
+                if cd["bye_user"].filter(is_legacy=True).exists():
                     cd["using_legacy"] = True
