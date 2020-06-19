@@ -1,5 +1,3 @@
-from tempfile import NamedTemporaryFile
-
 from django import forms
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -24,12 +22,8 @@ class SubmissionForm(forms.ModelForm):
             raise ValidationError("Please upload a non-empty Python file!")
         if not cd["name"]:
             cd["name"] = cd["code"].name
-        with NamedTemporaryFile("wb+") as f:
-            for chunk in cd["code"].chunks():
-                f.write(chunk)
-            f.read()  # for some reason importlib cannot read the file unless we do f.read first
-            if (errs := import_strategy_sandboxed(f.name)) != 0:
-                raise ValidationError(errs["message"])
+        if (errs := import_strategy_sandboxed(cd["code"].temporary_file_path())) != 0:
+            raise ValidationError(errs["message"])
 
         return cd
 
