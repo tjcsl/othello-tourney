@@ -23,6 +23,11 @@ class ServerError(enum.Enum):
 
 
 class Generator:
+    """
+    Wrapper class that saves the return value of a generator function to <generator>.return_value
+    https://stackoverflow.com/a/34073559 explains how this class works
+
+    """
     def __init__(self, gen):
         self.gen = gen
         self.return_value = None
@@ -32,6 +37,9 @@ class Generator:
 
 
 def capture_generator_value(f):
+    """
+    Convenience decorator function that wraps a generator function into the Generator class above
+    """
     @wraps(f)
     def g(*args, **kwargs):
         return Generator(f(*args, **kwargs))
@@ -43,7 +51,7 @@ def import_strategy(path):
     return importlib.machinery.SourceFileLoader("strategy", path).load_module().Strategy()
 
 
-bit_or = partial(reduce, operator.__or__)  # mimic builtin "sum" function except with bitwise or
+bit_or = partial(reduce, operator.__or__)  # mimics builtin "sum" function except with bitwise OR
 
 
 def is_on(x, pos):
@@ -84,6 +92,10 @@ def binary_to_string(board):
 def hamming_weight(n):
     """
     Calculates the hamming weight of a binary number (number of "on"(1) bits)
+    "n ^= n & -n" cuts off all the "off" bits until the next "on" bit.
+    Ex. "0b11000 ^= 0b11000 & -0b11000" => n = 0b11
+    This works because of the way Python handles binary numbers.
+    Makes this function O(k) where k is the amount of "on" bits, instead of O(n) where n is the number bit length
 
     @param n binary number
     """
@@ -97,10 +109,16 @@ def hamming_weight(n):
 def fill(current, opponent, direction):
     """
     Does a binary dumb7fill in one cardinal direction (N, E, S, W, NE, NW, SE, SW)
-    Read https://www.chessprogramming.org/Dumb7Fill for the strategy and how it relates to Chess
+    Read https://www.chessprogramming.org/Dumb7Fill for the strategy and how it relates to Chess.
+    Understanding dumb7fill is crucial to understanding how this method works
 
     This is a helper method for calculating the possible moves for a board and player using binary.
     Calculating possible moves for a board runs a fill in each cardinal direction
+    The direction is a key in the constants.MASK dictionary.
+    Each key points to a specific bit mask, which masks off the end of the board in the specified direction.
+
+    Since bitwise LSHIFT of a negative number is not a thing in Python, this function manually switches the
+    direction of the shift to bitwise RSHIFT if the direction is negative.
 
     @param current 8x8 othello bitboard for the current player
     @param opponent 8x8 othello bitboard for the opponent player
@@ -129,6 +147,7 @@ def fill(current, opponent, direction):
 def isolate_bits(x):
     """
     Generator that returns the indices of all the "on"(1) bits in a 8x8 bitboard
+    This is different from hamming_weight since it yields the specific indices of each "on" bit
 
     @param x 8x8 bitboard
     """
