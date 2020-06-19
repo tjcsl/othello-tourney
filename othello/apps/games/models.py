@@ -28,11 +28,6 @@ class SubmissionQuerySet(models.QuerySet):
         """
         return self.filter(**kwargs).order_by("user", "-created_at").distinct("user")
 
-    def delete(self):
-        for obj in self:
-            obj.code.delete()
-        super(SubmissionQuerySet, self).delete()
-
 
 class Submission(models.Model):
 
@@ -61,10 +56,6 @@ class Submission(models.Model):
 
     def get_submission_name(self):
         return f"{self.name}: <{self.get_submitted_time()}>"
-
-    def delete(self, *args, **kwargs):
-        self.code.delete()
-        super(Submission, self).delete(*args, **kwargs)
 
     def __str__(self):
         return self.get_game_name()

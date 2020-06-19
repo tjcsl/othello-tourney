@@ -8,10 +8,11 @@ def chunks(v, n):
 
 def make_pairings(players, bye_player):
     matches = []
-    players = players.order_by("-ranking")
+    player_count = players.count()
+    players = list(players.order_by("-ranking"))
 
-    for i in range(0, len(players), 2):
-        if i + 1 > players.count():
+    for i in range(0, player_count, 2):
+        if i + 1 > player_count:
             players.append(bye_player)
         black = random.choice((players[i], players[i + 1]))
         white = players[i] if black == players[i + 1] else players[i + 1]

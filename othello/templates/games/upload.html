@@ -25,7 +25,6 @@
                 <div id="first-form" class="column">
                     <form action="{% url 'games:upload' %}" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
-                        <input id="new_action" type="hidden" name="action" value="new_submission">
                         <p>
                             {{ submission_form.name.label }}
                             {{ submission_form.name }}
@@ -39,12 +38,11 @@
                     </form>
                 </div>
                 <div id="second-form" class="column">
-                    <form action="{% url 'games:upload' %}" method="post" enctype="multipart/form-data">
+                    <form action="{% url 'games:download' %}" method="post" enctype="multipart/form-data">
                         {% csrf_token %}
-                        <input id="change_action" type="hidden" name="action" value="download_submission">
                         <p>
-                            {{ change_form.script.label }}
-                            {{ change_form.script }}
+                            {{ download_form.script.label }}
+                            {{ download_form.script }}
                         </p>
                         <input type="submit" value="Download Submission" name="submit">
                     </form>

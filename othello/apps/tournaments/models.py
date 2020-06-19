@@ -7,14 +7,14 @@ from ..games.models import Game, Submission
 
 
 class TournamentSet(models.QuerySet):
-    def filter_finished(self, **kwargs):
-        return self.filter(finished=True, **kwargs)
+    def filter_finished(self):
+        return self.filter(finished=True)
 
-    def filter_in_progress(self, **kwargs):
-        return self.filter(start_time__lte=now(), finished=False, **kwargs)
+    def filter_in_progress(self):
+        return self.filter(start_time__lte=now(), finished=False)
 
-    def filter_future(self, **kwargs):
-        return self.filter(start_time__gt=now(), **kwargs)
+    def filter_future(self):
+        return self.filter(start_time__gt=now())
 
 
 class Tournament(models.Model):

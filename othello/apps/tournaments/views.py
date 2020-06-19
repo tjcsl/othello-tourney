@@ -72,7 +72,7 @@ def create(request):
         "tournaments/create.html",
         {
             "form": TournamentCreateForm(),
-            "in_progress": Tournament.objects.filter_in_progress(terminated=False),
+            "in_progress": Tournament.objects.filter_in_progress().filter(terminated=False),
             "future": Tournament.objects.filter_future(),
         },
     )

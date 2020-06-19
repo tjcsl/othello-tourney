@@ -10,6 +10,14 @@ class Player(enum.Enum):
     def opposite_player(cls, current_player):
         return cls.BLACK if current_player == cls.WHITE else cls.WHITE
 
+    @classmethod
+    def to_legacy(cls, player):
+        return "@" if player == cls.BLACK else cls.WHITE
+
+    @classmethod
+    def from_legacy(cls, player):
+        return cls.BLACK if player == "@" else cls.WHITE
+
 
 PLAYERS = {
     0: Player.WHITE,

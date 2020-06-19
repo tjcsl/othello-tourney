@@ -38,7 +38,7 @@ class GameConsumer(JsonWebsocketConsumer):
             self.game.channels_group_name, self.channel_name
         )
 
-    def disconnect(self):
+    def disconnect(self, code):
         self.connected = False
 
     def game_update(self, event):
@@ -87,17 +87,22 @@ class GamePlayingConsumer(GameConsumer):
         super(GamePlayingConsumer, self).connect()
         run_game.delay(self.game.id)
 
-    def disconnect(self):
+    def disconnect(self, code):
         self.game.playing = False
         self.game.save(update_fields=["playing"])
-        super().disconnect()
+        super().disconnect(code)
 
     def receive_json(self, content, **kwargs):
         self.game.last_heartbeat = timezone.now()
         self.game.save()
 
         player = content.get("player", None)
-        if move := int(content.get("move", None)):
+        try:
+            move = int(content.get("move", None))
+        except (ValueError, TypeError):
+            move = None
+
+        if move is not None and player is not None:
             if player == Player.WHITE.value and self.is_white_yourself:
                 self.game.moves.create(player=player, move=move)
             elif player == Player.BLACK.value and self.is_black_yourself:

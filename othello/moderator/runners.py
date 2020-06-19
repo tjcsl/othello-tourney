@@ -81,7 +81,7 @@ class PlayerRunner:
 
         if self.is_legacy:
             board = legacy_board_convert(board)
-            player = "@" if player == Player.BLACK.value else "o"
+            player = Player.to_legacy(player)
 
         self.process.stdin.write(
             f"{str(time_limit)}\n{player}\n{''.join(board)}\n".encode("latin-1")

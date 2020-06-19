@@ -133,10 +133,9 @@ class Moderator:
         Checks if the game is over.
         An Othello game is over if neither player can move.
         """
-        current_moves = self.possible_moves(player=self.current_player)
-        opponent_moves = self.possible_moves(player=1 ^ self.current_player)
         return self.board[0] & self.board[1] == constants.FULL_BOARD or not (
-            current_moves or opponent_moves
+            self.possible_moves(player=self.current_player)
+            or self.possible_moves(player=1 ^ self.current_player)
         )
 
     def is_valid_move(self, attempted_move):

@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.views.decorators.http import require_POST
 
 from .forms import DownloadSubmissionForm, GameForm, SubmissionForm
 from .models import Game
@@ -24,57 +25,59 @@ def upload(request):
             {
                 "success": False,
                 "submission_form": SubmissionForm(),
-                "change_form": DownloadSubmissionForm(request.user),
+                "download_form": DownloadSubmissionForm(request.user),
             },
         )
-    action, success = request.POST.get("action", False), False
-    if action == "new_submission":
-        form = SubmissionForm(request.POST, request.FILES)
-        if form.is_valid():
-            try:
-                submission = form.save(commit=False)
-                submission.user = request.user
-                submission.save()
-                success = True
-            except BaseException as e:
-                messages.error(
-                    request,
-                    "Unable to upload script at this time, try again later",
-                    extra_tags="danger",
-                )
-                raise e
-        else:
-            for errors in form.errors.get_json_data().values():
-                for error in errors:
-                    messages.error(request, error["message"], extra_tags="danger")
-    elif action == "download_submission":
-        form = DownloadSubmissionForm(user=request.user, data=request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
-            submission = cd["script"]
-            try:
-                return FileResponse(
-                    submission.code.open("rb"),
-                    as_attachment=True,
-                    filename=f"{submission.get_submission_name()}.py",
-                )
-            except BaseException as e:
-                messages.error(
-                    request, "Unable to download script, try again later", extra_tags="danger"
-                )
-                raise e
-        else:
-            for errors in form.errors.get_json_data().values():
-                for error in errors:
-                    messages.error(request, error["message"], extra_tags="danger")
+    success = False
+    form = SubmissionForm(request.POST, request.FILES)
+    if form.is_valid():
+        try:
+            submission = form.save(commit=False)
+            submission.user = request.user
+            submission.save()
+            success = True
+        except BaseException as e:
+            messages.error(
+                request,
+                "Unable to upload script at this time, try again later",
+                extra_tags="danger",
+            )
+            raise e
     else:
-        messages.error(request, "Received invalid request", extra_tags="danger")
+        for errors in form.errors.get_json_data().values():
+            for error in errors:
+                messages.error(request, error["message"], extra_tags="danger")
 
     return (
         render(request, "games/upload.html", {"success": success})
         if success
         else redirect("games:upload")
     )
+
+
+@require_POST
+@login_required
+def download(request):
+    form = DownloadSubmissionForm(user=request.user, data=request.POST)
+    if form.is_valid():
+        cd = form.cleaned_data
+        submission = cd["script"]
+        try:
+            return FileResponse(
+                submission.code.open("rb"),
+                as_attachment=True,
+                filename=f"{submission.get_submission_name()}.py",
+            )
+        except BaseException as e:
+            messages.error(
+                request, "Unable to download script, try again later", extra_tags="danger"
+            )
+            raise e
+    else:
+        for errors in form.errors.get_json_data().values():
+            for error in errors:
+                messages.error(request, error["message"], extra_tags="danger")
+    return redirect("games:upload")
 
 
 def play(request):
