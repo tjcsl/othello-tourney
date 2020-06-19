@@ -1,15 +1,10 @@
 from django import forms
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 from ..games.models import Submission
 from .models import Tournament
-
-
-def _get_game_name(obj):
-    return obj.get_game_name()
 
 
 class TournamentCreateForm(forms.ModelForm):
@@ -19,16 +14,16 @@ class TournamentCreateForm(forms.ModelForm):
         widget=forms.DateTimeInput(attrs={"type": "datetime-local"}),
     )
 
-    game_time_limit = forms.IntegerField(label="Game Time Limit: ", min_value=1, max_value=15,)
+    game_time_limit = forms.IntegerField(label="Game Time Limit: ", min_value=1, max_value=15)
     include_users = forms.ModelMultipleChoiceField(
         label="Include Users: ", queryset=Submission.objects.latest()
     )
-    bye_player = forms.ModelChoiceField(label="Bye Player: ", queryset=Submission.objects.latest(),)
+    bye_player = forms.ModelChoiceField(label="Bye Player: ", queryset=Submission.objects.latest())
 
     def __init__(self, *args, **kwargs):
         super(TournamentCreateForm, self).__init__(*args, **kwargs)
-        self.fields["include_users"].label_from_instance = _get_game_name
-        self.fields["bye_player"].label_from_instance = _get_game_name
+        self.fields["include_users"].label_from_instance = Submission.get_game_name
+        self.fields["bye_player"].label_from_instance = Submission.get_game_name
 
     def clean(self):
         cd = self.cleaned_data
@@ -83,8 +78,8 @@ class TournamentManagementForm(forms.Form):
             self.fields["add_users"] = forms.ModelMultipleChoiceField(
                 queryset=Submission.objects.latest(), required=False
             )
-            self.fields["bye_user"].label_from_instance = _get_game_name
-            self.fields["add_users"].label_from_instance = _get_game_name
+            self.fields["bye_user"].label_from_instance = Submission.get_game_name
+            self.fields["add_users"].label_from_instance = Submission.get_game_name
         else:
             self.fields["terminate"].label = "Terminate Tournament: "
             self.fields["remove_users"].queryset = tournament.players.all()

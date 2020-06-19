@@ -43,27 +43,50 @@ def import_strategy(path):
     return importlib.machinery.SourceFileLoader("strategy", path).load_module().Strategy()
 
 
-bit_or = partial(reduce, operator.__or__)
+bit_or = partial(reduce, operator.__or__)  # mimic builtin "sum" function except with bitwise or
 
 
 def is_on(x, pos):
+    """
+    Checks if an index on a 8x8 bitboard is "on"(1)
+
+    @param x 8x8 bitboard
+    @param pos index on bitboard
+    """
     return x & (1 << pos)
 
 
 def bit_not(x):
+    """
+    Returns the bitwise NOT value of a 8x8 bitboard
+    """
     return constants.FULL_BOARD ^ x
 
 
 def binary_to_string(board):
+    """
+    Converts a 8x8 othello bitboard to its string representation
+
+    @param board 8x8 othello bitboard
+    """
     return "".join(
         [
-            "o" if is_on(board[0], 63 - i) else "x" if is_on(board[1], 63 - i) else "."
+            constants.Player.WHITE.value
+            if is_on(board[0], 63 - i)
+            else constants.Player.BLACK.value
+            if is_on(board[1], 63 - i)
+            else constants.Player.EMPTY.value
             for i in range(64)
         ]
     )
 
 
 def hamming_weight(n):
+    """
+    Calculates the hamming weight of a binary number (number of "on"(1) bits)
+
+    @param n binary number
+    """
     c = 0
     while n:
         c += 1
@@ -72,6 +95,18 @@ def hamming_weight(n):
 
 
 def fill(current, opponent, direction):
+    """
+    Does a binary dumb7fill in one cardinal direction (N, E, S, W, NE, NW, SE, SW)
+    Read https://www.chessprogramming.org/Dumb7Fill for the strategy and how it relates to Chess
+
+    This is a helper method for calculating the possible moves for a board and player using binary.
+    Calculating possible moves for a board runs a fill in each cardinal direction
+
+    @param current 8x8 othello bitboard for the current player
+    @param opponent 8x8 othello bitboard for the opponent player
+    @param direction value in constants.MASK that represents the direction to fill in.
+
+    """
     mask = constants.MASKS[direction]
     if direction > 0:
         w = ((current & mask) << direction) & opponent
@@ -92,6 +127,11 @@ def fill(current, opponent, direction):
 
 
 def isolate_bits(x):
+    """
+    Generator that returns the indices of all the "on"(1) bits in a 8x8 bitboard
+
+    @param x 8x8 bitboard
+    """
     while x:
         b = -x & x
         yield constants.POS[b]

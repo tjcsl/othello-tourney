@@ -89,6 +89,8 @@ def run_tournament(tournament_id):
 
                 for game in finished_games:
                     del tasks[game]
+    t.finished = True
+    t.save(update_fields=["finished"])
     logger.info(f"Tournament {tournament_id} has now finished, sending emails")
 
     winners = [x.submission.user for x in get_winners(submissions)]

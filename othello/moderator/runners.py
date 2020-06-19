@@ -9,39 +9,16 @@ import psutil
 from django.conf import settings
 
 from ..sandboxing import get_sandbox_args
-from .moderator import Player
+from .constants import Player
 from .utils import ServerError, UserError, capture_generator_value
 
-LEGACY_MOVES = {
-    (
-        x + 11
-        if x < 8
-        else x + 13
-        if x < 16
-        else x + 15
-        if x < 24
-        else x + 17
-        if x < 32
-        else x + 19
-        if x < 40
-        else x + 21
-        if x < 48
-        else x + 23
-        if x < 56
-        else x + 25
-    ): x
-    for x in range(64)
-}
+# Legacy moves have a padding of "#"s around all four sides of the grid.
+LEGACY_MOVES = {(i + 11 + 2 * (i // 8)): i for i in range(64)}
 
 
 def legacy_board_convert(board):
-    legacy_board = ""
-    for i in range(100):
-        if i in LEGACY_MOVES:
-            legacy_board += board[LEGACY_MOVES[i]]
-        else:
-            legacy_board += "?"
-    return legacy_board.replace(Player.BLACK.value, "@")
+    table = {ord(Player.WHITE.value): "o", ord(Player.BLACK.value): "@"}
+    return "?" * 11 + "??".join(board[i: i + 8].translate(table) for i in range(0, 64, 8)) + "?" * 11
 
 
 class PlayerRunner:
@@ -62,7 +39,7 @@ class PlayerRunner:
 
     def start(self):
         cmd_args = ["python3", "-u", self.driver, self.path]
-        if settings.DEBUG:
+        if not settings.DEBUG:
             cmd_args = get_sandbox_args(
                 cmd_args, whitelist=[os.path.dirname(self.path)], readonly=[self.path]
             )
@@ -79,9 +56,12 @@ class PlayerRunner:
 
     def stop(self):
         if self.process is not None:
-            children = psutil.Process(self.process.pid).children(recursive=True)
             try:
+                children = psutil.Process(self.process.pid).children(recursive=True)
                 os.killpg(self.process.pid, signal.SIGKILL)
+            except psutil.NoSuchProcess:
+                self.process = None
+                return
             except ProcessLookupError:
                 self.process.kill()
             for child in children:

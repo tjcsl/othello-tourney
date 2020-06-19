@@ -3,7 +3,7 @@ from channels.generic.websocket import JsonWebsocketConsumer
 
 from django.utils import timezone
 
-from ...moderator.moderator import Player
+from ...moderator.constants import Player
 from .models import Game, Submission
 from .tasks import run_game
 from .utils import serialize_game_error, serialize_game_info, serialize_game_log
@@ -28,8 +28,8 @@ class GameConsumer(JsonWebsocketConsumer):
             self.close()
             return
 
-        self.is_black_yourself = self.game.black == yourself
-        self.is_white_yourself = self.game.white == yourself
+        self.is_black_yourself = self.game.black.id == yourself.id
+        self.is_white_yourself = self.game.white.id == yourself.id
 
         self.connected = True
         self.accept()
@@ -38,10 +38,8 @@ class GameConsumer(JsonWebsocketConsumer):
             self.game.channels_group_name, self.channel_name
         )
 
-    def disconnect(self, code):
+    def disconnect(self):
         self.connected = False
-        super().disconnect(code=code)
-        self.close()
 
     def game_update(self, event):
         self.update_game()
@@ -61,7 +59,7 @@ class GameConsumer(JsonWebsocketConsumer):
             game = serialize_game_info(self.game)
             self.send_json(game)
             if game["game_over"]:
-                self.disconnect(code=0)
+                self.close()
 
     def send_log(self, object_id):
         if self.connected:
@@ -89,17 +87,17 @@ class GamePlayingConsumer(GameConsumer):
         super(GamePlayingConsumer, self).connect()
         run_game.delay(self.game.id)
 
-    def disconnect(self, code):
+    def disconnect(self):
         self.game.playing = False
         self.game.save(update_fields=["playing"])
-        super(GamePlayingConsumer, self).disconnect(code)
+        super().disconnect()
 
     def receive_json(self, content, **kwargs):
         self.game.last_heartbeat = timezone.now()
         self.game.save()
 
-        player = content.get("player", False)
-        if move := int(content.get("move", False)):
+        player = content.get("player", None)
+        if move := int(content.get("move", None)):
             if player == Player.WHITE.value and self.is_white_yourself:
                 self.game.moves.create(player=player, move=move)
             elif player == Player.BLACK.value and self.is_black_yourself:

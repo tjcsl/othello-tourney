@@ -1,6 +1,5 @@
 import logging
 from datetime import datetime, timedelta
-from time import sleep
 
 from asgiref.sync import async_to_sync
 from celery import shared_task
@@ -11,7 +10,8 @@ from django.conf import settings
 from django.db.models import Q
 from django.utils import timezone
 
-from ...moderator.moderator import INITIAL_BOARD, InvalidMoveError, Moderator
+from ...moderator import INITIAL_BOARD
+from ...moderator.moderator import InvalidMoveError, Moderator
 from ...moderator.runners import PlayerRunner, ServerError, UserError, YourselfRunner
 from ..games.models import Game, Player, Submission
 
@@ -20,14 +20,13 @@ task_logger = get_task_logger(__name__)
 
 
 def send_through_game_channel(game, event_type, object_id):
-    print("sending" + event_type)
     task_logger.debug(f"sending {event_type}")
     async_to_sync(get_channel_layer().group_send)(
         game.channels_group_name, {"type": event_type, "object_id": object_id}
     )
 
 
-def ping(game):
+def check_heartbeat(game):
     if game.is_tournament:
         return True
     game.refresh_from_db()
@@ -96,7 +95,7 @@ def run_game(game_id):
         exception = None
 
         while not mod.is_game_over():
-            if not ping(game):
+            if not check_heartbeat(game):
                 game.playing = False
                 game.outcome = "T"
                 game.forfeit = False
@@ -157,9 +156,7 @@ def run_game(game_id):
                     player=current_player.value, error_code=e.code, error_msg=e.message,
                 )
                 game.forfeit, game.playing = True, False
-                game.outcome = (
-                    Player.BLACK.value if current_player == Player.WHITE else Player.WHITE.value
-                )
+                game.outcome = Player.opposite_player(current_player).value
                 game.save(update_fields=["forfeit", "outcome", "playing"])
                 send_through_game_channel(game, "game.error", game_err.id)
                 task_logger.info(

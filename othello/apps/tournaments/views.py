@@ -16,22 +16,18 @@ class TournamentListView(ListView):
     ordering = ["-start_time"]
 
     def get_queryset(self):
-        return Tournament.objects.finished().order_by(*self.ordering)
+        return Tournament.objects.filter_finished().order_by(*self.ordering)
 
 
 def detail(request, tournament_id=None):
-    t = Tournament.objects.in_progress()
-    t = t[0] if t.exists() else None
-
     if tournament_id is not None:
         t = get_object_or_404(Tournament, id=tournament_id)
+    else:
+        t = Tournament.objects.filter_in_progress().first()
 
-    players = sorted(t.players.all(), key=lambda x: -x.ranking) if t is not None else None
+    players = t.players.all().order_by("-ranking")
 
-    page_obj = None
-    if players is not None:
-        paginator = Paginator(players, 10)
-        page_obj = paginator.get_page(request.GET.get("page"))
+    page_obj = Paginator(players, 10).get_page(request.GET.get("page"))
 
     return render(
         request,
@@ -76,8 +72,8 @@ def create(request):
         "tournaments/create.html",
         {
             "form": TournamentCreateForm(),
-            "in_progress": Tournament.objects.in_progress(terminated=False),
-            "future": Tournament.objects.future(),
+            "in_progress": Tournament.objects.filter_in_progress(terminated=False),
+            "future": Tournament.objects.filter_future(),
         },
     )
 
@@ -91,7 +87,7 @@ def management(request, tournament_id=None):
             cd = form.cleaned_data
             if cd.get("terminate", False):
                 tid = tournament.id
-                if tournament in Tournament.objects.in_progress():
+                if tournament in Tournament.objects.filter_in_progress():
                     tournament.terminated = False
                     tournament.save(update_fields=["terminated"])
                 else:
@@ -103,17 +99,17 @@ def management(request, tournament_id=None):
                 )
                 return redirect("tournaments:create")
 
-            if time := cd.get("reschedule", False):
+            if time := cd.get("reschedule", None):
                 tournament.start_time = time
-            if num_rounds := cd.get("num_rounds", False):
+            if num_rounds := cd.get("num_rounds", None):
                 tournament.num_rounds = num_rounds
-            if tl := cd.get("game_time_limit", False):
+            if tl := cd.get("game_time_limit", None):
                 tournament.game_time_limit = tl
-            if bye_user := cd.get("bye_user", False):
+            if bye_user := cd.get("bye_user", None):
                 tournament.bye_player = bye_user
-            if added_users := cd.get("add_users", False):
+            if added_users := cd.get("add_users", None):
                 tournament.include_users.set(tournament.include_users.all().union(added_users))
-            if removed_users := cd.get("remove_users", False):
+            if removed_users := cd.get("remove_users", None):
                 if tournament in Tournament.objects.in_progress():
                     tournament.players.filter(id__in=removed_users).delete()
                 else:
@@ -135,12 +131,12 @@ def management(request, tournament_id=None):
                 for error in errors:
                     messages.error(request, error["message"], extra_tags="danger")
 
-    if tournament in Tournament.objects.future():
+    if tournament in Tournament.objects.filter_future():
         page_obj = Paginator(tournament.include_users.all(), 10).get_page(request.GET.get("page"))
     else:
-        page_obj = Paginator(
-            sorted(tournament.players.all(), key=lambda x: -x.ranking), 10
-        ).get_page(request.GET.get("page"))
+        page_obj = Paginator(tournament.players.all().order_by("-ranking"), 10).get_page(
+            request.GET.get("page")
+        )
     return render(
         request,
         "tournaments/manage.html",
@@ -148,7 +144,7 @@ def management(request, tournament_id=None):
             "tournament": tournament,
             "players": page_obj,
             "form": TournamentManagementForm(tournament),
-            "future": tournament in Tournament.objects.future(),
+            "future": tournament in Tournament.objects.filter_future(),
         },
     )
 

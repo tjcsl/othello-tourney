@@ -1,3 +1,23 @@
+import enum
+
+
+class Player(enum.Enum):
+    BLACK = "x"
+    WHITE = "o"
+    EMPTY = "."
+
+    @classmethod
+    def opposite_player(cls, current_player):
+        return cls.BLACK if current_player == cls.WHITE else cls.WHITE
+
+
+PLAYERS = {
+    0: Player.WHITE,
+    1: Player.BLACK,
+}
+
+INITIAL_BOARD = "...........................ox......xo..........................."
+
 WHITE, BLACK = 0, 1
 INITIAL = {0: 68853694464, 1: 34628173824}
 

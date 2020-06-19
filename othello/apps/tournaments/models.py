@@ -1,5 +1,4 @@
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.timezone import now
@@ -8,13 +7,13 @@ from ..games.models import Game, Submission
 
 
 class TournamentSet(models.QuerySet):
-    def finished(self, **kwargs):
+    def filter_finished(self, **kwargs):
         return self.filter(finished=True, **kwargs)
 
-    def in_progress(self, **kwargs):
+    def filter_in_progress(self, **kwargs):
         return self.filter(start_time__lte=now(), finished=False, **kwargs)
 
-    def future(self, **kwargs):
+    def filter_future(self, **kwargs):
         return self.filter(start_time__gt=now(), **kwargs)
 
 

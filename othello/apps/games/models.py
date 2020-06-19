@@ -9,7 +9,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils import timezone
 
-from ...moderator.moderator import Player
+from ...moderator.constants import Player
 
 PLAYER_CHOICES = (
     (Player.BLACK.value, "Black"),
