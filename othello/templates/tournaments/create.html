@@ -47,25 +47,21 @@
             <div style="height: 50%">
                 <h4>In Progress Tournaments</h4>
                 <ul>
-                    {% if not in_progress %}
+                    {% for tournament in in_progress %}
+                        <li><a href="{% url 'tournaments:manage' tournament.id %}">Tournament #{{ tournament.id }} @ {{ tournament.start_time }}</a></li>
+                    {% empty %}
                         <li>No Tournaments Currently Running</li>
-                    {% else %}
-                        {% for tournament in in_progress %}
-                            <li><a href="{% url 'tournaments:manage' tournament.id %}">Tournament #{{ tournament.id }} @ {{ tournament.start_time }}</a></li>
-                        {% endfor %}
-                    {% endif %}
+                    {% endfor %}
                 </ul>
             </div>
             <div style="height: 50%">
                 <h4>Scheduled Tournaments</h4>
                 <ul>
-                    {% if not future %}
+                    {% for tournament in future %}
+                        <li><a href="{% url 'tournaments:manage' tournament.id %}">Tournament #{{ tournament.id }} @ {{ tournament.start_time }}</a></li>
+                    {% empty %}
                         <li>No Tournaments Scheduled</li>
-                    {% else %}
-                        {% for tournament in future %}
-                            <li><a href="{% url 'tournaments:manage' tournament.id %}">Tournament #{{ tournament.id }} @ {{ tournament.start_time }}</a></li>
-                        {% endfor %}
-                    {% endif %}
+                    {% endfor %}
                 </ul>
             </div>
         </div>
