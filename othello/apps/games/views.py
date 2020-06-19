@@ -109,7 +109,7 @@ def play(request):
                 for error in errors:
                     messages.error(request, error["message"], extra_tags="danger")
     initial = json.loads(request.session.get("form-data", "{}"))
-    return render(request, "games/design.html", {"form": GameForm(initial=initial), },)
+    return render(request, "games/design.html", {"form": GameForm(initial=initial)})
 
 
 def watch(request, game_id=False):

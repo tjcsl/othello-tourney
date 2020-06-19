@@ -36,10 +36,10 @@ class Submission(models.Model):
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="user")
     name = models.CharField(max_length=500, default="")
     created_at = models.DateTimeField(auto_now=True)
-    code = models.FileField(upload_to=_save_path, default=None,)
+    code = models.FileField(upload_to=_save_path, default=None)
 
     is_legacy = models.BooleanField(default=False)
-    tournament_win_year = models.IntegerField(default=-1,)
+    tournament_win_year = models.IntegerField(default=-1)
 
     def get_user_name(self):
         return self.user.short_name
@@ -90,12 +90,12 @@ class Game(models.Model):
     black = models.ForeignKey(Submission, on_delete=models.PROTECT, related_name="black")
     white = models.ForeignKey(Submission, on_delete=models.PROTECT, related_name="white")
     time_limit = models.IntegerField(
-        default=5, validators=[MaxValueValidator(settings.MAX_TIME_LIMIT), MinValueValidator(1), ]
+        default=5, validators=[MaxValueValidator(settings.MAX_TIME_LIMIT), MinValueValidator(1)]
     )
 
     forfeit = models.BooleanField(default=False)
     outcome = models.CharField(max_length=1, choices=OUTCOME_CHOICES, default="T")
-    score = models.IntegerField(default=0,)
+    score = models.IntegerField(default=0)
 
     is_tournament = models.BooleanField(default=False)
     playing = models.BooleanField(default=False)

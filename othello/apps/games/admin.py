@@ -4,11 +4,11 @@ from .models import Game, Submission
 
 
 class GameAdmin(admin.ModelAdmin):
-    readonly_fields = ('id',)
+    readonly_fields = ("id",)
 
 
 class SubmissionAdmin(admin.ModelAdmin):
-    readonly_fields = ('id',)
+    readonly_fields = ("id",)
 
 
 admin.site.register(Game, GameAdmin)

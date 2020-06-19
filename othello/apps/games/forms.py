@@ -29,7 +29,7 @@ class SubmissionForm(forms.ModelForm):
 
 
 class DownloadSubmissionForm(forms.Form):
-    script = forms.ModelChoiceField(label="Previous Submissions:", queryset=None,)
+    script = forms.ModelChoiceField(label="Previous Submissions:", queryset=None)
 
     def __init__(self, user, *args, **kwargs):
         super(DownloadSubmissionForm, self).__init__(*args, **kwargs)

@@ -120,7 +120,7 @@ def run_game(game_id):
 
             for log in running_turn:
                 print(log)
-                game_log = game.logs.create(player=current_player.value, message=log,)
+                game_log = game.logs.create(player=current_player.value, message=log)
                 send_through_game_channel(game, "game.log", game_log.id)
             submitted_move, error = running_turn.return_value
 
@@ -129,9 +129,7 @@ def run_game(game_id):
 
             if error != 0:
                 game_err = game.errors.create(
-                    player=current_player.value,
-                    error_code=error.value[0],
-                    error_msg=error.value[1],
+                    player=current_player.value, error_code=error.value[0], error_msg=error.value[1]
                 )
                 if isinstance(error, ServerError):
                     game.forfeit = False
@@ -153,7 +151,7 @@ def run_game(game_id):
                     game_over = True
             except InvalidMoveError as e:
                 game_err = game.errors.create(
-                    player=current_player.value, error_code=e.code, error_msg=e.message,
+                    player=current_player.value, error_code=e.code, error_msg=e.message
                 )
                 game.forfeit, game.playing = True, False
                 game.outcome = Player.opposite_player(current_player).value

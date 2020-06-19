@@ -24,7 +24,7 @@ class Tournament(models.Model):
     created_at = models.DateTimeField(auto_now=True)
 
     start_time = models.DateTimeField()
-    include_users = models.ManyToManyField(Submission, blank=True,)
+    include_users = models.ManyToManyField(Submission, blank=True)
     game_time_limit = models.IntegerField(
         default=1, validators=[MinValueValidator(1), MaxValueValidator(settings.MAX_TIME_LIMIT)]
     )
@@ -43,8 +43,8 @@ class Tournament(models.Model):
         default=None,
     )
 
-    finished = models.BooleanField(default=False,)
-    terminated = models.BooleanField(default=False,)
+    finished = models.BooleanField(default=False)
+    terminated = models.BooleanField(default=False)
 
     def __str__(self):
         return "Tournament at {}".format(self.start_time.strftime("%Y-%m-%d %H:%M:%S"))
