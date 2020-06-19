@@ -18,7 +18,9 @@ LEGACY_MOVES = {(i + 11 + 2 * (i // 8)): i for i in range(64)}
 
 def legacy_board_convert(board):
     table = {ord(Player.WHITE.value): "o", ord(Player.BLACK.value): "@"}
-    return "?" * 11 + "??".join(board[i: i + 8].translate(table) for i in range(0, 64, 8)) + "?" * 11
+    return (
+        "?" * 11 + "??".join(board[i: i + 8].translate(table) for i in range(0, 64, 8)) + "?" * 11
+    )
 
 
 class PlayerRunner:

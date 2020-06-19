@@ -28,6 +28,7 @@ class Generator:
     https://stackoverflow.com/a/34073559 explains how this class works
 
     """
+
     def __init__(self, gen):
         self.gen = gen
         self.return_value = None
@@ -40,6 +41,7 @@ def capture_generator_value(f):
     """
     Convenience decorator function that wraps a generator function into the Generator class above
     """
+
     @wraps(f)
     def g(*args, **kwargs):
         return Generator(f(*args, **kwargs))

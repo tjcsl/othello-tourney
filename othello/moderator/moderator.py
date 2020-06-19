@@ -8,6 +8,7 @@ class InvalidMoveError(RuntimeError):
     """
     Exception representing an invalid move given the current game state
     """
+
     def __init__(self, board, player, move):
         self.code = utils.UserError.INVALID_MOVE.value[0]
         self.message = utils.UserError.INVALID_MOVE.value[1].format(
@@ -72,7 +73,9 @@ class Moderator:
         """
         if player is None:
             player = self.current_player
-        discriminator = utils.bit_not(self.board[player] | self.board[1 ^ player])  # A bitboard where all the empty indices are turned "on"
+        discriminator = utils.bit_not(
+            self.board[player] | self.board[1 ^ player]
+        )  # A bitboard where all the empty indices are turned "on"
         # The discriminator is a bitboard that represents all the currently empty spaces on the board.
         # This bitboard is used as a "dummy check" since a player can only move to an empty tile
         moves = utils.bit_or(
