@@ -43,7 +43,7 @@ class DownloadSubmissionForm(forms.Form):
         super(DownloadSubmissionForm, self).__init__(*args, **kwargs)
         choices = Submission.objects.filter(user=user).order_by("-created_at")
         self.fields["script"].queryset = choices
-        self.fields["script"].initial = choices[0] if choices.exists() else None
+        self.fields["script"].initial = choices.first()
         self.fields["script"].label_from_instance = _get_submission_name
 
 
