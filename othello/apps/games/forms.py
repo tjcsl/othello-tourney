@@ -24,7 +24,7 @@ class SubmissionForm(forms.ModelForm):
             raise ValidationError("Please upload a non-empty Python file!")
         if not cd["name"]:
             cd["name"] = cd["code"].name
-        if (errs := import_strategy_sandboxed(cd["code"].temporary_file_path())) != 0:
+        if errs := import_strategy_sandboxed(cd["code"].temporary_file_path()):
             raise ValidationError(errs["message"])
 
         return cd

@@ -9,7 +9,7 @@ from django.conf import settings
 logger = logging.getLogger("othello")
 
 
-def import_strategy_sandboxed(path: str) -> Union[int, Dict[str, str]]:
+def import_strategy_sandboxed(path: str) -> Optional[Dict[str, str]]:
     cmd_args = ["python3", "-u", settings.IMPORT_DRIVER, path]
     if not settings.DEBUG:
         cmd_args = get_sandbox_args(cmd_args)
@@ -17,7 +17,7 @@ def import_strategy_sandboxed(path: str) -> Union[int, Dict[str, str]]:
     p = subprocess.Popen(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     output, error = p.communicate()
     if p.returncode == 0:
-        return 0
+        return None
     else:
         try:
             return json.loads(error.decode("latin-1"))

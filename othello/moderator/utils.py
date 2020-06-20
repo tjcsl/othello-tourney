@@ -2,6 +2,7 @@ import enum
 import importlib.machinery
 import operator
 from functools import partial, reduce, wraps
+from typing import Any, Callable, Iterable
 
 from . import constants
 
@@ -22,7 +23,7 @@ class ServerError(enum.Enum):
     DISCONNECT = (-8, "Unexpectedly disconnected from socket")
 
 
-class Generator:
+class CaptureGenerator:
     """
     Wrapper class that saves the return value of a generator function to <generator>.return_value
     https://stackoverflow.com/a/34073559 explains how this class works
@@ -37,14 +38,14 @@ class Generator:
         self.return_value = yield from self.gen
 
 
-def capture_generator_value(f):
+def capture_generator_value(f: callable) -> callable:
     """
     Convenience decorator function that wraps a generator function into the Generator class above
     """
 
     @wraps(f)
-    def g(*args, **kwargs):
-        return Generator(f(*args, **kwargs))
+    def g(*args: Any, **kwargs: Any) -> CaptureGenerator:
+        return CaptureGenerator(f(*args, **kwargs))
 
     return g
 
@@ -53,7 +54,9 @@ def import_strategy(path: str):
     return importlib.machinery.SourceFileLoader("strategy", path).load_module().Strategy()
 
 
-bit_or = partial(reduce, operator.__or__)  # mimics builtin "sum" function except with bitwise OR
+bit_or: Callable[[Iterable[int]], int] = partial(
+    reduce, operator.__or__
+)  # mimics builtin "sum" function except with bitwise OR
 
 
 def is_on(x: int, pos: int) -> int:

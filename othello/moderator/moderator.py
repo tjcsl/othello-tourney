@@ -46,7 +46,7 @@ class Moderator:
         """
         self.current_player ^= 1
 
-    def outcome(self) -> Union[str, bool]:
+    def outcome(self) -> Optional[str]:
         """
         Returns the outcome of the game(Black win, White win, Tie)
         A positive score represents a black win, a negative score a white win.
@@ -63,7 +63,6 @@ class Moderator:
                 if score < 0
                 else "T"
             )
-        return False
 
     def possible_moves(self, player: Optional[int] = None) -> int:
         """
@@ -142,7 +141,7 @@ class Moderator:
             or self.possible_moves(player=1 ^ self.current_player)
         )
 
-    def is_valid_move(self, attempted_move: int) -> bool:
+    def is_valid_move(self, attempted_move: int) -> int:
         """
         Takes in an integer representing a tile which the current player is trying to move to
 
@@ -152,7 +151,7 @@ class Moderator:
         """
         return constants.MOVES.get(attempted_move, None) & self.possible_moves()
 
-    def submit_move(self, submitted_move: int) -> Union[List[int], bool]:
+    def submit_move(self, submitted_move: int) -> Optional[List[int]]:
         """
         Submits a move for validation.
         submitted_move is an integer representing a tile the current player is trying to move to.
@@ -172,14 +171,14 @@ class Moderator:
 
         if self.check_game_over():
             self.game_over = True
-            return False
+            return None
 
         if not self.possible_moves():
             self.toggle_current_player()
 
         return list(utils.isolate_bits(self.possible_moves()))
 
-    def get_game_state(self) -> Tuple[str, str]:
+    def get_game_state(self) -> Tuple[str, constants.Player]:
         """
         Returns the current board and player
         """

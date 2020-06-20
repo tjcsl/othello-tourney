@@ -3,7 +3,7 @@ import select
 import signal
 import subprocess
 import time
-from typing import Tuple, Union
+from typing import Generator, Tuple, Union
 
 import psutil
 
@@ -81,18 +81,20 @@ class PlayerRunner:
 
     @capture_generator_value
     def get_move(
-        self, board: str, player: str, time_limit: int, last_move: Move
-    ) -> Union[Tuple[int, int], Tuple[int, ServerError], Tuple[int, UserError]]:
+        self, board: str, player: Player, time_limit: int, last_move: Move
+    ) -> Generator[
+        str, None, Union[Tuple[int, int], Tuple[int, ServerError], Tuple[int, UserError]]
+    ]:
         if self.process.poll():
             print(self.process.communicate())
             return -1, ServerError.PROCESS_EXITED
 
         if self.is_legacy:
             board = legacy_board_convert(board)
-            player = Player.to_legacy(player)
+            player = player.to_legacy()
 
         self.process.stdin.write(
-            f"{str(time_limit)}\n{player}\n{''.join(board)}\n".encode("latin-1")
+            f"{str(time_limit)}\n{player.value}\n{''.join(board)}\n".encode("latin-1")
         )
         self.process.stdin.flush()
         move = -1
@@ -141,8 +143,10 @@ class YourselfRunner:
 
     @capture_generator_value
     def get_move(
-        self, board: str, player: str, time_limit: int, last_move: Move
-    ) -> Union[Tuple[int, int], Tuple[int, ServerError], Tuple[int, UserError]]:
+        self, board: str, player: Player, time_limit: int, last_move: Move
+    ) -> Generator[
+        str, None, Union[Tuple[int, int], Tuple[int, ServerError], Tuple[int, UserError]]
+    ]:
         yield "Choose your move!"
         start = time.time()
         while True:

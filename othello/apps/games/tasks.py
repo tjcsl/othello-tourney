@@ -109,11 +109,11 @@ def run_game(game_id: int) -> Optional[str]:
             try:
                 if current_player == Player.BLACK:
                     running_turn = player_black.get_move(
-                        board, current_player.value, time_limit, last_move
+                        board, current_player, time_limit, last_move
                     )
                 elif current_player == Player.WHITE:
                     running_turn = player_white.get_move(
-                        board, current_player.value, time_limit, last_move
+                        board, current_player, time_limit, last_move
                     )
             except BaseException as e:
                 logger.error(f"Error when getting move {game_id}, {current_player}, {str(e)}")
@@ -156,7 +156,7 @@ def run_game(game_id: int) -> Optional[str]:
                     player=current_player.value, error_code=e.code, error_msg=e.message
                 )
                 game.forfeit, game.playing = True, False
-                game.outcome = Player.opposite_player(current_player).value
+                game.outcome = current_player.opposite_player().value
                 game.save(update_fields=["forfeit", "outcome", "playing"])
                 send_through_game_channel(game, "game.error", game_err.id)
                 task_logger.info(

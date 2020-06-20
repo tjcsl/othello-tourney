@@ -6,13 +6,13 @@ class Player(enum.Enum):
     WHITE = "o"
     EMPTY = "."
 
-    @classmethod
-    def opposite_player(cls, current_player):
-        return cls.BLACK if current_player == cls.WHITE else cls.WHITE
+    def opposite_player(self):
+        if self == self.EMPTY:
+            return self.EMPTY
+        return self.BLACK if self == self.WHITE else self.WHITE
 
-    @classmethod
-    def to_legacy(cls, player):
-        return "@" if player == cls.BLACK else cls(player).value
+    def to_legacy(self):
+        return "@" if self == self.BLACK else self.value
 
     @classmethod
     def from_legacy(cls, player):

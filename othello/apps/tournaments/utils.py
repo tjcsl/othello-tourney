@@ -1,10 +1,12 @@
 import random
-from typing import Any, List, Tuple
+from typing import Generator, List, Tuple, TypeVar
 
 from .models import TournamentPlayer
 
+T = TypeVar("T")
 
-def chunks(v: List[Any], n: int):
+
+def chunks(v: List[T], n: int) -> Generator[List[T], None, None]:
     for i in range(0, len(v), n):
         yield v[i: i + n]
 
