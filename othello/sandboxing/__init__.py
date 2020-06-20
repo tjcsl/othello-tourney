@@ -2,13 +2,14 @@ import json
 import logging
 import subprocess
 import traceback
+from typing import Dict, List, Optional, Union
 
 from django.conf import settings
 
 logger = logging.getLogger("othello")
 
 
-def import_strategy_sandboxed(path):
+def import_strategy_sandboxed(path: str) -> Union[int, Dict[str, str]]:
     cmd_args = ["python3", "-u", settings.IMPORT_DRIVER, path]
     if not settings.DEBUG:
         cmd_args = get_sandbox_args(cmd_args)
@@ -25,7 +26,13 @@ def import_strategy_sandboxed(path):
             return {"message": error.decode()}
 
 
-def get_sandbox_args(cmd_args, *, whitelist=None, readonly=None, extra_args=None):
+def get_sandbox_args(
+    cmd_args: List[str],
+    *,
+    whitelist: Optional[List[str]] = None,
+    readonly: Optional[List[str]] = None,
+    extra_args: Optional[List[str]] = None,
+) -> List[str]:
     firejail_args = [
         "firejail",
         "--quiet",

@@ -4,13 +4,13 @@ import sys
 from inspect import signature
 
 
-def import_strategy(path):
+def import_strategy(path: str):
     strat = importlib.machinery.SourceFileLoader("strategy", path).load_module().Strategy()
     assert len(signature(strat.best_strategy).parameters) == 4
     return strat
 
 
-def main():
+def main() -> None:
     try:
         import_strategy(sys.argv[-1])
     except SyntaxError:
