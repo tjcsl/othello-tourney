@@ -1,4 +1,5 @@
 from django import forms
+from typing import Any
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.utils import timezone
@@ -20,12 +21,12 @@ class TournamentCreateForm(forms.ModelForm):
     )
     bye_player = forms.ModelChoiceField(label="Bye Player: ", queryset=Submission.objects.latest())
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(TournamentCreateForm, self).__init__(*args, **kwargs)
         self.fields["include_users"].label_from_instance = Submission.get_game_name
         self.fields["bye_player"].label_from_instance = Submission.get_game_name
 
-    def clean(self):
+    def clean(self) -> None:
         cd = self.cleaned_data
         if cd["start_time"] < timezone.now():
             raise ValidationError("A Tournament cannot take place in the past!")
@@ -51,7 +52,7 @@ class TournamentManagementForm(forms.Form):
     terminate = forms.BooleanField(required=False)
     remove_users = forms.ModelMultipleChoiceField(queryset=None, required=False)
 
-    def __init__(self, tournament, *args, **kwargs):
+    def __init__(self, tournament: Tournament, *args: Any, **kwargs: Any) -> None:
         super(TournamentManagementForm, self).__init__(*args, **kwargs)
         self.tournament = tournament
         self.status = "future" if tournament in Tournament.objects.future() else "in_progress"
@@ -84,7 +85,7 @@ class TournamentManagementForm(forms.Form):
             self.fields["terminate"].label = "Terminate Tournament: "
             self.fields["remove_users"].queryset = tournament.players.all()
 
-    def clean(self):
+    def clean(self) -> None:
         cd = self.cleaned_data
         if self.status == "future":
             if cd.get("reschedule", False) and cd["reschedule"] < timezone.now():

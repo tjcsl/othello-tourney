@@ -1,5 +1,5 @@
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
-from django.http import HttpResponse, HttpRequest
 
 
 def handle_500_view(request: HttpRequest) -> HttpResponse:

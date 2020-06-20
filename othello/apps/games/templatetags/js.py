@@ -1,8 +1,8 @@
 import json
-
 from typing import Any, Dict
+
 from django.template import Library
-from django.utils.safestring import mark_safe, SafeString
+from django.utils.safestring import SafeString, mark_safe
 
 register = Library()
 

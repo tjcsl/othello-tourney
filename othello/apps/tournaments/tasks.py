@@ -16,7 +16,7 @@ logger = logging.getLogger("othello")
 
 
 @shared_task
-def run_tournament_game(tournament_game_id):
+def run_tournament_game(tournament_game_id: int) -> str:
     try:
         t_game = TournamentGame.objects.get(id=tournament_game_id)
     except TournamentGame.DoesNotExist as e:
@@ -30,7 +30,7 @@ def run_tournament_game(tournament_game_id):
 
 
 @shared_task
-def run_tournament(tournament_id):
+def run_tournament(tournament_id: int) -> None:
     try:
         t = Tournament.objects.get(id=tournament_id)
     except Tournament.DoesNotExist as e:

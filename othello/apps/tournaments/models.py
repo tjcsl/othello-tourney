@@ -1,4 +1,5 @@
 from django.conf import settings
+from typing import Any
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.timezone import now
@@ -7,19 +8,19 @@ from ..games.models import Game, Submission
 
 
 class TournamentSet(models.QuerySet):
-    def filter_finished(self):
+    def filter_finished(self) -> "models.query.QuerySet[Tournament]":
         return self.filter(finished=True)
 
-    def filter_in_progress(self):
+    def filter_in_progress(self) -> "models.query.QuerySet[Tournament]":
         return self.filter(start_time__lte=now(), finished=False)
 
-    def filter_future(self):
+    def filter_future(self) -> "models.query.QuerySet[Tournament]":
         return self.filter(start_time__gt=now())
 
 
 class Tournament(models.Model):
 
-    objects = TournamentSet().as_manager()
+    objects: Any = TournamentSet().as_manager()
 
     created_at = models.DateTimeField(auto_now=True)
 
@@ -46,10 +47,10 @@ class Tournament(models.Model):
     finished = models.BooleanField(default=False)
     terminated = models.BooleanField(default=False)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "Tournament at {}".format(self.start_time.strftime("%Y-%m-%d %H:%M:%S"))
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<Tournament @ {}, {}>".format(
             self.start_time.strftime("%Y-%m-%d %H:%M:%S"), self.finished
         )
@@ -61,7 +62,7 @@ class TournamentPlayer(models.Model):
     submission = models.ForeignKey(Submission, on_delete=models.CASCADE)
     ranking = models.DecimalField(default=0, decimal_places=1, max_digits=15)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.submission.get_game_name()
 
 
@@ -73,5 +74,5 @@ class TournamentGame(models.Model):
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=False, blank=False)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{str(self.tournament)} - {self.game.black.get_user_name()} v. {self.game.white.get_user_name()}"

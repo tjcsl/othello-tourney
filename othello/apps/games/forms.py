@@ -1,6 +1,7 @@
+from typing import Any
+
 from django import forms
 from django.conf import settings
-from typing import Any
 from django.core.exceptions import ValidationError
 
 from ...sandboxing import import_strategy_sandboxed

@@ -1,12 +1,15 @@
 import random
+from typing import List, Any, Tuple
+
+from .models import TournamentPlayer
 
 
-def chunks(v, n):
+def chunks(v: List[Any], n: int):
     for i in range(0, len(v), n):
         yield v[i: i + n]
 
 
-def make_pairings(players, bye_player):
+def make_pairings(players, bye_player: TournamentPlayer) -> List[(str, str)]:
     matches = []
     players = list(players.order_by("-ranking"))
 
@@ -20,7 +23,7 @@ def make_pairings(players, bye_player):
     return matches
 
 
-def get_winners(players):
+def get_winners(players: list) -> Tuple[TournamentPlayer, TournamentPlayer, TournamentPlayer]:
     first, second, third = (-1, None), (-1, None), (-1, None)
     for player in players:
         r = player.ranking

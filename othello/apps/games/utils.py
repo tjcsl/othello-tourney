@@ -1,5 +1,7 @@
-from typing import Dict, Any
-from .models import Game, GameLog, GameError
+from typing import Any, Dict
+
+from .models import Game, GameError, GameLog
+
 
 def serialize_game_info(game: Game) -> Dict[str, Any]:
     data = {

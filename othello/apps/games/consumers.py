@@ -1,11 +1,12 @@
+from typing import Any, Dict, Optional
+
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 
 from django.utils import timezone
-from typing import Any, Dict
 
 from ...moderator.constants import Player
-from .models import Game, Submission, GameLog
+from .models import Game, GameLog, Submission
 from .tasks import run_game
 from .utils import serialize_game_error, serialize_game_info, serialize_game_log
 
@@ -13,7 +14,7 @@ from .utils import serialize_game_error, serialize_game_info, serialize_game_log
 class GameConsumer(JsonWebsocketConsumer):
     def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
-        self.game: Game = None
+        self.game: Optional[Game] = None
         self.connected: bool = False
 
     def connect(self) -> None:
