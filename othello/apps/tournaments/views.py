@@ -1,8 +1,10 @@
+from typing import Optional
+
 from django.contrib import messages
 from django.core.paginator import Paginator
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic.list import ListView
-from django.http import HttpResponse, HttpRequest
 
 from ..auth.decorators import management_only
 from .forms import TournamentCreateForm, TournamentManagementForm
@@ -20,7 +22,7 @@ class TournamentListView(ListView):
         return Tournament.objects.filter_finished().order_by(*self.ordering)
 
 
-def detail(request: HttpRequest, tournament_id: int = None) -> HttpResponse:
+def detail(request: HttpRequest, tournament_id: Optional[int] = None) -> HttpResponse:
     if tournament_id is not None:
         t = get_object_or_404(Tournament, id=tournament_id)
     else:
@@ -80,7 +82,7 @@ def create(request: HttpRequest) -> HttpResponse:
 
 
 @management_only
-def management(request: HttpRequest, tournament_id: int = None) -> HttpResponse:
+def management(request: HttpRequest, tournament_id: Optional[int] = None) -> HttpResponse:
     tournament = get_object_or_404(Tournament, id=tournament_id)
     if request.method == "POST":
         form = TournamentManagementForm(tournament, request.POST)

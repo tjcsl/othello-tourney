@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Optional
 
 from asgiref.sync import async_to_sync
 from celery import shared_task
@@ -40,7 +40,7 @@ def delete_game(game: Game) -> None:
 
 
 @shared_task
-def run_game(game_id: int) -> Any[str, None]:
+def run_game(game_id: int) -> Optional[str]:
     try:
         game = Game.objects.get(id=game_id)
         yourself = Submission.objects.get(user__username="Yourself")

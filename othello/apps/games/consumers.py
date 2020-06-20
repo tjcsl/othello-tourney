@@ -12,7 +12,7 @@ from .utils import serialize_game_error, serialize_game_info, serialize_game_log
 
 
 class GameConsumer(JsonWebsocketConsumer):
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.game: Optional[Game] = None
         self.connected: bool = False

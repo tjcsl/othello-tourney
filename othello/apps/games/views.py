@@ -1,5 +1,6 @@
 import json
 import logging
+from typing import Optional
 
 from django.conf import settings
 from django.contrib import messages
@@ -112,7 +113,7 @@ def play(request: HttpRequest) -> HttpResponse:
     return render(request, "games/design.html", {"form": GameForm(initial=initial)})
 
 
-def watch(request: HttpRequest, game_id: int = None) -> HttpResponse:
+def watch(request: HttpRequest, game_id: Optional[int] = None) -> HttpResponse:
     if game_id is not None:
         return render(
             request,
@@ -122,9 +123,9 @@ def watch(request: HttpRequest, game_id: int = None) -> HttpResponse:
     return render(request, "games/watch_list.html", {"games": Game.objects.running()})
 
 
-def about(request):
+def about(request: HttpRequest) -> HttpResponse:
     return render(request, "games/about.html")
 
 
-def help_view(request):
+def help_view(request: HttpRequest) -> HttpResponse:
     return render(request, "games/help.html")

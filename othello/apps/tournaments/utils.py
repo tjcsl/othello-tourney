@@ -1,5 +1,5 @@
 import random
-from typing import List, Any, Tuple
+from typing import Any, List, Tuple
 
 from .models import TournamentPlayer
 

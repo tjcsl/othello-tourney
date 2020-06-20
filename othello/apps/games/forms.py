@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Dict
 
 from django import forms
 from django.conf import settings
@@ -18,7 +18,7 @@ class SubmissionForm(forms.ModelForm):
             "code",
         )
 
-    def clean(self) -> None:
+    def clean(self) -> Dict[str, Any]:
         cd = self.cleaned_data
         if "code" not in cd:
             raise ValidationError("Please upload a non-empty Python file!")
