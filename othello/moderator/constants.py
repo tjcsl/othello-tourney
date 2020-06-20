@@ -12,11 +12,11 @@ class Player(enum.Enum):
 
     @classmethod
     def to_legacy(cls, player):
-        return "@" if player == cls.BLACK else player
+        return "@" if player == cls.BLACK else cls(player).value
 
     @classmethod
     def from_legacy(cls, player):
-        return cls.BLACK if player == "@" else player
+        return cls.BLACK.value if player == "@" else cls(player).value
 
 
 PLAYERS = {
