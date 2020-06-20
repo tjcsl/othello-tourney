@@ -1,6 +1,8 @@
 # Before trying to understand how the server uses binary to calculate moves,
 # become familiar with binary numbers, bitwise operators, bit masks, bitboards, and how Python handles binary.
 # The functions in Moderator are not intuitive and will be hard to understand without background knowledge.
+from typing import Dict, List, Optional, Tuple, Union
+
 from . import constants, utils
 
 
@@ -9,32 +11,34 @@ class InvalidMoveError(RuntimeError):
     Exception representing an invalid move given the current game state
     """
 
-    def __init__(self, board, player, move):
+    def __init__(self, board: str, player: str, move: int) -> None:
         self.code = utils.UserError.INVALID_MOVE.value[0]
         self.message = utils.UserError.INVALID_MOVE.value[1].format(
             move=move, player=constants.PLAYERS[player].value, board=utils.binary_to_string(board)
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.message
 
 
 class Moderator:
     def __init__(self):
-        self.board = constants.INITIAL  # bitboards representation of the initial othello board
-        self.game_over = False
-        self.current_player = constants.BLACK  # black moves first
+        self.board: Dict[
+            int, int
+        ] = constants.INITIAL  # bitboards representation of the initial othello board
+        self.game_over: bool = False
+        self.current_player: int = constants.BLACK  # black moves first
 
-    def is_game_over(self):
+    def is_game_over(self) -> bool:
         return self.game_over
 
-    def get_board(self):
+    def get_board(self) -> str:
         """
         Returns the string representation of the current bitboards
         """
         return utils.binary_to_string(self.board)
 
-    def toggle_current_player(self):
+    def toggle_current_player(self) -> None:
         """
         Switches the current player
         1 ^ 1 = 0
@@ -42,7 +46,7 @@ class Moderator:
         """
         self.current_player ^= 1
 
-    def outcome(self):
+    def outcome(self) -> Union[str, bool]:
         """
         Returns the outcome of the game(Black win, White win, Tie)
         A positive score represents a black win, a negative score a white win.
@@ -61,7 +65,7 @@ class Moderator:
             )
         return False
 
-    def possible_moves(self, player=None):
+    def possible_moves(self, player: Optional[int] = None) -> int:
         """
         Returns a bitboard representing all the possible moves for the current game state.
         In the resultant bitboard, possible move indices will be "on" while invalid moves will be "off"
@@ -94,7 +98,7 @@ class Moderator:
         # The discriminator roots out all the extraneous bits and all the results are bitwise OR'ed together to get the entire set of possible moves
         return moves
 
-    def make_move(self, move):
+    def make_move(self, move: int) -> None:
         """
         Given an integer move, updates the bitboards to show that the current player has placed a token at that tile.
         This method assumes that the passed move is valid, but will not error if the move is invalid.
@@ -128,7 +132,7 @@ class Moderator:
         # Afterwards is updates the current player bitboard with the flipped tile bits and removes those same bits from the opponent bitboard
         # Finally, update the class instance of board, and toggle the current player
 
-    def check_game_over(self):
+    def check_game_over(self) -> bool:
         """
         Checks if the game is over.
         An Othello game is over if neither player can move.
@@ -138,7 +142,7 @@ class Moderator:
             or self.possible_moves(player=1 ^ self.current_player)
         )
 
-    def is_valid_move(self, attempted_move):
+    def is_valid_move(self, attempted_move: int) -> bool:
         """
         Takes in an integer representing a tile which the current player is trying to move to
 
@@ -148,7 +152,7 @@ class Moderator:
         """
         return constants.MOVES.get(attempted_move, None) & self.possible_moves()
 
-    def submit_move(self, submitted_move):
+    def submit_move(self, submitted_move: int) -> Union[List[int], bool]:
         """
         Submits a move for validation.
         submitted_move is an integer representing a tile the current player is trying to move to.
@@ -175,13 +179,13 @@ class Moderator:
 
         return list(utils.isolate_bits(self.possible_moves()))
 
-    def get_game_state(self):
+    def get_game_state(self) -> Tuple[str, str]:
         """
         Returns the current board and player
         """
         return utils.binary_to_string(self.board), constants.PLAYERS[self.current_player]
 
-    def score(self):
+    def score(self) -> int:
         """
         Returns the score of the game.
         Calculated by: black_tokens - white_tokens

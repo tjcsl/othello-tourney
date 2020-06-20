@@ -3,11 +3,13 @@ import select
 import signal
 import subprocess
 import time
+from typing import Tuple, Union
 
 import psutil
 
 from django.conf import settings
 
+from ..apps.games.models import Move, Submission
 from ..sandboxing import get_sandbox_args
 from .constants import Player
 from .utils import ServerError, UserError, capture_generator_value
@@ -16,7 +18,7 @@ from .utils import ServerError, UserError, capture_generator_value
 LEGACY_MOVES = {(i + 11 + 2 * (i // 8)): i for i in range(64)}
 
 
-def legacy_board_convert(board):
+def legacy_board_convert(board: str) -> str:
     table = {ord(Player.WHITE.value): "o", ord(Player.BLACK.value): "@"}
     return (
         "?" * 11 + "??".join(board[i: i + 8].translate(table) for i in range(0, 64, 8)) + "?" * 11
@@ -24,7 +26,7 @@ def legacy_board_convert(board):
 
 
 class PlayerRunner:
-    def __init__(self, submission, driver):
+    def __init__(self, submission: Submission, driver: str) -> None:
         if not os.path.isfile(submission.code.path):
             raise OSError("file not found")
         self.path = submission.code.path
@@ -78,7 +80,9 @@ class PlayerRunner:
             self.process = None
 
     @capture_generator_value
-    def get_move(self, board, player, time_limit, last_move):
+    def get_move(
+        self, board: str, player: str, time_limit: int, last_move: Move
+    ) -> Union[Tuple[int, int], Tuple[int, ServerError], Tuple[int, UserError]]:
         if self.process.poll():
             print(self.process.communicate())
             return -1, ServerError.PROCESS_EXITED
@@ -136,7 +140,9 @@ class YourselfRunner:
         pass
 
     @capture_generator_value
-    def get_move(self, board, player, time_limit, last_move):
+    def get_move(
+        self, board: str, player: str, time_limit: int, last_move: Move
+    ) -> Union[Tuple[int, int], Tuple[int, ServerError], Tuple[int, UserError]]:
         yield "Choose your move!"
         start = time.time()
         while True:

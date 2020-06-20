@@ -2,12 +2,13 @@ import multiprocessing as mp
 import os
 import sys
 import traceback
+from typing import Any, Optional, TextIO, Union
 
 from .utils import ServerError, import_strategy
 
 
 class PrintLogger:
-    def __init__(self, logging=False):
+    def __init__(self, logging: Optional[bool] = False) -> None:
         self.logging = logging
 
     def __enter__(self):
@@ -23,12 +24,12 @@ class PrintLogger:
 
 
 class LocalRunner:  # Called from JailedRunner, inherits accessibility restrictions
-    def __init__(self, script_path):
+    def __init__(self, script_path: str) -> None:
         self.path = script_path
         self.strat = import_strategy(script_path)
         self.logging = getattr(self.strat, "logging", False)
 
-    def play_wrapper(self, *game_args, pipe_to_parent):
+    def play_wrapper(self, *game_args: Any, pipe_to_parent: mp.Pipe) -> None:
         try:
             self.strat.best_strategy(*game_args)
             pipe_to_parent.send(None)
@@ -39,7 +40,7 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
         except:
             pipe_to_parent.send(traceback.format_exc())
 
-    def get_move(self, board, player, time_limit):
+    def get_move(self, board: str, player: str, time_limit: int) -> Union[int, str]:
         best_move, is_running = mp.Value("i", -1), mp.Value("i", 1)
 
         to_child, to_self = mp.Pipe()
@@ -70,7 +71,7 @@ class JailedRunner(
         while True:
             self.handle(sys.stdin, sys.stdout, sys.stderr)
 
-    def handle(self, stdin, stdout, stderr):
+    def handle(self, stdin: TextIO, stdout: TextIO, stderr: TextIO) -> None:
         time_limit = int(stdin.readline().strip())
         player = stdin.readline().strip()
         board = stdin.readline().strip()

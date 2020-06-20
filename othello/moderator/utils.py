@@ -49,14 +49,14 @@ def capture_generator_value(f):
     return g
 
 
-def import_strategy(path):
+def import_strategy(path: str):
     return importlib.machinery.SourceFileLoader("strategy", path).load_module().Strategy()
 
 
 bit_or = partial(reduce, operator.__or__)  # mimics builtin "sum" function except with bitwise OR
 
 
-def is_on(x, pos):
+def is_on(x: int, pos: int) -> int:
     """
     Checks if an index on a 8x8 bitboard is "on"(1)
 
@@ -66,14 +66,14 @@ def is_on(x, pos):
     return x & (1 << pos)
 
 
-def bit_not(x):
+def bit_not(x: int) -> int:
     """
     Returns the bitwise NOT value of a 8x8 bitboard
     """
     return constants.FULL_BOARD ^ x
 
 
-def binary_to_string(board):
+def binary_to_string(board: str) -> str:
     """
     Converts a 8x8 othello bitboard to its string representation
 
@@ -91,7 +91,7 @@ def binary_to_string(board):
     )
 
 
-def hamming_weight(n):
+def hamming_weight(n: int) -> int:
     """
     Calculates the hamming weight of a binary number (number of "on"(1) bits)
     "n ^= n & -n" cuts off all the "off" bits until the next "on" bit.
@@ -108,7 +108,7 @@ def hamming_weight(n):
     return c
 
 
-def fill(current, opponent, direction):
+def fill(current: int, opponent: int, direction: int) -> int:
     """
     Does a binary dumb7fill in one cardinal direction (N, E, S, W, NE, NW, SE, SW)
     Read https://www.chessprogramming.org/Dumb7Fill for the strategy and how it relates to Chess.
@@ -146,7 +146,7 @@ def fill(current, opponent, direction):
     return (w & mask) >> direction
 
 
-def isolate_bits(x):
+def isolate_bits(x: int):
     """
     Generator that returns the indices of all the "on"(1) bits in a 8x8 bitboard
     This is different from hamming_weight since it yields the specific indices of each "on" bit
