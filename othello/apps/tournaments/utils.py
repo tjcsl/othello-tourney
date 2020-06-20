@@ -9,7 +9,7 @@ def chunks(v: List[Any], n: int):
         yield v[i: i + n]
 
 
-def make_pairings(players, bye_player: TournamentPlayer) -> List[(str, str)]:
+def make_pairings(players, bye_player: TournamentPlayer) -> List[Tuple[str, str]]:
     matches = []
     players = list(players.order_by("-ranking"))
 
