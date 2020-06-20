@@ -45,7 +45,7 @@ class PlayerRunner:
             cmd_args = get_sandbox_args(
                 cmd_args,
                 whitelist=[os.path.dirname(self.path)],
-                readonly=[self.path, os.path.dirname(self.path)],
+                readonly=[os.path.dirname(self.path)],  # WARNING: Making the submission directory writable creates potential for extremely dangerous symlink attacks
             )
 
         self.process = subprocess.Popen(
