@@ -38,8 +38,7 @@
                     </form>
                 </div>
                 <div id="second-form" class="column">
-                    <form action="{% url 'games:download' %}" method="post" enctype="multipart/form-data">
-                        {% csrf_token %}
+                    <form action="{% url 'games:download' %}" method="get" enctype="multipart/form-data">
                         <p>
                             {{ download_form.script.label }}
                             {{ download_form.script }}

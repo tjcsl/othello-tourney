@@ -8,7 +8,6 @@ from django.contrib.auth.decorators import login_required
 from django.http import FileResponse, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
-from django.views.decorators.http import require_POST
 
 from .forms import DownloadSubmissionForm, GameForm, SubmissionForm
 from .models import Game
@@ -56,10 +55,9 @@ def upload(request: HttpRequest) -> HttpResponse:
     )
 
 
-@require_POST
 @login_required
 def download(request: HttpRequest) -> HttpResponse:
-    form = DownloadSubmissionForm(user=request.user, data=request.POST)
+    form = DownloadSubmissionForm(user=request.user, data=request.GET)
     if form.is_valid():
         cd = form.cleaned_data
         submission = cd["script"]
