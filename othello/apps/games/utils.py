@@ -1,4 +1,7 @@
-def serialize_game_info(game):
+from typing import Dict, Any
+from .models import Game, GameLog, GameError
+
+def serialize_game_info(game: Game) -> Dict[str, Any]:
     data = {
         "type": "game.update",
         "id": game.id,
@@ -25,12 +28,12 @@ def serialize_game_info(game):
     return data
 
 
-def serialize_game_log(log):
+def serialize_game_log(log: GameLog) -> Dict[str, Any]:
     data = {"type": "game.log", "player": log.player.lower(), "message": log.message}
     return data
 
 
-def serialize_game_error(error):
+def serialize_game_error(error: GameError) -> Dict[str, Any]:
     data = {
         "type": "game.error",
         "player": error.player.lower(),

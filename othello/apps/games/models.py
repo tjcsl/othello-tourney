@@ -1,6 +1,7 @@
 import os
 import uuid
 
+from typing import Any, AnyStr
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
@@ -17,12 +18,12 @@ PLAYER_CHOICES = (
 )
 
 
-def _save_path(instance, filename):
+def _save_path(instance, filename: str) -> AnyStr:
     return os.path.join(instance.user.short_name, f"{uuid.uuid4()}.py")
 
 
 class SubmissionQuerySet(models.QuerySet):
-    def latest(self, **kwargs):
+    def latest(self, **kwargs: Any) -> "models.query.QuerySet[Submission]":
         """
         Returns a set of all the latest submissions for all users
         """
@@ -31,7 +32,7 @@ class SubmissionQuerySet(models.QuerySet):
 
 class Submission(models.Model):
 
-    objects = SubmissionQuerySet.as_manager()
+    objects: Any = SubmissionQuerySet.as_manager()
 
     user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="user")
     name = models.CharField(max_length=500, default="")
@@ -41,31 +42,31 @@ class Submission(models.Model):
     is_legacy = models.BooleanField(default=False)
     tournament_win_year = models.IntegerField(default=-1)
 
-    def get_user_name(self):
+    def get_user_name(self) -> str:
         return self.user.short_name
 
-    def get_game_name(self):
+    def get_game_name(self) -> str:
         return (
             f"T-{self.tournament_win_year} {self.get_user_name()}"
             if self.tournament_win_year != -1
             else self.get_user_name()
         )
 
-    def get_submitted_time(self):
+    def get_submitted_time(self) -> str:
         return self.created_at.strftime("%Y-%m-%d %H:%M:%S")
 
-    def get_submission_name(self):
+    def get_submission_name(self) -> str:
         return f"{self.name}: <{self.get_submitted_time()}>"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.get_game_name()
 
 
 class GameQuerySet(models.QuerySet):
-    def running(self):
+    def running(self) -> "models.query.QuerySet[Game]":
         return self.filter(playing=True)
 
-    def wins_for_user(self, submission):
+    def wins_for_user(self, submission: Submission) -> int:
         return (
             self.filter(playing=False, is_tournament=True)
             .filter(
@@ -84,7 +85,7 @@ class Game(models.Model):
         ("T", "Tie"),
     )
 
-    objects = GameQuerySet.as_manager()
+    objects: Any = GameQuerySet.as_manager()
     created_at = models.DateTimeField(auto_now=True)
 
     black = models.ForeignKey(Submission, on_delete=models.PROTECT, related_name="black")
@@ -102,21 +103,21 @@ class Game(models.Model):
     last_heartbeat = models.DateTimeField(default=timezone.now)
 
     @property
-    def channels_group_name(self):
+    def channels_group_name(self) -> str:
         return f"game-{self.id}"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.black.user} (Black) vs {self.white.user} (White) [{self.time_limit}s]"
 
 
 class MoveSet(models.QuerySet):
-    def latest(self, **kwargs):
+    def latest(self) -> "models.query.QuerySet[Move]":
         return self.order_by("-created_at").first()
 
 
 class Move(models.Model):
 
-    objects = MoveSet.as_manager()
+    objects: Any = MoveSet.as_manager()
 
     id = models.BigAutoField(primary_key=True)
 
@@ -128,7 +129,7 @@ class Move(models.Model):
 
     possible = ArrayField(models.IntegerField(default=-1), default=list)
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.game}, {self.player}, {self.move}, {self.created_at}"
 
 

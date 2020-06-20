@@ -1,5 +1,6 @@
 from django import forms
 from django.conf import settings
+from typing import Any
 from django.core.exceptions import ValidationError
 
 from ...sandboxing import import_strategy_sandboxed
@@ -16,7 +17,7 @@ class SubmissionForm(forms.ModelForm):
             "code",
         )
 
-    def clean(self):
+    def clean(self) -> None:
         cd = self.cleaned_data
         if "code" not in cd:
             raise ValidationError("Please upload a non-empty Python file!")
@@ -31,7 +32,7 @@ class SubmissionForm(forms.ModelForm):
 class DownloadSubmissionForm(forms.Form):
     script = forms.ModelChoiceField(label="Previous Submissions:", queryset=None)
 
-    def __init__(self, user, *args, **kwargs):
+    def __init__(self, user, *args: Any, **kwargs: Any) -> None:
         super(DownloadSubmissionForm, self).__init__(*args, **kwargs)
         choices = Submission.objects.filter(user=user).order_by("-created_at")
         self.fields["script"].queryset = choices
@@ -47,7 +48,7 @@ class GameForm(forms.Form):
         label="Time Limit (secs):", initial=5, min_value=1, max_value=settings.MAX_TIME_LIMIT
     )
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.fields["black"].label_from_instance = Submission.get_game_name
         self.fields["white"].label_from_instance = Submission.get_game_name

@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime, timedelta
+from typing import Any
 
 from asgiref.sync import async_to_sync
 from celery import shared_task
@@ -13,46 +14,47 @@ from django.utils import timezone
 from ...moderator import INITIAL_BOARD
 from ...moderator.moderator import InvalidMoveError, Moderator
 from ...moderator.runners import PlayerRunner, ServerError, UserError, YourselfRunner
-from ..games.models import Game, Player, Submission
+from ..games.models import Game, Player, Submission, GameLog, GameError, Move
 
 logger = logging.getLogger("othello")
 task_logger = get_task_logger(__name__)
 
 
-def send_through_game_channel(game, event_type, object_id):
+def send_through_game_channel(game: Game, event_type: str, object_id: int) -> int:
     task_logger.debug(f"sending {event_type}")
     async_to_sync(get_channel_layer().group_send)(
         game.channels_group_name, {"type": event_type, "object_id": object_id}
     )
 
 
-def check_heartbeat(game):
+def check_heartbeat(game: Game) -> bool:
     if game.is_tournament:
         return True
     game.refresh_from_db()
     return (timezone.now() - game.last_heartbeat).seconds < settings.CLIENT_HEARTBEAT_INTERVAL * 2
 
 
-def delete_game(game):
+def delete_game(game: Game) -> None:
     if not game.is_tournament:
         game.delete()
 
 
 @shared_task
-def run_game(game_id):
+def run_game(game_id: int) -> Any[str, None]:
     try:
-        game = Game.objects.get(id=game_id)
-        yourself = Submission.objects.get(user__username="Yourself")
+        game: Game = Game.objects.get(id=game_id)
+        yourself: Submission = Submission.objects.get(user__username="Yourself")
     except Game.DoesNotExist:
         logger.error(f"Trying to play nonexistent game ({game_id}")
         return "game not found"
 
-    mod, time_limit = Moderator(), game.time_limit
-    game_over = False
-    file_deleted = None
+    mod: Moderator = Moderator()
+    time_limit: int = game.time_limit
+    game_over: bool = False
+    file_deleted: GameError = None
 
     try:
-        black_runner = (
+        black_runner: Any[YourselfRunner, PlayerRunner] = (
             YourselfRunner(game, settings.YOURSELF_TIMEOUT)
             if game.black == yourself
             else PlayerRunner(game.black, settings.JAILEDRUNNER_DRIVER)
@@ -66,7 +68,7 @@ def run_game(game_id):
             error_msg=ServerError.FILE_DELETED.value[1],
         )
     try:
-        white_runner = (
+        white_runner: Any[YourselfRunner, PlayerRunner] = (
             YourselfRunner(game, settings.YOURSELF_TIMEOUT)
             if game.white == yourself
             else PlayerRunner(game.white, settings.JAILEDRUNNER_DRIVER)
@@ -90,7 +92,7 @@ def run_game(game_id):
 
     error = 0
     with black_runner as player_black, white_runner as player_white:
-        last_move = game.moves.create(board=INITIAL_BOARD, player="-", possible=[26, 19, 44, 37])
+        last_move: Move = game.moves.create(board=INITIAL_BOARD, player="-", possible=[26, 19, 44, 37])
         send_through_game_channel(game, "game.update", game_id)
         exception = None
 
@@ -188,7 +190,7 @@ def run_game(game_id):
 
 
 @shared_task
-def delete_old_games():
+def delete_old_games() -> None:
     logger.info("Deleting stale games")
     Game.objects.filter(is_tournament=False).filter(
         Q(playing=False) | Q(created_at__lt=datetime.now() - timedelta(hours=settings.STALE_GAME))

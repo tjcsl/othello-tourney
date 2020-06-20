@@ -4,7 +4,7 @@ import logging
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse, HttpRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -17,7 +17,7 @@ logger = logging.getLogger("othello")
 
 
 @login_required
-def upload(request):
+def upload(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
         return render(
             request,
@@ -57,7 +57,7 @@ def upload(request):
 
 @require_POST
 @login_required
-def download(request):
+def download(request: HttpRequest) -> HttpResponse:
     form = DownloadSubmissionForm(user=request.user, data=request.POST)
     if form.is_valid():
         cd = form.cleaned_data
@@ -80,7 +80,7 @@ def download(request):
     return redirect("games:upload")
 
 
-def play(request):
+def play(request: HttpRequest) -> HttpResponse:
     if request.method == "POST":
         form = GameForm(request.POST)
         if form.is_valid():
@@ -112,8 +112,8 @@ def play(request):
     return render(request, "games/design.html", {"form": GameForm(initial=initial)})
 
 
-def watch(request, game_id=False):
-    if game_id:
+def watch(request: HttpRequest, game_id: int = None) -> HttpResponse:
+    if game_id is not None:
         return render(
             request,
             "games/board.html",

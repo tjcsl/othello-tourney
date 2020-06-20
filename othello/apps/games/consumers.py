@@ -2,34 +2,35 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 
 from django.utils import timezone
+from typing import Any, Dict
 
 from ...moderator.constants import Player
-from .models import Game, Submission
+from .models import Game, Submission, GameLog
 from .tasks import run_game
 from .utils import serialize_game_error, serialize_game_info, serialize_game_log
 
 
 class GameConsumer(JsonWebsocketConsumer):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any):
         super().__init__(*args, **kwargs)
-        self.game = None
-        self.connected = False
+        self.game: Game = None
+        self.connected: bool = False
 
-    def connect(self):
+    def connect(self) -> None:
         try:
             self.game = Game.objects.get(id=self.scope["url_route"]["kwargs"]["game_id"])
         except Game.DoesNotExist:
             self.close()
             return
 
-        yourself = Submission.objects.get(user__username="Yourself")
+        yourself: Submission = Submission.objects.get(user__username="Yourself")
 
         if not self.game.playing:
             self.close()
             return
 
-        self.is_black_yourself = self.game.black.id == yourself.id
-        self.is_white_yourself = self.game.white.id == yourself.id
+        self.is_black_yourself: bool = self.game.black.id == yourself.id
+        self.is_white_yourself: bool = self.game.white.id == yourself.id
 
         self.connected = True
         self.accept()
@@ -38,22 +39,19 @@ class GameConsumer(JsonWebsocketConsumer):
             self.game.channels_group_name, self.channel_name
         )
 
-    def disconnect(self, code):
+    def disconnect(self, code: int) -> None:
         self.connected = False
 
-    def game_update(self, event):
+    def game_update(self, event: Dict[str, Any]) -> None:
         self.update_game()
 
-    def game_log(self, event):
+    def game_log(self, event: Dict[str, Any]) -> None:
         self.send_log(event["object_id"])
 
-    def game_error(self, event):
+    def game_error(self, event: Dict[str, Any]) -> None:
         self.send_error(event["object_id"])
 
-    def game_ping(self, event):
-        self.send_json({"type": "game.ping"})
-
-    def update_game(self):
+    def update_game(self) -> None:
         if self.connected:
             self.game.refresh_from_db()
             game = serialize_game_info(self.game)
@@ -61,11 +59,11 @@ class GameConsumer(JsonWebsocketConsumer):
             if game["game_over"]:
                 self.close()
 
-    def send_log(self, object_id):
+    def send_log(self, object_id: int) -> None:
         if self.connected:
             self.game.refresh_from_db()
-            log = self.game.logs.get(id=object_id)
-            has_access = (
+            log: GameLog = self.game.logs.get(id=object_id)
+            has_access: bool = (
                 log.game.black.user == self.scope["user"]
                 if log.player == Player.BLACK.value
                 else log.game.white.user == self.scope["user"]
@@ -77,28 +75,28 @@ class GameConsumer(JsonWebsocketConsumer):
             ):
                 self.send_json(serialize_game_log(log))
 
-    def send_error(self, object_id):
+    def send_error(self, object_id: int) -> None:
         if self.connected:
             self.send_json(serialize_game_error(self.game.errors.get(id=object_id)))
 
 
 class GamePlayingConsumer(GameConsumer):
-    def connect(self):
+    def connect(self) -> None:
         super(GamePlayingConsumer, self).connect()
         run_game.delay(self.game.id)
 
-    def disconnect(self, code):
+    def disconnect(self, code: int) -> None:
         self.game.playing = False
         self.game.save(update_fields=["playing"])
         super().disconnect(code)
 
-    def receive_json(self, content, **kwargs):
+    def receive_json(self, content: Dict[str, Any], **kwargs: Any) -> None:
         self.game.last_heartbeat = timezone.now()
         self.game.save()
 
-        player = content.get("player", None)
+        player: str = content.get("player", None)
         try:
-            move = int(content.get("move", None))
+            move: int = int(content.get("move", None))
         except (ValueError, TypeError):
             move = None
 
