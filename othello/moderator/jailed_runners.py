@@ -1,3 +1,9 @@
+# This file CANNOT import any file other than utils.py and constants.py
+# This file is run in a sandboxed subprocess and is detached from the main application
+# This file cannot access Django. its only I/O is through stdout/stderr
+# Be careful when adding imports, because the file you are importing may import other files that import/reference
+# unreachable modules themselves.
+# ex. import xxx; [IN xxx.py]: import yyy; [IN yyy.py]: from django.conf import settings  => WILL BREAK
 import multiprocessing as mp
 import os
 import sys
