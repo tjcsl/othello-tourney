@@ -2,7 +2,7 @@ import enum
 import importlib.machinery
 import operator
 from functools import partial, reduce, wraps
-from typing import Any, Callable, Iterable
+from typing import Any, Callable, Iterable, Generator
 
 from . import constants
 
@@ -40,7 +40,7 @@ class CaptureGenerator:
 
 def capture_generator_value(f: callable) -> callable:
     """
-    Convenience decorator function that wraps a generator function into the Generator class above
+    Convenience decorator function that wraps a generator function into the CaptureGenerator class above
     """
 
     @wraps(f)
@@ -149,7 +149,7 @@ def fill(current: int, opponent: int, direction: int) -> int:
     return (w & mask) >> direction
 
 
-def isolate_bits(x: int):
+def isolate_bits(x: int) -> Generator[int, None, None]:
     """
     Generator that returns the indices of all the "on"(1) bits in a 8x8 bitboard
     This is different from hamming_weight since it yields the specific indices of each "on" bit

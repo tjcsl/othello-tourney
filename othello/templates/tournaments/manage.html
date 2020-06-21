@@ -9,6 +9,10 @@
 {% block main %}
     <div class="row" style="display: flex">
         <div class="col-lg-8">
+            {% if not future %}
+                <h4 style="color: red">Some settings are locked since Tournament is in progress</h4>
+                <br>
+            {% endif %}
             <h4 style="text-decoration: underline">Tournament #{{ tournament.id }}</h4>
             <h6>Started at: {{ tournament.start_time }}</h6>
             <h6>{{ players|length }} Players Participating</h6>
