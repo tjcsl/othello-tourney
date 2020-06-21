@@ -16,7 +16,7 @@ class Player(enum.Enum):
 
     @classmethod
     def from_legacy(cls, player):
-        return cls.BLACK.value if player == "@" else cls(player).value
+        return cls.BLACK if player == "@" else cls(player)
 
 
 PLAYERS = {

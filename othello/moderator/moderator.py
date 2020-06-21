@@ -141,7 +141,7 @@ class Moderator:
             or self.possible_moves(player=1 ^ self.current_player)
         )
 
-    def is_valid_move(self, attempted_move: int) -> int:
+    def is_valid_move(self, attempted_move: int) -> bool:
         """
         Takes in an integer representing a tile which the current player is trying to move to
 
@@ -149,7 +149,7 @@ class Moderator:
 
         @param attempted_move tile current plays is trying to move to
         """
-        return constants.MOVES.get(attempted_move, None) & self.possible_moves()
+        return bool(constants.MOVES.get(attempted_move, None) & self.possible_moves())
 
     def submit_move(self, submitted_move: int) -> Optional[List[int]]:
         """
