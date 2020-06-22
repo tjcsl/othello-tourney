@@ -55,6 +55,8 @@ urllib3 = "==1.25.8"
 vine = "==1.3.0"
 "zope.interface" = "==5.0.2"
 sentry-sdk = "*"
+django-extensions = "*"
+ipython = "*"
 
 [dev-packages]
 flake8 = "~=3.8.2"
