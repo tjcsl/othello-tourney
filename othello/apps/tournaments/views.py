@@ -56,7 +56,8 @@ def create(request: HttpRequest) -> HttpResponse:
                 if cd.get("using_legacy", False):
                     messages.warning(
                         request,
-                        "Warning: One of more participating users is using legacy code! If this was a mistake, you can delete the Tournament and recreate it.",
+                        "Warning: One of more participating users is using legacy code! "
+                        "If this was a mistake, you can delete the Tournament and recreate it.",
                         extra_tags="warning",
                     )
             except Exception as e:
@@ -126,7 +127,8 @@ def management(request: HttpRequest, tournament_id: Optional[int] = None) -> Htt
             if cd.get("using_legacy", False):
                 messages.warning(
                     request,
-                    "Warning: One of more participating users is using legacy code! If this was a mistake, you can delete the Tournament and recreate it.",
+                    "Warning: One of more participating users is using legacy code!"
+                    " If this was a mistake, you can delete the Tournament and recreate it.",
                     extra_tags="warning",
                 )
         else:

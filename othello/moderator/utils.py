@@ -2,7 +2,7 @@ import enum
 import importlib.machinery
 import operator
 from functools import partial, reduce, wraps
-from typing import Any, Callable, Iterable, Generator
+from typing import Any, Callable, Generator, Iterable
 
 from . import constants
 

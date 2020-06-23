@@ -2,7 +2,7 @@ import json
 import logging
 import subprocess
 import traceback
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional
 
 from django.conf import settings
 
@@ -21,7 +21,7 @@ def import_strategy_sandboxed(path: str) -> Optional[Dict[str, str]]:
     else:
         try:
             return json.loads(error.decode("latin-1"))
-        except:
+        except json.JSONDecodeError:
             logger.error(f"Failed to import/load strategy file {traceback.format_exc()}")
             return {"message": error.decode()}
 

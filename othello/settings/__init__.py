@@ -200,7 +200,7 @@ MAX_ROUND_NUM = 75  # amount of rounds
 CONCURRENT_GAME_LIMIT = 5  # max amount of games that can be played at any time
 
 try:
-    from .secret import *
+    from .secret import *  # noqa
 except ImportError:
     DEBUG = True
     SENTRY_DSN = ""

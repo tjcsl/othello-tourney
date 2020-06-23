@@ -14,22 +14,17 @@ def main() -> None:
     try:
         import_strategy(sys.argv[-1])
     except SyntaxError:
-        sys.stderr.write(json.dumps({"message": "File has invalid syntax"}))
-        sys.exit(1)
+        sys.exit(json.dumps({"message": "File has invalid syntax"}))
     except AttributeError:
-        sys.stderr.write(
-            json.dumps({"message": "Cannot find attribute Strategy.best_strategy in file"})
-        )
-        sys.exit(1)
+        sys.exit(json.dumps({"message": "Cannot find attribute Strategy.best_strategy in file"}))
     except AssertionError:
-        sys.stderr.write(
+        sys.exit(
             json.dumps(
                 {"message": "Attribute Strategy.best_strategy has an invalid amount of parameters"}
             )
         )
-        sys.exit(1)
     except Exception as e:
-        sys.stderr.write(json.dumps({"message": f"Script is unable to be run, {str(e)}"}))
+        sys.exit(json.dumps({"message": f"Script is unable to be run, {str(e)}"}))
     sys.exit(0)
 
 

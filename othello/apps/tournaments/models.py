@@ -1,11 +1,11 @@
 from typing import Any
 
-from django.conf import settings
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.utils.timezone import now
 
 from ..games.models import Game, Submission
+from ..games.validators import validate_game_time_limit
+from .validators import validate_tournament_rounds
 
 
 class TournamentSet(models.QuerySet):
@@ -27,15 +27,9 @@ class Tournament(models.Model):
 
     start_time = models.DateTimeField()
     include_users = models.ManyToManyField(Submission, blank=True)
-    game_time_limit = models.IntegerField(
-        default=1, validators=[MinValueValidator(1), MaxValueValidator(settings.MAX_TIME_LIMIT)]
-    )
-    num_rounds = models.IntegerField(
-        default=15, validators=[MinValueValidator(15), MaxValueValidator(settings.MAX_ROUND_NUM)]
-    )
-    played = models.IntegerField(
-        default=0, validators=[MinValueValidator(0), MaxValueValidator(settings.MAX_ROUND_NUM)]
-    )
+    game_time_limit = models.IntegerField(default=1, validators=[validate_game_time_limit])
+    num_rounds = models.IntegerField(default=15, validators=[validate_tournament_rounds])
+    played = models.IntegerField(default=0)
     bye_player = models.ForeignKey(
         Submission,
         blank=False,

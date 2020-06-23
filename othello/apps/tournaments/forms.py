@@ -17,6 +17,9 @@ class TournamentCreateForm(forms.ModelForm):
     )
 
     game_time_limit = forms.IntegerField(label="Game Time Limit: ", min_value=1, max_value=15)
+    num_rounds = forms.IntegerField(
+        label="Amount of Rounds: ", min_value=15, max_value=settings.MAX_ROUND_NUM
+    )
     include_users = forms.ModelMultipleChoiceField(
         label="Include Users: ", queryset=Submission.objects.latest()
     )
@@ -56,7 +59,9 @@ class TournamentManagementForm(forms.Form):
     def __init__(self, tournament: Tournament, *args: Any, **kwargs: Any) -> None:
         super(TournamentManagementForm, self).__init__(*args, **kwargs)
         self.tournament = tournament
-        self.status = "future" if tournament in Tournament.objects.filter_future() else "in_progress"
+        self.status = (
+            "future" if tournament in Tournament.objects.filter_future() else "in_progress"
+        )
 
         if self.status == "future":
             self.fields["remove_users"].queryset = tournament.include_users.all()

@@ -1,2 +1,2 @@
-from .constants import INITIAL_BOARD
-from .moderator import InvalidMoveError, Moderator
+from .constants import INITIAL_BOARD  # noqa
+from .moderator import InvalidMoveError, Moderator  # noqa

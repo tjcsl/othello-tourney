@@ -2,15 +2,14 @@ import os
 import uuid
 from typing import Any, AnyStr
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
 
 from ...moderator.constants import Player
+from .validators import validate_game_time_limit
 
 PLAYER_CHOICES = (
     (Player.BLACK.value, "Black"),
@@ -90,9 +89,7 @@ class Game(models.Model):
 
     black = models.ForeignKey(Submission, on_delete=models.PROTECT, related_name="black")
     white = models.ForeignKey(Submission, on_delete=models.PROTECT, related_name="white")
-    time_limit = models.IntegerField(
-        default=5, validators=[MaxValueValidator(settings.MAX_TIME_LIMIT), MinValueValidator(1)]
-    )
+    time_limit = models.IntegerField(default=5, validators=[validate_game_time_limit])
 
     forfeit = models.BooleanField(default=False)
     outcome = models.CharField(max_length=1, choices=OUTCOME_CHOICES, default="T")
@@ -108,6 +105,9 @@ class Game(models.Model):
 
     def __str__(self) -> str:
         return f"{self.black.user} (Black) vs {self.white.user} (White) [{self.time_limit}s]"
+
+    def __repr__(self) -> str:
+        return f"<Game: {self.black.user} vs {self.white.user}>"
 
 
 class MoveSet(models.QuerySet):
@@ -147,11 +147,11 @@ class GameObject(models.Model):
 class GameError(GameObject):
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="errors")
-    error_code = models.IntegerField(default=-1)
-    error_msg = models.CharField(max_length=10 * 1024, default="")
+    error_code = models.IntegerField(default=0)
+    error_msg = models.TextField(default="")
 
 
 class GameLog(GameObject):
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="logs")
-    message = models.CharField(max_length=10 * 1024, default="")
+    message = models.TextField(default="")

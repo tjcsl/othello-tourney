@@ -1,7 +1,7 @@
 # Before trying to understand how the server uses binary to calculate moves,
 # become familiar with binary numbers, bitwise operators, bit masks, bitboards, and how Python handles binary.
 # The functions in Moderator are not intuitive and will be hard to understand without background knowledge.
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple
 
 from . import constants, utils
 
