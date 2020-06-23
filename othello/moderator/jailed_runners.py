@@ -32,7 +32,7 @@ class PrintLogger:
 class LocalRunner:  # Called from JailedRunner, inherits accessibility restrictions
     def __init__(self, script_path: str) -> None:
         self.path = script_path
-        self.strat = import_strategy(script_path)
+        self.strat, self.nargs = import_strategy(script_path)
         self.logging = getattr(self.strat, "logging", False)
 
     def play_wrapper(self, *game_args: Any, pipe_to_parent: mp.Pipe) -> None:
@@ -51,9 +51,14 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
 
         to_child, to_self = mp.Pipe()
         try:
+            args = (
+                ("".join(board), player, best_move, is_running)
+                if self.nargs == 4
+                else ("".join(board), player, best_move, is_running, time_limit)
+            )
             p = mp.Process(
                 target=self.play_wrapper,
-                args=("".join(board), player, best_move, is_running),
+                args=args,
                 kwargs={"pipe_to_parent": to_child},
                 daemon=True,
             )

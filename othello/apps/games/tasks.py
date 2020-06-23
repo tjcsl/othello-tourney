@@ -102,7 +102,6 @@ def run_game(game_id: int) -> Optional[str]:
                 game.outcome = "T"
                 game.forfeit = False
                 game.save(update_fields=["playing", "outcome", "forfeit"])
-                delete_game(game)
                 return "no ping"
             board, current_player = mod.get_game_state()
 

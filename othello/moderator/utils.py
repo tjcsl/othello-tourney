@@ -2,6 +2,7 @@ import enum
 import importlib.machinery
 import operator
 from functools import partial, reduce, wraps
+from inspect import signature
 from typing import Any, Callable, Generator, Iterable
 
 from . import constants
@@ -51,7 +52,11 @@ def capture_generator_value(f: callable) -> callable:
 
 
 def import_strategy(path: str):
-    return importlib.machinery.SourceFileLoader("strategy", path).load_module().Strategy()
+    strat = importlib.machinery.SourceFileLoader("strategy", path).load_module().Strategy()
+    return (
+        strat,
+        len(signature(strat.best_strategy).parameters),
+    )
 
 
 bit_or: Callable[[Iterable[int]], int] = partial(

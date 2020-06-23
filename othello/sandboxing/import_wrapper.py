@@ -6,7 +6,10 @@ from inspect import signature
 
 def import_strategy(path: str):
     strat = importlib.machinery.SourceFileLoader("strategy", path).load_module().Strategy()
-    assert len(signature(strat.best_strategy).parameters) == 4
+    assert (
+        len(signature(strat.best_strategy).parameters) == 4
+        or len(signature(strat.best_strategy).parameters) == 5
+    )
     return strat
 
 
