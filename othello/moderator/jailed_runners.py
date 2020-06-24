@@ -43,7 +43,7 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
             print(
                 "invalid submission"
             )  # printing to stdout from within LocalRunner will automatically give a READ_INVALID error
-        except:  # noqa
+        except Exception:  # noqa
             pipe_to_parent.send(traceback.format_exc())
 
     def get_move(self, board: str, player: str, time_limit: int) -> Union[int, str]:
