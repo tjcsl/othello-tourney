@@ -5,15 +5,25 @@
         File specification
     </h3>
     <p>
-        A valid Othello AI consists of a Python file, version 3+, with a class called <code>Strategy</code> containing a method called <code>best_strategy</code> with the arguments <code>board, player, best_move, still_running</code> in that order. <code>best_move</code> and <code>still_running</code> are <code>multiprocessing.Value</code> objects.
+        A valid Othello AI consists of a Python file, version 3+, with a class called <code>Strategy</code> containing a method called <code>best_strategy</code> with the arguments <code>board, player, best_move, still_running</code> in that order.
+        <code>best_move</code> and <code>still_running</code> are <code>multiprocessing.Value</code> objects.
         They can be accessed and modified by doing <code>best_move.value=34</code> or <code>print(still_running.value)</code>.
         The <code>still_running</code> variable will start as 1 but will change to 0 when your processing time is about to run out.
     </p>
     <p>
-         Note: Your script will be automatically cut off regardless of whether or not your code uses the <code>still_running</code> parameter
+        You do not need to import the <code>multiprocessing</code> library to access these objects
     </p>
     <p>
-        You do not need to import the <code>multiprocessing</code> library to access these objects
+        In addition to the method specification above, the <code>best_strategy</code> method can accept an additional parameter that would represent the time limit.
+        In this case the method header would be <code>def best_strategy(board, player, best_move, still_running, time_limit)</code>.
+        If you choose to include the additional parameter, an integer representing the amount of time allocated to your script will be passed to the function.
+    </p>
+    <p>
+        Note: The <code>best_strategy</code> method has to follow one of the above specification.
+        Depending on the method header, the Othello server will choose the appropriate parameters to pass.
+    </p>
+    <p>
+         Note: Your script will be automatically cut off regardless of whether or not your code uses the <code>still_running</code> parameter
     </p>
     <p>
         <span style="color: red">Warning: </span> All user code will be run in a daemonized <code>multiprocessing.Process</code>. This means your script
