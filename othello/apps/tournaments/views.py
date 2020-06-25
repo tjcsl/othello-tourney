@@ -28,9 +28,11 @@ def detail(request: HttpRequest, tournament_id: Optional[int] = None) -> HttpRes
     else:
         t = Tournament.objects.filter_in_progress().first()
 
-    players = t.players.all().order_by("-ranking")
-
-    page_obj = Paginator(players, 10).get_page(request.GET.get("page"))
+    if t is not None:
+        players = t.players.all().order_by("-ranking")
+        page_obj = Paginator(players, 10).get_page(request.GET.get("page"))
+    else:
+        players = page_obj = None
 
     return render(
         request,
