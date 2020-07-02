@@ -1,11 +1,12 @@
 from typing import Optional
 
+from celery.result import AsyncResult
+
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic.list import ListView
-from celery.result import AsyncResult
 
 from ..auth.decorators import management_only
 from .forms import TournamentCreateForm, TournamentManagementForm

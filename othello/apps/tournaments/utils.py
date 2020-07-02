@@ -1,6 +1,8 @@
 import random
 from typing import Generator, List, Tuple, TypeVar
 
+from django.db import models
+
 from .models import TournamentPlayer
 
 T = TypeVar("T")
@@ -11,7 +13,9 @@ def chunks(v: List[T], n: int) -> Generator[List[T], None, None]:
         yield v[i: i + n]
 
 
-def make_pairings(players, bye_player: TournamentPlayer) -> List[Tuple[str, str]]:
+def make_pairings(
+    players: "models.query.QuerySet[TournamentPlayer]", bye_player: TournamentPlayer
+) -> List[Tuple[TournamentPlayer, TournamentPlayer]]:
     matches = []
     players = list(players.order_by("-ranking"))
 
