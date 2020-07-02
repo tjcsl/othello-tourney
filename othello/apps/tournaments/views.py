@@ -5,6 +5,7 @@ from django.core.paginator import Paginator
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic.list import ListView
+from celery.result import AsyncResult
 
 from ..auth.decorators import management_only
 from .forms import TournamentCreateForm, TournamentManagementForm
@@ -49,7 +50,9 @@ def create(request: HttpRequest) -> HttpResponse:
             try:
                 t = form.save()
                 cd = form.cleaned_data
-                run_tournament.apply_async([t.id], eta=t.start_time)
+                task = run_tournament.apply_async([t.id], eta=t.start_time)
+                t.celery_task_id = task.id
+                t.save(update_fields=["celery_task_id"])
                 messages.success(
                     request,
                     f"Successfully created tournament! Tournament is scheduled to run at {t.start_time}",
@@ -106,7 +109,10 @@ def management(request: HttpRequest, tournament_id: Optional[int] = None) -> Htt
                 return redirect("tournaments:create")
 
             if time := cd.get("reschedule", None):
+                AsyncResult(tournament.celery_task_id).forget()
                 tournament.start_time = time
+                task = run_tournament.apply_async([tournament.id], eta=time)
+                tournament.celery_task_id = task.id
             if num_rounds := cd.get("num_rounds", None):
                 tournament.num_rounds = num_rounds
             if tl := cd.get("game_time_limit", None):

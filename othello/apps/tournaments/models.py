@@ -41,6 +41,7 @@ class Tournament(models.Model):
 
     finished = models.BooleanField(default=False)
     terminated = models.BooleanField(default=False)
+    celery_task_id = models.CharField(max_length=48, default="")
 
     def __str__(self) -> str:
         return "Tournament at {}".format(self.start_time.strftime("%Y-%m-%d %H:%M:%S"))
