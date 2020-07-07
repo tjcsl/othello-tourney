@@ -12,7 +12,7 @@
     <script type="text/javascript">
         const game = JSON.parse('{{ game|safe_json }}');
         const is_watching = JSON.parse('{{ is_watching|safe_json }}');
-        const heartbeat_interval = {{ heartbeat_interval }};
+        const heartbeat_interval = {{ settings.CLIENT_HEARTBEAT_INTERVAL }};
     </script>
 {% endblock %}
 

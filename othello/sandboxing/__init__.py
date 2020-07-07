@@ -15,7 +15,10 @@ def import_strategy_sandboxed(path: str) -> Optional[Dict[str, str]]:
         cmd_args = get_sandbox_args(cmd_args)
 
     p = subprocess.Popen(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    output, error = p.communicate()
+    try:
+        output, error = p.communicate(timeout=settings.IMPORT_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        return {"message": "Code takes too long to validate!"}
     if p.returncode == 0:
         return None
     else:

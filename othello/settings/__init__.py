@@ -66,6 +66,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "social_django.context_processors.backends",
                 "social_django.context_processors.login_redirect",
+                "othello.apps.context_processors.base_context",
             ]
         },
     }
@@ -181,6 +182,8 @@ EMAIL_USE_TLS = True
 EMAIL_SUBJECT_PREFIX = "[Othello]"
 EMAIL_FROM = "othello-noreply@tjhsst.edu"
 FORCE_EMAIL_SEND = True
+DEVELOPER_EMAIL = "mailto:othello@tjhsst.edu"
+
 
 # Othello Settings
 SANDBOXING_ROOT = os.path.join(BASE_DIR, "sandboxing")
@@ -189,6 +192,7 @@ IMPORT_DRIVER = os.path.join(SANDBOXING_ROOT, "import_wrapper.py")
 FIREJAIL_PROFILE = os.path.join(SANDBOXING_ROOT, "sandbox.profile")
 JAILEDRUNNER_DRIVER = os.path.abspath(os.path.join(os.path.dirname(BASE_DIR), "run_ai_jailed.py"))
 CLIENT_HEARTBEAT_INTERVAL = 5  # seconds
+IMPORT_TIMEOUT = 1  # seconds
 
 # Game settings
 STALE_GAME = 6  # hours

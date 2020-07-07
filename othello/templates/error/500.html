@@ -4,6 +4,7 @@
 {% block main %}
     <h3>Internal Server Error</h3>
     <h4>Something Unexpected Occurred</h4>
+    <p>Email <a href="{{ settings.DEVELOPER_EMAIL }}">othello@tjhsst.edu</a> if this is a recurring issue</p>
     <a href="{% url 'auth:index' %}">Go Home</a>
     <br>
 {% endblock %}

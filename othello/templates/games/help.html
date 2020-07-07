@@ -42,6 +42,58 @@
         and modify the set of characters to <code>{'.','x','o'}</code>(instead of the previous <code>{'.','@','o','?'}</code>) and resubmit their script.
     </p>
     <h3>
+        Upload Errors
+    </h3>
+    <p>
+        When uploading code to the server you may encounter one of the following errors.
+    </p>
+    <ul>
+        <li>
+            File has invalid syntax
+            <ul>
+                <li>
+                    The Othello server was unable to validate your code because there was a syntax error somewhere in the file.
+                    Go back through your code and revise any syntax issues then upload again.
+                </li>
+            </ul>
+        </li>
+        <li>
+            Cannot find attribute Strategy.best_strategy in file
+            <ul>
+                <li>
+                    Your code does not follow the specifications listed above.
+                    Reread the specifications and revise your code before submitting again.
+                </li>
+            </ul>
+        </li>
+        <li>
+            Attribute Strategy.best_strategy has an invalid amount of parameters
+            <ul>
+                <li>
+                    Your code does not follow the specifications listed above.
+                    Specifically regarding the amount of parameters <code>Strategy.best_strategy</code> should take.
+                    Reread the specifications and revise your code before submitting again.
+                </li>
+            </ul>
+        </li>
+        <li>
+            Code takes too long to validate!
+            <ul>
+                <li>
+                    Your file has some code that is outside a function or outside an "if __name__ == '__main__'" block.
+                    Any code that is outside such block must terminate after {{ settings.IMPORT_TIMEOUT }}s.
+                    Go back through your file and ensure that code that runs on import terminates quickly.
+                </li>
+            </ul>
+        </li>
+    </ul>
+    <p>
+        <b>
+            If you encounter another error message that you cannot interpret, email <a href="{{ settings.DEVELOPER_EMAIL }}">othello@tjhsst.edu</a>
+            a screenshot of the error message as well as your code.
+        </b>
+    </p>
+    <h3>
         Logging
     </h3>
     <p>
@@ -90,7 +142,7 @@
     <p>
         If any other error code is outputted, namely an error code within <code>{-4,-5,-6, -7, -8}</code>, this means the server has
         encountered an error while running your game. In this case, the game will be marked as a tie between both players, but
-        you should email <a href="mailto:othello@tjhsst.edu">othello@tjhsst.edu</a> a screenshot of the game along with your code
+        you should email <a href="{{ settings.DEVELOPER_EMAIL }}">othello@tjhsst.edu</a> a screenshot of the game along with your code
         so we can investigate and fix this error.
     </p>
     <p>
@@ -143,7 +195,7 @@ class Strategy:
         As of now the Othello server will only run the most recently uploaded script.
         You should try to put all your code in a single file and upload that file.
         Any files created by your code will persist between runs and games.
-        If you do in fact need other files for your code to work, and it is infeasible to include it in one file, contact <a href="mailto:othello@tjhsst.edu">othello@tjhsst.edu</a> or your AI teacher about your situation.
+        If you do in fact need other files for your code to work, and it is infeasible to include it in one file, contact <a href="{{ settings.DEVELOPER_EMAIL }}">othello@tjhsst.edu</a> or your AI teacher about your situation.
     </p>
     <p>
         <span style="color: red">Warning:</span> When your code is uploaded, it is stored under a different, randomly-generated filename. Submitting two Python files and expecting to be able to import the other file by name is infeasible.
