@@ -89,7 +89,6 @@ class GamePlayingConsumer(GameConsumer):
     def disconnect(self, code: int) -> None:
         self.game.playing = False
         self.game.save(update_fields=["playing"])
-        self.game.delete()
         super().disconnect(code)
 
     def receive_json(self, content: Dict[str, Any], **kwargs: Any) -> None:

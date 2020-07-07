@@ -116,7 +116,11 @@ def watch(request: HttpRequest, game_id: Optional[int] = None) -> HttpResponse:
         return render(
             request,
             "games/board.html",
-            {"game": serialize_game_info(get_object_or_404(Game, id=game_id)), "is_watching": True},
+            {
+                "game": serialize_game_info(get_object_or_404(Game, id=game_id)),
+                "is_watching": True,
+                "heartbeat_interval": settings.CLIENT_HEARTBEAT_INTERVAL,
+            },
         )
     return render(request, "games/watch_list.html", {"games": Game.objects.running()})
 
