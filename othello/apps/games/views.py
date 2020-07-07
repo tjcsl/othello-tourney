@@ -97,10 +97,7 @@ def play(request: HttpRequest) -> HttpResponse:
             return render(
                 request,
                 "games/board.html",
-                {
-                    "game": serialize_game_info(g),
-                    "is_watching": False,
-                },
+                {"game": serialize_game_info(g), "is_watching": False, },
             )
         else:
             for errors in form.errors.get_json_data().values():
