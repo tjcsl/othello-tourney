@@ -1,8 +1,6 @@
 # Othello
 
 ## Getting Started
-DISCLAIMER: Setting up a dev environment on Windows is possible but so tedious and basically impossible to recreate on different machines so I'm not going to go over how to do that. (I know because I tried and failed)
-
 
 The Othello server models require a PostgreSQL database and will not work with SQLite. 
 Celery and the channels layer also require a redis server running.
@@ -11,6 +9,8 @@ There are two ways to develop for Othello:
   1) Docker (recommended, easy)
   2) Vagrant (not recommended, less easy)
 
+
+NOTE: If you are using windows, make sure you are using WSL 2. Run all shell commands in the WSL and if you are using docker make sure the docker backend is WSL 2.0
 
 Start by cloning this repository:
 `git clone https://github.com/tjcsl/othello-tourney.git`
@@ -62,16 +62,16 @@ After registering an OAuth application enter the key and secret in the `SOCIAL_A
 After you have setup your dev environment and configured Ion OAuth, you will need to install the project dependencies. 
 
 This project uses [Pipenv](https://pipenv.pypa.io/en/latest/) to manage dependencies, to install the dependencies run:
-  * `pipenv install --rm`
-
-After the dependencies are installed you will need to load the "Yourself" player through its fixture:
-  * `pipenv run ./manage.py loaddata othello/fixtures/yourself.json`
+  * `pipenv install --dev`
+  
+After installing the dependencies, run the model migrations
+  * `pipenv run python3 manage.py migrate`
 
 Note: Failure to do this will cause the game code to fail.
 
 
 You can run the django server by running:
-  * `pipenv run ./manage.py runserver <host>:<port>`
+  * `pipenv run python3 manage.py runserver <host>:<port>`
 
 Note: If you are using `vagrant`, host should be `0.0.0.0` and port should be `8000`. Vagrant on Linux has some issues forwarding traffic if the host is `127.0.0.1` or `localhost`, so `0.0.0.0` will have the most success. The only port forwarded from the vagrant VM is `8000` so no other port will work (unless you change the Vagrant config). 
 
