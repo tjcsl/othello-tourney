@@ -2,5 +2,5 @@ Congratulations {{ name }}! You have placed {{ rank }} in the past Othello AI To
 
 You can view your rankings and those of your classmates here: {{ base_url }}/{{ ranking_url }}
 
-If you have any questions email your AI teacher or othello@tjhsst.edu
+If you have any questions email your AI teacher or {{ dev_email }}
 {% include "emails/footer.txt" %}

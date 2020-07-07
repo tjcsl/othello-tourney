@@ -7,7 +7,7 @@
         There was a problem when trying to authenticate you.
     </h5>
     <p>
-        Please try again later or contact <a href="{{ settings.DEVELOPER_EMAIL }}">othello@tjhsst.edu</a> if this persists.
+        Please try again later or contact <a href="mailto:{{ settings.DEVELOPER_EMAIL }}">{{ settings.DEVELOPER_EMAIL }}</a> if this persists.
     </p>
     <a href="{% url 'auth:index' %}">Go Home</a>
     <br>

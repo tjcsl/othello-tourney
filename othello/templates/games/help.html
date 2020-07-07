@@ -89,7 +89,7 @@
     </ul>
     <p>
         <b>
-            If you encounter another error message that you cannot interpret, email <a href="{{ settings.DEVELOPER_EMAIL }}">othello@tjhsst.edu</a>
+            If you encounter another error message that you cannot interpret, email <a href="mailto:{{ settings.DEVELOPER_EMAIL }}">{{ settings.DEVELOPER_EMAIL }}</a>
             a screenshot of the error message as well as your code.
         </b>
     </p>
@@ -142,7 +142,7 @@
     <p>
         If any other error code is outputted, namely an error code within <code>{-4,-5,-6, -7, -8}</code>, this means the server has
         encountered an error while running your game. In this case, the game will be marked as a tie between both players, but
-        you should email <a href="{{ settings.DEVELOPER_EMAIL }}">othello@tjhsst.edu</a> a screenshot of the game along with your code
+        you should email <a href="mailto:{{ settings.DEVELOPER_EMAIL }}">{{ settings.DEVELOPER_EMAIL }}</a> a screenshot of the game along with your code
         so we can investigate and fix this error.
     </p>
     <p>
@@ -195,7 +195,7 @@ class Strategy:
         As of now the Othello server will only run the most recently uploaded script.
         You should try to put all your code in a single file and upload that file.
         Any files created by your code will persist between runs and games.
-        If you do in fact need other files for your code to work, and it is infeasible to include it in one file, contact <a href="{{ settings.DEVELOPER_EMAIL }}">othello@tjhsst.edu</a> or your AI teacher about your situation.
+        If you do in fact need other files for your code to work, and it is infeasible to include it in one file, contact <a href="mailto:{{ settings.DEVELOPER_EMAIL }}">{{ settings.DEVELOPER_EMAIL }}</a> or your AI teacher about your situation.
     </p>
     <p>
         <span style="color: red">Warning:</span> When your code is uploaded, it is stored under a different, randomly-generated filename. Submitting two Python files and expecting to be able to import the other file by name is infeasible.
