@@ -123,7 +123,7 @@ def management(request: HttpRequest, tournament_id: Optional[int] = None) -> Htt
             if added_users := cd.get("add_users", None):
                 tournament.include_users.set(tournament.include_users.all().union(added_users))
             if removed_users := cd.get("remove_users", None):
-                if tournament in Tournament.objects.in_progress():
+                if tournament in Tournament.objects.filter_in_progress():
                     tournament.players.filter(id__in=removed_users).delete()
                 else:
                     tournament.include_users.set(
