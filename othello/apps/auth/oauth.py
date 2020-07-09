@@ -1,10 +1,4 @@
 from social_core.backends.oauth import BaseOAuth2
-from social_core.pipeline.user import get_username as social_get_username
-
-
-def get_username(strategy, details, user=None, *args, **kwargs):
-    result = social_get_username(strategy, details, user=user, *args, **kwargs)
-    return result
 
 
 class IonOauth2(BaseOAuth2):
