@@ -13,7 +13,6 @@ SECRET_KEY = "y_xy)s%b_0h=#=y#3le5wfk!iy_+w#3#2j_&g@k^u-^qbrhxl2"
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
-    "othello.csl.tjhsst.edu",
     "othello.tjhsst.edu",
 ]
 
