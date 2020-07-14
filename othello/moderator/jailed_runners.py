@@ -4,29 +4,13 @@
 # Be careful when adding imports, because the file you are importing may import other files that import/reference
 # unreachable modules themselves.
 # ex. import xxx; [IN xxx.py]: import yyy; [IN yyy.py]: from django.conf import settings  => WILL BREAK
-import multiprocessing as mp
-import os
 import sys
 import traceback
-from typing import Any, Optional, TextIO, Union
+import multiprocessing as mp
+from contextlib import redirect_stdout
+from typing import Any, TextIO, Union
 
 from .utils import ServerError, import_strategy
-
-
-class PrintLogger:
-    def __init__(self, logging: Optional[bool] = False) -> None:
-        self.logging = logging
-
-    def __enter__(self):
-        self._original_stdout = sys.stdout
-        if self.logging:
-            sys.stdout = sys.stderr
-        else:
-            sys.stdout = open(os.devnull, "w")
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        sys.stdout = self._original_stdout
 
 
 class LocalRunner:  # Called from JailedRunner, inherits accessibility restrictions
@@ -87,7 +71,7 @@ class JailedRunner(
         player = stdin.readline().strip()
         board = stdin.readline().strip()
 
-        with PrintLogger(self.logging):
+        with redirect_stdout(sys.stderr if self.logging else None):
             move, err = self.get_move(board, player, time_limit)
 
         if err is not None:
