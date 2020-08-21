@@ -10,6 +10,7 @@ from .models import Submission
 
 class SubmissionForm(forms.ModelForm):
     name = forms.CharField(required=False)
+    code = forms.FileField(allow_empty_file=False)
 
     class Meta:
         model = Submission
