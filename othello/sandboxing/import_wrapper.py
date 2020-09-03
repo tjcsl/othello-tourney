@@ -24,7 +24,8 @@ def main() -> None:
             )
         )
     except Exception as e:
-        sys.exit(json.dumps({"message": f"Script is unable to be run, {str(e)}"}))
+        sys.stderr.write(json.dumps({"message": f"Script is unable to be run, make sure your script runs on your computer before submitting"}))
+        sys.exit(1)
     sys.exit(0)
 
 

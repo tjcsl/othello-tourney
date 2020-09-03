@@ -20,14 +20,14 @@ def import_strategy_sandboxed(path: str) -> Optional[Dict[str, str]]:
         output, error = p.communicate(timeout=settings.IMPORT_TIMEOUT)
     except subprocess.TimeoutExpired:
         return {"message": "Code takes too long to validate!"}
-    if p.returncode == 0:
+    if p.returncode == 0 and not error.decode('latin-1'):
         return None
     else:
         try:
             return json.loads(error.decode("latin-1"))
         except json.JSONDecodeError:
             logger.error(f"Failed to import/load strategy file {traceback.format_exc()}")
-            return {"message": error.decode()}
+            return {"message": f"Script is unable to be run, make sure your script runs on your computer before submitting"}
 
 
 def get_sandbox_args(
