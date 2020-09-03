@@ -24,12 +24,12 @@ def upload(request: HttpRequest) -> HttpResponse:
             "games/upload.html",
             {
                 "success": False,
-                "submission_form": SubmissionForm(),
+                "submission_form": SubmissionForm(user=request.user),
                 "download_form": DownloadSubmissionForm(request.user),
             },
         )
     success = False
-    form = SubmissionForm(request.POST, request.FILES)
+    form = SubmissionForm(user=request.user, data=request.POST, files=request.FILES)
     if form.is_valid():
         try:
             submission = form.save(commit=False)

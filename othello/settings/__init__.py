@@ -154,7 +154,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, "serve")
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"),)
 
 # Files
-FILE_UPLOAD_HANDLERS = ["django.core.files.uploadhandler.TemporaryFileUploadHandler"]
 MEDIA_ROOT = os.path.join(BASE_DIR, "submissions")
 
 # Logging

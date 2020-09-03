@@ -1,3 +1,4 @@
+import os
 from typing import Any, Dict
 from tempfile import NamedTemporaryFile
 
@@ -20,13 +21,17 @@ class SubmissionForm(forms.ModelForm):
             "code",
         )
 
+    def __init__(self, user, *args: Any, **kwargs: Any) -> None:
+        super(SubmissionForm, self).__init__(*args, **kwargs)
+        self.user = user
+
     def clean(self) -> Dict[str, Any]:
         cd = self.cleaned_data
         if "code" not in cd:
             raise ValidationError("Please upload a non-empty Python file!")
         if not cd["name"]:
             cd["name"] = cd["code"].name
-        with NamedTemporaryFile("wb+") as f:
+        with NamedTemporaryFile("wb+", dir=os.path.join(settings.MEDIA_ROOT, self.user.short_name)) as f:
             for chunk in cd["code"].chunks():
                 f.write(chunk)
             f.seek(0)
