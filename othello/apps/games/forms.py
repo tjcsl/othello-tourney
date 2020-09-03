@@ -1,4 +1,5 @@
 from typing import Any, Dict
+from tempfile import NamedTemporaryFile
 
 from django import forms
 from django.conf import settings
@@ -25,9 +26,13 @@ class SubmissionForm(forms.ModelForm):
             raise ValidationError("Please upload a non-empty Python file!")
         if not cd["name"]:
             cd["name"] = cd["code"].name
-        if (errs := import_strategy_sandboxed(cd["code"].temporary_file_path())) is not None:
-            print(errs)
-            raise ValidationError(errs["message"])
+        with NamedTemporaryFile("wb+") as f:
+            for chunk in cd["code"].chunks():
+                f.write(chunk)
+            f.seek(0)
+            if (errs := import_strategy_sandboxed(f.name)) is not None:
+                print(errs)
+                raise ValidationError(errs["message"])
 
         return cd
 
