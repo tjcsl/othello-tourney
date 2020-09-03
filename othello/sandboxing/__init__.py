@@ -1,3 +1,4 @@
+import os
 import json
 import logging
 import subprocess
@@ -12,7 +13,7 @@ logger = logging.getLogger("othello")
 def import_strategy_sandboxed(path: str) -> Optional[Dict[str, str]]:
     cmd_args = ["python3", "-u", settings.IMPORT_DRIVER, path]
     if not settings.DEBUG:
-        cmd_args = get_sandbox_args(cmd_args)
+        cmd_args = get_sandbox_args(cmd_args, whitelist=[os.path.dirname(path)], readonly=[os.path.dirname(path)])
 
     p = subprocess.Popen(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     try:
