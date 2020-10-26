@@ -92,9 +92,11 @@ class PlayerRunner:
         if self.is_legacy:
             board = legacy_board_convert(board)
             player = player.to_legacy()
+        else:
+            player = player.value
 
         self.process.stdin.write(
-            f"{str(time_limit)}\n{player.value}\n{''.join(board)}\n".encode("latin-1")
+            f"{str(time_limit)}\n{player}\n{''.join(board)}\n".encode("latin-1")
         )
         self.process.stdin.flush()
         move = -1

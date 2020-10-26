@@ -18,7 +18,7 @@ PLAYER_CHOICES = (
 
 
 def _save_path(instance, filename: str) -> AnyStr:
-    return os.path.join(instance.user.short_name, f"{uuid.uuid4()}.py")
+    return os.path.join(instance.user.short_name if instance.user else instance.name, f"{uuid.uuid4()}.py")
 
 
 class SubmissionQuerySet(models.QuerySet):
@@ -33,13 +33,21 @@ class Submission(models.Model):
 
     objects: Any = SubmissionQuerySet.as_manager()
 
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="user")
-    name = models.CharField(max_length=500, default="")
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="user", null=True)
+    name = models.CharField(max_length=500, null=True)
     created_at = models.DateTimeField(auto_now=True)
     code = models.FileField(upload_to=_save_path, default=None)
 
     is_legacy = models.BooleanField(default=False)
     tournament_win_year = models.IntegerField(default=-1)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                name='user_or_name',
+                check=models.Q(user__isnull=False) | models.Q(name__isnull=False),
+            )
+        ]
 
     def get_user_name(self) -> str:
         return self.user.short_name
@@ -49,6 +57,8 @@ class Submission(models.Model):
             f"T-{self.tournament_win_year} {self.get_user_name()}"
             if self.tournament_win_year != -1
             else self.get_user_name()
+            if self.user is not None
+            else self.name
         )
 
     def get_submitted_time(self) -> str:
