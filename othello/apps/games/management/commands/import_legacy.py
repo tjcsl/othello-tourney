@@ -27,7 +27,7 @@ class Command(BaseCommand):
             u, created = User.objects.get_or_create(username=folder)
             if created:
                 u.is_imported = True
-            u.save(update_fields=["is_imported"])
+            u.save()
             name = u.short_name if u else folder
             Submission.objects.filter(user=u).delete()
             s = Submission.objects.create(
