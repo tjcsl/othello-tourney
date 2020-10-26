@@ -21,7 +21,10 @@ class Command(BaseCommand):
         import_dir = options['dir']
         for folder in os.listdir(import_dir):
             shutil.copytree(os.path.join(import_dir, folder), os.path.join(submissions_dir, folder))
-            u = User.objects.get_or_create(username=folder)[0]
+            u, created = User.objects.get_or_create(username=folder)
+            if created:
+                u.is_imported = True
+            u.save(update_fields=["is_imported"])
             name = u.short_name if u else folder
             s = Submission.objects.create(
                 user=u,
