@@ -36,7 +36,7 @@ class Command(BaseCommand):
                 is_legacy=True,
             )
             s.code.save("", File(open(os.path.join(submissions_dir, folder, "strategy.py"))))
-            s.save(update_fields=["code"])
+            s.save()
             print(f"Imported {folder}")
 
 
