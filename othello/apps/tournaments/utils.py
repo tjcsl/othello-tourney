@@ -14,10 +14,10 @@ def chunks(v: List[T], n: int) -> Generator[List[T], None, None]:
 
 
 def make_pairings(
-    players: "models.query.QuerySet[TournamentPlayer]", bye_player: TournamentPlayer
+    players: List[TournamentPlayer], bye_player: TournamentPlayer
 ) -> List[Tuple[TournamentPlayer, TournamentPlayer]]:
     matches = []
-    players = list(players.order_by("-ranking"))
+    players = sorted(players, key=lambda x: -x.ranking)
 
     for i in range(0, len(players), 2):
         if i + 1 > len(players):
