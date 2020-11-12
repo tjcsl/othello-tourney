@@ -16,17 +16,19 @@ function helps(){
 window.onload = function () {
     helps()
     $("#id_black").selectize({
+        plugins: ['remove_button'],
         maxItems: 1,
         onChange: function (val) {
             showYourselfHelp(val, "#black-help");
         },
-        sortField: [{'field': 'text', 'direction': 'asc'}]
+        sortField: [{'field': 'text', 'direction': 'desc'}]
     });
     $("#id_white").selectize({
+        plugins: ['remove_button'],
         maxItems: 1,
         onChange: function (val) {
             showYourselfHelp(val, "#white-help");
         },
-        sortField: [{'field': 'text', 'direction': 'asc'}]
+        sortField: [{'field': 'text', 'direction': 'desc'}]
     });
 };
