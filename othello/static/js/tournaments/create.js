@@ -20,11 +20,10 @@ window.onload = function () {
     })
 
     $("#id_include_users").selectize({
-        maxItems: 1,
+        plugins: ['remove_button'],
         sortField: [{'field': 'text', 'direction': 'desc'}]
     });
     $("#id_bye_player").selectize({
-        plugins: ['remove_button'],
         maxItems: 1,
         sortField: [{'field': 'text', 'direction': 'desc'}]
     });
