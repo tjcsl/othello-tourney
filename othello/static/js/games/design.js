@@ -19,12 +19,14 @@ window.onload = function () {
         maxItems: 1,
         onChange: function (val) {
             showYourselfHelp(val, "#black-help");
-        }
+        },
+        sortField: [{'field': 'text', 'direction': 'asc'}]
     });
     $("#id_white").selectize({
         maxItems: 1,
         onChange: function (val) {
             showYourselfHelp(val, "#white-help");
-        }
+        },
+        sortField: [{'field': 'text', 'direction': 'asc'}]
     });
 };
