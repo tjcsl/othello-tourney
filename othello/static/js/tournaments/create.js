@@ -19,8 +19,15 @@ window.onload = function () {
         users[`${$(this).text()}`] = $(this).val()
     })
 
-    $("#id_include_users").selectize();
-    $("#id_bye_player").selectize();
+    $("#id_include_users").selectize({
+        maxItems: 1,
+        sortField: [{'field': 'text', 'direction': 'desc'}]
+    });
+    $("#id_bye_player").selectize({
+        plugins: ['remove_button'],
+        maxItems: 1,
+        sortField: [{'field': 'text', 'direction': 'desc'}]
+    });
 
     $("#includeUsersFile").on('change', function () {
         let reader = new FileReader();
