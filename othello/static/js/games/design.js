@@ -16,7 +16,6 @@ function helps(){
 window.onload = function () {
     helps()
     $("#id_black").selectize({
-        plugins: ['remove_button'],
         maxItems: 1,
         onChange: function (val) {
             showYourselfHelp(val, "#black-help");
@@ -24,7 +23,6 @@ window.onload = function () {
         sortField: [{'field': 'text', 'direction': 'desc'}]
     });
     $("#id_white").selectize({
-        plugins: ['remove_button'],
         maxItems: 1,
         onChange: function (val) {
             showYourselfHelp(val, "#white-help");
