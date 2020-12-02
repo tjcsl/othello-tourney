@@ -31,7 +31,7 @@ tippy("#inlude_users_file_help", {
 })
 
 tippy("#runoff-help", {
-    content: "Enables runoff (\"hoarding\") of extra time every move. " +
+    content: "Enables time hoarding every move. " +
          "(ex. If the time limit is 5s but your script takes 4s one turn, you will get 6s next round)",
     placement: "right"
 })
