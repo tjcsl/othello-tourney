@@ -24,6 +24,7 @@ class TournamentCreateForm(forms.ModelForm):
         label="Include Users: ", queryset=Submission.objects.latest()
     )
     bye_player = forms.ModelChoiceField(label="Bye Player: ", queryset=Submission.objects.latest())
+    runoff = forms.BooleanField(label="Enable Time Hoarding?", initial=False, required=False)
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(TournamentCreateForm, self).__init__(*args, **kwargs)

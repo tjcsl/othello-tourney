@@ -59,6 +59,7 @@ def run_tournament(tournament_id: int) -> None:
                         time_limit=t.game_time_limit,
                         playing=True,
                         is_tournament=True,
+                        runoff=t.runoff_enabled,
                     )
                 )
                 for game in round_matches

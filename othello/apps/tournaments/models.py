@@ -30,6 +30,7 @@ class Tournament(models.Model):
     game_time_limit = models.IntegerField(default=1, validators=[validate_game_time_limit])
     num_rounds = models.IntegerField(default=15, validators=[validate_tournament_rounds])
     played = models.IntegerField(default=0)
+    runoff_enabled = models.BooleanField(default=False)
     bye_player = models.ForeignKey(
         Submission,
         blank=False,
