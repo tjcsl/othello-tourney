@@ -83,11 +83,11 @@ class PlayerRunner:
     def get_move(
         self, board: str, player: Player, time_limit: int, last_move: Move
     ) -> Generator[
-        str, None, Union[Tuple[int, int], Tuple[int, ServerError], Tuple[int, UserError]]
+        str, None, Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]]
     ]:
         if self.process.poll():
             print(self.process.communicate())
-            return -1, ServerError.PROCESS_EXITED
+            return -1, ServerError.PROCESS_EXITED, -1
 
         if self.is_legacy:
             board = legacy_board_convert(board)
@@ -95,19 +95,20 @@ class PlayerRunner:
         else:
             player = player.value
 
+        print(time_limit)
         self.process.stdin.write(
             f"{str(time_limit)}\n{player}\n{''.join(board)}\n".encode("latin-1")
         )
         self.process.stdin.flush()
-        move = -1
+        move, extra_time = -1, 0
 
         start, total_timeout = time.time(), time_limit + 10
         while move == -1:
             if self.process.poll():
                 print(self.process.communicate())
-                return -1, ServerError.PROCESS_EXITED
+                return -1, ServerError.PROCESS_EXITED, -1
             if (timeout := total_timeout - (time.time() - start)) <= 0:
-                return -1, ServerError.TIMEOUT
+                return -1, ServerError.TIMEOUT, -1
 
             files_ready = select.select(
                 [self.process.stdout, self.process.stderr], [], [], timeout
@@ -116,17 +117,19 @@ class PlayerRunner:
                 yield self.process.stderr.read(8192).decode("latin-1")
             if self.process.stdout in files_ready:
                 try:
-                    move = int(self.process.stdout.readline())
-                    print(f"GOT MOVE {move}")
+                    parts = self.process.stdout.readline().decode("latin-1").split(";")
+                    move, extra_time = int(parts[0]), int(parts[1])
+                    print(f"GOT MOVE {move};{extra_time}")
+
                     if self.is_legacy:
                         if move not in LEGACY_MOVES:
-                            return -1, UserError.READ_INVALID
+                            return -1, UserError.READ_INVALID, -1
                     else:
                         if move < 0 or move >= 64:
-                            return -1, UserError.READ_INVALID
-                except ValueError:
-                    return -1, UserError.READ_INVALID
-        return (move, 0) if not self.is_legacy else (LEGACY_MOVES[move], 0)
+                            return -1, UserError.READ_INVALID, -1
+                except (ValueError, IndexError):
+                    return -1, UserError.READ_INVALID, -1
+        return (move, 0, extra_time) if not self.is_legacy else (LEGACY_MOVES[move], 0, extra_time)
 
 
 class YourselfRunner:

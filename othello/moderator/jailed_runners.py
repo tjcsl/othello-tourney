@@ -7,8 +7,9 @@
 import sys
 import traceback
 import multiprocessing as mp
+from time import process_time
 from contextlib import redirect_stdout
-from typing import Any, TextIO, Union
+from typing import Any, TextIO, Tuple, Union
 
 from .utils import ServerError, import_strategy
 
@@ -30,7 +31,7 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
         except Exception:  # noqa
             pipe_to_parent.send(traceback.format_exc())
 
-    def get_move(self, board: str, player: str, time_limit: int) -> Union[int, str]:
+    def get_move(self, board: str, player: str, time_limit: int) -> Union[Tuple[int, str, int], Tuple[ServerError, str, int]]:
         best_move, is_running = mp.Value("i", -1), mp.Value("i", 1)
 
         to_child, to_self = mp.Pipe()
@@ -47,16 +48,19 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
                 daemon=True,
             )
             p.start()
+            s = process_time()
             p.join(time_limit)
+            extra_time = int(time_limit - (process_time() - s))
             if p.is_alive():
                 is_running.value = 0
                 p.join(0.05)
                 if p.is_alive():
                     p.terminate()
-            return best_move.value, to_self.recv() if to_self.poll() else None
+                extra_time = 0
+            return best_move.value, to_self.recv() if to_self.poll() else None, max(0, extra_time)
         except mp.ProcessError:
             traceback.print_exc()
-            return ServerError.UNEXPECTED, "Server Error"
+            return ServerError.UNEXPECTED, "Server Error", -1
 
 
 class JailedRunner(
@@ -72,12 +76,12 @@ class JailedRunner(
         board = stdin.readline().strip()
 
         with redirect_stdout(sys.stderr if self.logging else None):
-            move, err = self.get_move(board, player, time_limit)
+            move, err, time_limit = self.get_move(board, player, time_limit)
 
         if err is not None:
             stderr.write(f"SERVER: {err}\n")
 
-        stdout.write(f"{move}\n")
+        stdout.write(f"{move};{time_limit}\n")
 
         stdout.flush()
         stderr.flush()

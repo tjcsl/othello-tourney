@@ -62,8 +62,12 @@ class GameForm(forms.Form):
     time_limit = forms.IntegerField(
         label="Time Limit (secs):", initial=5, min_value=1, max_value=settings.MAX_TIME_LIMIT
     )
+    runoff = forms.BooleanField(label="Runoff time?", initial=False)
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.fields["black"].label_from_instance = Submission.get_game_name
         self.fields["white"].label_from_instance = Submission.get_game_name
+
+    class Meta:
+        ordering = ['black', 'white']

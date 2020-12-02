@@ -123,10 +123,13 @@ def run_game(game_id: int) -> Optional[str]:
                 print(log)
                 game_log = game.logs.create(player=current_player.value, message=log)
                 send_through_game_channel(game, "game.log", game_log.id)
-            submitted_move, error = running_turn.return_value
+            submitted_move, error, extra_time = running_turn.return_value
 
             if exception is not None:
                 error = ServerError.UNEXPECTED
+
+            if game.runoff:
+                time_limit = game.time_limit + extra_time
 
             if error != 0:
                 game_err = game.errors.create(

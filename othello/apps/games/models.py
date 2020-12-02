@@ -100,6 +100,7 @@ class Game(models.Model):
     black = models.ForeignKey(Submission, on_delete=models.PROTECT, related_name="black")
     white = models.ForeignKey(Submission, on_delete=models.PROTECT, related_name="white")
     time_limit = models.IntegerField(default=5, validators=[validate_game_time_limit])
+    runoff = models.BooleanField(default=False)
 
     forfeit = models.BooleanField(default=False)
     outcome = models.CharField(max_length=1, choices=OUTCOME_CHOICES, default="T")

@@ -90,6 +90,7 @@ def play(request: HttpRequest) -> HttpResponse:
                 time_limit=cd["time_limit"],
                 playing=True,
                 last_heartbeat=timezone.now(),
+                runoff=cd["runoff"],
             )
             logger.info(f"Created game with id: {g.id}")
             cd["black"], cd["white"] = cd["black"].id, cd["white"].id
