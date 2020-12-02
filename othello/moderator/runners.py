@@ -95,7 +95,6 @@ class PlayerRunner:
         else:
             player = player.value
 
-        print(time_limit)
         self.process.stdin.write(
             f"{str(time_limit)}\n{player}\n{''.join(board)}\n".encode("latin-1")
         )
@@ -119,7 +118,7 @@ class PlayerRunner:
                 try:
                     parts = self.process.stdout.readline().decode("latin-1").split(";")
                     move, extra_time = int(parts[0]), int(parts[1])
-                    print(f"GOT MOVE {move};{extra_time}")
+                    print(f"GOT MOVE {player} {move};{extra_time}")
 
                     if self.is_legacy:
                         if move not in LEGACY_MOVES:
@@ -150,19 +149,19 @@ class YourselfRunner:
     def get_move(
         self, board: str, player: Player, time_limit: int, last_move: Move
     ) -> Generator[
-        str, None, Union[Tuple[int, int], Tuple[int, ServerError], Tuple[int, UserError]]
+        str, None, Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]]
     ]:
         yield "Choose your move!"
         start = time.time()
         while True:
             self.game.refresh_from_db()
             if not self.game.playing:
-                return -1, ServerError.DISCONNECT
+                return -1, ServerError.DISCONNECT, -1
             if (time.time() - start) > self.timeout:
-                return -1, UserError.NO_MOVE_ERROR
+                return -1, UserError.NO_MOVE_ERROR, -1
             if (m := self.game.moves.latest()) != last_move:
                 if m is not None:
                     m.delete()
-                    return m.move, 0
+                    return m.move, 0, -1
                 else:
-                    return -1, ServerError.DISCONNECT
+                    return -1, ServerError.DISCONNECT, -1

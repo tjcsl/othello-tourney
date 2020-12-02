@@ -49,7 +49,7 @@ def run_game(game_id: int) -> Optional[str]:
         return "game not found"
 
     mod = Moderator()
-    time_limit = game.time_limit
+    black_time_limit, white_time_limit = game.time_limit, game.time_limit
     game_over = False
     file_deleted = None
 
@@ -97,7 +97,7 @@ def run_game(game_id: int) -> Optional[str]:
         exception = None
 
         while not mod.is_game_over():
-            if not check_heartbeat(game):
+            if not check_heartbeat(game) or not game.playing:
                 game.playing = False
                 game.outcome = "T"
                 game.forfeit = False
@@ -108,11 +108,11 @@ def run_game(game_id: int) -> Optional[str]:
             try:
                 if current_player == Player.BLACK:
                     running_turn = player_black.get_move(
-                        board, current_player, time_limit, last_move
+                        board, current_player, black_time_limit, last_move
                     )
                 elif current_player == Player.WHITE:
                     running_turn = player_white.get_move(
-                        board, current_player, time_limit, last_move
+                        board, current_player, white_time_limit, last_move
                     )
             except BaseException as e:
                 logger.error(f"Error when getting move {game_id}, {current_player}, {str(e)}")
@@ -129,9 +129,13 @@ def run_game(game_id: int) -> Optional[str]:
                 error = ServerError.UNEXPECTED
 
             if game.runoff:
-                time_limit = game.time_limit + extra_time
+                if current_player == Player.BLACK:
+                    black_time_limit = game.time_limit + extra_time
+                else:
+                    white_time_limit = game.time_limit + extra_time
 
             if error != 0:
+                print('err')
                 game_err = game.errors.create(
                     player=current_player.value, error_code=error.value[0], error_msg=error.value[1]
                 )

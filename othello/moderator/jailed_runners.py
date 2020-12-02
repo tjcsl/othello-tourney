@@ -7,7 +7,7 @@
 import sys
 import traceback
 import multiprocessing as mp
-from time import process_time
+from time import perf_counter
 from contextlib import redirect_stdout
 from typing import Any, TextIO, Tuple, Union
 
@@ -24,10 +24,6 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
         try:
             self.strat.best_strategy(*game_args)
             pipe_to_parent.send(None)
-        except TypeError:
-            print(
-                "invalid submission"
-            )  # printing to stdout from within LocalRunner will automatically give a READ_INVALID error
         except Exception:  # noqa
             pipe_to_parent.send(traceback.format_exc())
 
@@ -48,9 +44,9 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
                 daemon=True,
             )
             p.start()
-            s = process_time()
+            s = perf_counter()
             p.join(time_limit)
-            extra_time = int(time_limit - (process_time() - s))
+            extra_time = int(time_limit - (perf_counter() - s))
             if p.is_alive():
                 is_running.value = 0
                 p.join(0.05)
