@@ -3,6 +3,7 @@ import logging
 from celery import shared_task
 
 from django.conf import settings
+from django.db.models import Q
 from django.contrib.auth import get_user_model
 from django.urls import reverse_lazy
 
@@ -40,9 +41,10 @@ def run_tournament(tournament_id: int) -> None:
     submissions = TournamentPlayer.objects.bulk_create(
         [TournamentPlayer(tournament=t, submission=s) for s in t.include_users.all()]
     )
+    bye_player = TournamentPlayer.objects.create(tournament=t, submission=t.bye_player)
 
     for round_num in range(t.num_rounds):
-        matches = make_pairings(submissions, t.bye_player)
+        matches = make_pairings(submissions, bye_player)
         t.refresh_from_db()
         if t.terminated:
             t.delete()
@@ -121,5 +123,5 @@ def run_tournament(tournament_id: int) -> None:
             "dev_email": settings.DEVELOPER_EMAIL,
         },
         " Tournament Completed",
-        [x.email for x in get_user_model().objects.filter(is_teacher=True)],
+        [x.email for x in get_user_model().objects.filter(Q(is_teacher=True) | Q(is_staff=True) | Q(is_superuser=True))],
     )
