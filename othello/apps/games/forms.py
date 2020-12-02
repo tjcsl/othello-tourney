@@ -62,7 +62,7 @@ class GameForm(forms.Form):
     time_limit = forms.IntegerField(
         label="Time Limit (secs):", initial=5, min_value=1, max_value=settings.MAX_TIME_LIMIT
     )
-    runoff = forms.BooleanField(initial=False)
+    runoff = forms.BooleanField(initial=False, required=False)
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
