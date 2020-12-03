@@ -33,11 +33,11 @@ def get_winners(players: list) -> Tuple[TournamentPlayer, TournamentPlayer, Tour
     first, second, third = (-1, None), (-1, None), (-1, None)
     for player in players:
         r = player.ranking
-        if r > first:
+        if r > first[0]:
             first = (r, player)
-        elif r > second:
+        elif r > second[0]:
             second = (r, player)
-        elif r > third:
+        elif r > third[0]:
             third = (r, player)
 
     return first[1], second[1], third[1]
