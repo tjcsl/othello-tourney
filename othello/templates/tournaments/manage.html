@@ -46,6 +46,10 @@
                                 <td><input type="checkbox" class="user-remove" id="{{ player.id }}"></td>
                             </tr>
                         {% endfor %}
+                            <tr>
+                                <td>Bye Player</td>
+                                <td>{{ bye_player }}</td>
+                            </tr>
                     </tbody>
                 </table>
                 {% if page_obj.has_other_pages %}

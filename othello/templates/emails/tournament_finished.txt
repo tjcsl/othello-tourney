@@ -7,7 +7,7 @@ The following students placed in the Top 3:
     {{ forloop.counter }}. {{ player }}
 {% endfor %}
 
-You can view the full rankings here: {{ base_url}}/{{ ranking_url}}
+You can view the full rankings here: {{ base_url}}{{ ranking_url}}
 If you have any questions feel free to email {{ dev_email }}
 
 {% include "emails/footer.txt" %}
