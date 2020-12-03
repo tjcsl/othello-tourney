@@ -135,7 +135,6 @@ def run_game(game_id: int) -> Optional[str]:
                     white_time_limit = game.time_limit + extra_time
 
             if error != 0:
-                print('err')
                 game_err = game.errors.create(
                     player=current_player.value, error_code=error.value[0], error_msg=error.value[1]
                 )

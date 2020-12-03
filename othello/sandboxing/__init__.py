@@ -1,6 +1,6 @@
-import os
 import json
 import logging
+import os
 import subprocess
 import traceback
 from typing import Dict, List, Optional
@@ -13,21 +13,25 @@ logger = logging.getLogger("othello")
 def import_strategy_sandboxed(path: str) -> Optional[Dict[str, str]]:
     cmd_args = ["python3", "-u", settings.IMPORT_DRIVER, path]
     if not settings.DEBUG:
-        cmd_args = get_sandbox_args(cmd_args, whitelist=[os.path.dirname(path)], readonly=[os.path.dirname(path)])
+        cmd_args = get_sandbox_args(
+            cmd_args, whitelist=[os.path.dirname(path)], readonly=[os.path.dirname(path)]
+        )
 
     p = subprocess.Popen(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     try:
         output, error = p.communicate(timeout=settings.IMPORT_TIMEOUT)
     except subprocess.TimeoutExpired:
         return {"message": "Code takes too long to validate!"}
-    if p.returncode == 0 and not error.decode('latin-1'):
+    if p.returncode == 0 and not error.decode("latin-1"):
         return None
     else:
         try:
             return json.loads(error.decode("latin-1"))
         except json.JSONDecodeError:
             logger.error(f"Failed to import/load strategy file {traceback.format_exc()}")
-            return {"message": f"Script is unable to be run, make sure your script runs on your computer before submitting"}
+            return {
+                "message": f"Script is unable to be run, make sure your script runs on your computer before submitting"
+            }
 
 
 def get_sandbox_args(

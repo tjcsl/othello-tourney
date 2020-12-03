@@ -3,8 +3,8 @@ import logging
 from celery import shared_task
 
 from django.conf import settings
-from django.db.models import Q
 from django.contrib.auth import get_user_model
+from django.db.models import Q
 from django.urls import reverse_lazy
 
 from ..games.models import Game
@@ -123,5 +123,10 @@ def run_tournament(tournament_id: int) -> None:
             "dev_email": settings.DEVELOPER_EMAIL,
         },
         " Tournament Completed",
-        [x.email for x in get_user_model().objects.filter(Q(is_teacher=True) | Q(is_staff=True) | Q(is_superuser=True))],
+        [
+            x.email
+            for x in get_user_model().objects.filter(
+                Q(is_teacher=True) | Q(is_staff=True) | Q(is_superuser=True)
+            )
+        ],
     )

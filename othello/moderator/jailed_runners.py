@@ -4,11 +4,11 @@
 # Be careful when adding imports, because the file you are importing may import other files that import/reference
 # unreachable modules themselves.
 # ex. import xxx; [IN xxx.py]: import yyy; [IN yyy.py]: from django.conf import settings  => WILL BREAK
+import multiprocessing as mp
 import sys
 import traceback
-import multiprocessing as mp
-from time import perf_counter
 from contextlib import redirect_stdout
+from time import perf_counter
 from typing import Any, TextIO, Tuple, Union
 
 from .utils import ServerError, import_strategy
@@ -27,7 +27,9 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
         except Exception:  # noqa
             pipe_to_parent.send(traceback.format_exc())
 
-    def get_move(self, board: str, player: str, time_limit: int) -> Union[Tuple[int, str, int], Tuple[ServerError, str, int]]:
+    def get_move(
+        self, board: str, player: str, time_limit: int
+    ) -> Union[Tuple[int, str, int], Tuple[ServerError, str, int]]:
         best_move, is_running = mp.Value("i", -1), mp.Value("i", 1)
 
         to_child, to_self = mp.Pipe()

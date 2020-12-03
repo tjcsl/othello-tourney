@@ -1,6 +1,6 @@
 import os
-from typing import Any, Dict
 from tempfile import NamedTemporaryFile
+from typing import Any, Dict
 
 from django import forms
 from django.conf import settings
@@ -33,7 +33,9 @@ class SubmissionForm(forms.ModelForm):
             cd["name"] = cd["code"].name
         if not os.path.exists(os.path.join(settings.MEDIA_ROOT, self.user.short_name)):
             os.mkdir(os.path.join(settings.MEDIA_ROOT, self.user.short_name))
-        with NamedTemporaryFile("wb+", dir=os.path.join(settings.MEDIA_ROOT, self.user.short_name)) as f:
+        with NamedTemporaryFile(
+            "wb+", dir=os.path.join(settings.MEDIA_ROOT, self.user.short_name)
+        ) as f:
             for chunk in cd["code"].chunks():
                 f.write(chunk)
             f.seek(0)
@@ -70,4 +72,4 @@ class GameForm(forms.Form):
         self.fields["white"].label_from_instance = Submission.get_game_name
 
     class Meta:
-        ordering = ['black', 'white']
+        ordering = ["black", "white"]

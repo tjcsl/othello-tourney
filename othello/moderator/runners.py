@@ -83,7 +83,9 @@ class PlayerRunner:
     def get_move(
         self, board: str, player: Player, time_limit: int, last_move: Move
     ) -> Generator[
-        str, None, Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]]
+        str,
+        None,
+        Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]],
     ]:
         if self.process.poll():
             print(self.process.communicate())
@@ -149,7 +151,9 @@ class YourselfRunner:
     def get_move(
         self, board: str, player: Player, time_limit: int, last_move: Move
     ) -> Generator[
-        str, None, Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]]
+        str,
+        None,
+        Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]],
     ]:
         yield "Choose your move!"
         start = time.time()

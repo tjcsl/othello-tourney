@@ -1,5 +1,5 @@
 from django.contrib.auth.models import AbstractUser
-from django.db import models, DatabaseError
+from django.db import DatabaseError, models
 
 
 class User(AbstractUser):
@@ -24,6 +24,7 @@ class User(AbstractUser):
         existing_user = User.objects.filter(username=self.username, is_imported=True).first()
         if existing_user:
             from ..games.models import Submission
+
             Submission.objects.filter(user=existing_user).update(user=self)
             existing_user.delete()
         super().save(*args, **kwargs)
