@@ -13,6 +13,8 @@ def serialize_game_info(game: Game) -> Dict[str, Any]:
         "outcome": game.outcome,
         "forfeit": game.forfeit,
         "moves": None,
+        "time_limit": game.time_limit,
+        "runoff": game.runoff,
     }
     if moves := game.moves.order_by("-created_at"):
         data["moves"] = [
