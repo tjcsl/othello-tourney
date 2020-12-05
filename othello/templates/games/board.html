@@ -35,9 +35,7 @@
                     <p id="player-white" class="player-score"></p>
                 </div>
             </div>
-            {% if game.runoff %}
-                <p style="color: red">Time Hoarding Enabled</p>
-            {% endif %}
+            <p style="color: red">Time Hoarding {% if game.runoff %}Enabled{% else %}Disabled{%endif%}</p>
             <p>Time Limit: {{ game.time_limit }}s</p>
             <div class="downloadHistory">
                 <button id="downloadHistoryButton" type="button" data-toggle="modal" data-target="#downloadModal">Download Game</button>
