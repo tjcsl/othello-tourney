@@ -10,6 +10,5 @@ urlpatterns = [
     path("download/", views.download, name="download"),
     path("watch/", views.watch, name="watch"),
     path("watch/<int:game_id>", views.watch, name="watch"),
-    path("about/", views.about, name="about"),
     path("help/", views.help_view, name="help"),
 ]

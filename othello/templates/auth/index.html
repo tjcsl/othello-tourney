@@ -2,17 +2,40 @@
 {% block title %}Othello: Home{% endblock %}
 {% block header %} Home {% endblock %}
 {% block main %}
+    <div class="messages">
+        <div class="alert alert-danger alert-dismissible fade show my-2" role="alert">
+            Scripts submitted before the 2020-21 school year are now invalid!
+            <br>
+            The previously used 10x10 board has now been changed to the conventional, 8x8 Othello board (No more "<code>?</code>"s in board string).<br>
+            Read <a href="{% url 'games:help' %}">About Uploading</a> to see all changes.
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </div>
     <p>
-        Welcome to the TJ AI othello tournament home page! Click on any of the links above to navigate.
+        Welcome to the TJ AI Othello tournament home page! Click on any of the links above to navigate.
     </p>
     <p>
-        For more information, see <a href="{% url 'games:about' %}">About</a>, <a href="https://en.wikipedia.org/wiki/Reversi">General Othello Information</a> or <a href="https://en.wikipedia.org/wiki/Computer_Othello">Computer Othello</a>.
+        This is a simple web app to run the TJHSST Othello AI Tournament.
+    </p>
+    <p>
+        You can pit AIs against each other, upload your own AI, or even play against an existing AI.
+    </p>
+    <p>
+        For more information, see <a href="https://en.wikipedia.org/wiki/Reversi">General Othello Information</a> or <a href="https://en.wikipedia.org/wiki/Computer_Othello">Computer Othello</a>.
+    </p>
+    <p>
+        For more information on the specifics of uploading see <a href="{% url 'games:help' %}">About Uploading</a>
+    </p>
+    <p>
+        If you have any questions about the api or the website in general, please email <a href="mailto:{{ settings.DEVELOPER_EMAIL }}">{{ settings.DEVELOPER_EMAIL }}</a> or your current AI teacher.
     </p>
     <br>
-    <h4 style="text-decoration: underline">
-        Scripts submitted before the 2020-21 school year are now invalid!
-    </h4>
-    <p>
-        The previously used 10x10 board has now been changed to the conventional, 8x8 Othello board (No more "<code>?</code>"s in board string).<br>
-         Read <a href="{% url 'games:help' %}">About Uploading</a> to see all changes.
+    <h5>Othello Server Developers</h5>
+    <ul>
+        <li>Jack Duvall (2019)</li>
+        <li>Anup Bagali (2021)</li>
+    </ul>
+    <br>
     {% endblock %}
