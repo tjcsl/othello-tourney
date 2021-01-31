@@ -34,3 +34,9 @@ CELERY_BROKER_URL = "redis://localhost/1"
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
 SOCIAL_AUTH_ION_KEY = ""
 SOCIAL_AUTH_ION_SECRET = ""
+
+# Message to display on the front page. HTML not escaped, be careful.
+FRONT_PAGE_MESSAGE = ""
+
+# Message to display on every page. HTML not escaped, be careful.
+GLOBAL_MESSAGE = ""
