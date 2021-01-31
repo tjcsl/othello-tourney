@@ -12,6 +12,16 @@
                 <span aria-hidden="true">&times;</span>
             </button>
         </div>
+
+        {# Front page message #}
+        {% if settings.FRONT_PAGE_MESSAGE %}
+            <div class="alert alert-warning alert-dismissible fade show my-2" role="alert">
+                {{ settings.FRONT_PAGE_MESSAGE|safe }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endif %}
     </div>
     <p>
         Welcome to the TJ AI Othello tournament home page! Click on any of the links above to navigate.

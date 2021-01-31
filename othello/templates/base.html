@@ -75,6 +75,15 @@
                         </button>
                     </div>
                 {% endfor %}
+                {# Global message #}
+                {% if settings.GLOBAL_MESSAGE %}
+                    <div class="alert alert-warning alert-dismissible fade show my-2" role="alert">
+                        {{ settings.GLOBAL_MESSAGE|safe }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                {% endif %}
             </div>
         {% block main %}{% endblock %}
         <br>

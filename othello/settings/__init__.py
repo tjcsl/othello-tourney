@@ -201,6 +201,12 @@ JAILEDRUNNER_DRIVER = os.path.abspath(os.path.join(os.path.dirname(BASE_DIR), "r
 CLIENT_HEARTBEAT_INTERVAL = 5  # seconds
 IMPORT_TIMEOUT = 1  # seconds
 
+# Message to display on the front page. HTML not escaped, be careful.
+FRONT_PAGE_MESSAGE = ""
+
+# Message to display on every page. HTML not escaped, be careful.
+GLOBAL_MESSAGE = ""
+
 # Game settings
 STALE_GAME = 6  # hours
 YOURSELF_TIMEOUT = 300  # seconds
