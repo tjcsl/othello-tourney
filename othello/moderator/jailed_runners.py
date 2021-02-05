@@ -48,7 +48,7 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
             p.start()
             s = perf_counter()
             p.join(time_limit)
-            extra_time = int(time_limit - (perf_counter() - s))
+            extra_time = round(time_limit - (perf_counter() - s))
             if p.is_alive():
                 is_running.value = 0
                 p.join(0.05)
