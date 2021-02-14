@@ -1,0 +1,11 @@
+[run]
+branch = True
+source = othello
+omit =
+    */migrations/*
+    */apps.py
+    */urls.py
+    */wsgi.py
+
+# Needed for the Coveralls reporter
+relative_files = True
