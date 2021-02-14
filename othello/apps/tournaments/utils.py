@@ -1,8 +1,6 @@
 import random
 from typing import Generator, List, Tuple, TypeVar
 
-from django.db import models
-
 from .models import TournamentPlayer
 
 T = TypeVar("T")

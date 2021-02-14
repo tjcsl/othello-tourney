@@ -1,4 +1,5 @@
 import os
+import sys
 
 import sentry_sdk
 from celery.schedules import crontab
@@ -20,7 +21,11 @@ ALLOWED_HOSTS = [
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {"hosts": [("localhost", 6379)], "capacity": 1500, "expiry": 2, },
+        "CONFIG": {
+            "hosts": [("localhost", 6379)],
+            "capacity": 1500,
+            "expiry": 2,
+        },
     },
 }
 
@@ -171,11 +176,22 @@ LOGGING = {
             "filename": os.path.join(BASE_DIR, "logs/info.log"),
             "formatter": "verbose",
         },
-        "console": {"class": "logging.StreamHandler", "formatter": "simple", },
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
     },
     "loggers": {
-        "django": {"handlers": ["console", "file"], "level": "INFO", "propagate": True, },
-        "othello": {"handlers": ["console", "file"], "level": "INFO", "propagate": True, },
+        "django": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": True,
+        },
+        "othello": {
+            "handlers": ["console", "file"],
+            "level": "INFO",
+            "propagate": True,
+        },
     },
 }
 
@@ -219,5 +235,12 @@ except ImportError:
 
 if not DEBUG:
     sentry_sdk.init(
-        SENTRY_DSN, integrations=[DjangoIntegration(), CeleryIntegration()], send_default_pii=True,
+        SENTRY_DSN,
+        integrations=[DjangoIntegration(), CeleryIntegration()],
+        send_default_pii=True,
     )
+
+TESTING = "test" in sys.argv
+if TESTING:
+    DATABASES["default"]["ENGINE"] = "django.db.backends.sqlite3"
+    DATABASES["default"]["NAME"] = ":memory:"

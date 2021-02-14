@@ -30,7 +30,8 @@ WHITE, BLACK = 0, 1
 INITIAL = {0: 68853694464, 1: 34628173824}  # Binary representation of INITIAL_BOARD
 # Since a single tile can be one of three values at any given time ('x', 'o', '.') we must use ...
 # two binary numbers(bitboards) to represent the full state of an othello board.
-# The binary number with key "0" represents the white bitboard, while the binary number with key "1" represents the black bitboard.
+# The binary number with key "0" represents the white bitboard,
+# while the binary number with key "1" represents the black bitboard.
 # For the white bitboard, if a tile is 'o' the corresponding binary number is 1 otherwise it is 0
 # For the black bitboard, if a tile is 'x' the corresponding binary number is 1 otherwise it is 0
 

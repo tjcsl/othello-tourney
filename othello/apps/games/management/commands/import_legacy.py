@@ -1,6 +1,5 @@
 import os
 import shutil
-from uuid import uuid4
 
 from django.conf import settings
 from django.core.files import File
@@ -30,7 +29,11 @@ class Command(BaseCommand):
             u.save()
             name = u.short_name if u else folder
             Submission.objects.filter(user=u).delete()
-            s = Submission.objects.create(user=u, name=str(name), is_legacy=True,)
+            s = Submission.objects.create(
+                user=u,
+                name=str(name),
+                is_legacy=True,
+            )
             s.code.save("", File(open(os.path.join(submissions_dir, folder, "strategy.py"))))
             s.save()
             print(f"Imported {folder}")

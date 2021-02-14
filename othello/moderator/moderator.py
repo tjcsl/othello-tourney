@@ -88,13 +88,17 @@ class Moderator:
         # For each cardinal direction, do a fill in that direction, bitwise AND the result with the discriminator
         # Then bitwise OR all the returned values from all the fills.
         # Think of a "fill" as tracing an Othello bracket in that direction.
-        # A North "fill" will shift the current player's bitboard up and compare it to the opponent's bitboard 7 times (8-1).
+        # A North "fill" will shift the current player's bitboard up and
+        # compare it to the opponent's bitboard 7 times (8-1).
         # This "fill" will detect all Othello "brackets" and mark the tiles in the bracket as "on"
-        # This is a "bracket" (assume current player is 'x'): 'xoo.' The '.' is a possible move according to the Othello rules.
+        # This is a "bracket" (assume current player is 'x'): 'xoo.'
+        # The '.' is a possible move according to the Othello rules.
         # Since there are 8 cardinal directions, there are 8 fills (1 in each direction).
         # Each fill will detect all brackets and mark each tile in the bracket as "on" IN ITS SPECIFIED DIRECTION.
-        # Since a "bracket" includes the tiles to be flipped after the move, the result is bitwised AND'ed against the discriminator
-        # The discriminator roots out all the extraneous bits and all the results are bitwise OR'ed together to get the entire set of possible moves
+        # Since a "bracket" includes the tiles to be flipped after the move,
+        # the result is bitwised AND'ed against the discriminator
+        # The discriminator roots out all the extraneous bits and all the
+        # results are bitwise OR'ed together to get the entire set of possible moves
         return moves
 
     def make_move(self, move: int) -> None:
@@ -126,9 +130,12 @@ class Moderator:
         # This method uses the same "fill" strategy as the "possible_moves" method but instead actually fills the bracket
         # First this method marks the specified tile as "on" to show that the player has moved to that tile
         # Then it will fill in every direction until it detects that the marked move lines up with the fill (bitwise AND)
-        # After it detects that a certain fill lines up with the submitted move, it will shift the fill result back one "unit"
-        # This is because the fill marks the entire bracket, but we only want to get the bits that should be flipped (middle bits).
-        # Afterwards is updates the current player bitboard with the flipped tile bits and removes those same bits from the opponent bitboard
+        # After it detects that a certain fill lines up with the submitted move,
+        # it will shift the fill result back one "unit"
+        # This is because the fill marks the entire bracket,
+        # but we only want to get the bits that should be flipped (middle bits).
+        # Afterwards is updates the current player bitboard with the
+        # flipped tile bits and removes those same bits from the opponent bitboard
         # Finally, update the class instance of board, and toggle the current player
 
     def check_game_over(self) -> bool:
@@ -145,7 +152,8 @@ class Moderator:
         """
         Takes in an integer representing a tile which the current player is trying to move to
 
-        This integer is converted to its corresponding bitboard and bitwise AND'ed against the possible moves for the current player
+        This integer is converted to its corresponding bitboard and bitwise
+        AND'ed against the possible moves for the current player
 
         @param attempted_move tile current plays is trying to move to
         """
