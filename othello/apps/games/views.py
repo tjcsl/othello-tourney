@@ -1,8 +1,7 @@
 import json
 import logging
-from typing import Optional
+from typing import Optional, Union
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import FileResponse, HttpRequest, HttpResponse
@@ -56,7 +55,7 @@ def upload(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
-def download(request: HttpRequest) -> HttpResponse:
+def download(request: HttpRequest) -> Union[HttpResponse, FileResponse]:
     form = DownloadSubmissionForm(user=request.user, data=request.GET)
     if form.is_valid():
         cd = form.cleaned_data
@@ -98,7 +97,10 @@ def play(request: HttpRequest) -> HttpResponse:
             return render(
                 request,
                 "games/board.html",
-                {"game": serialize_game_info(g), "is_watching": False, },
+                {
+                    "game": serialize_game_info(g),
+                    "is_watching": False,
+                },
             )
         else:
             for errors in form.errors.get_json_data().values():

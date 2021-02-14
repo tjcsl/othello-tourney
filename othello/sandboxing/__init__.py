@@ -30,7 +30,7 @@ def import_strategy_sandboxed(path: str) -> Optional[Dict[str, str]]:
         except json.JSONDecodeError:
             logger.error(f"Failed to import/load strategy file {traceback.format_exc()}")
             return {
-                "message": f"Script is unable to be run, make sure your script runs on your computer before submitting"
+                "message": "Script is unable to be run, make sure your script runs on your computer before submitting"
             }
 
 

@@ -131,7 +131,9 @@ def management(request: HttpRequest, tournament_id: Optional[int] = None) -> Htt
                     )
             tournament.save()
             messages.success(
-                request, "Successfully made changes to tournament!", extra_tags="success",
+                request,
+                "Successfully made changes to tournament!",
+                extra_tags="success",
             )
             if cd.get("using_legacy", False):
                 messages.warning(
@@ -159,7 +161,7 @@ def management(request: HttpRequest, tournament_id: Optional[int] = None) -> Htt
             "players": page_obj,
             "form": TournamentManagementForm(tournament),
             "future": tournament in Tournament.objects.filter_future(),
-            "bye_player": tournament.bye_player
+            "bye_player": tournament.bye_player,
         },
     )
 

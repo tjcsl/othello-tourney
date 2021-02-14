@@ -23,11 +23,11 @@ def main() -> None:
                 {"message": "Attribute Strategy.best_strategy has an invalid amount of parameters"}
             )
         )
-    except Exception as e:
+    except Exception:
         sys.stderr.write(
             json.dumps(
                 {
-                    "message": f"Script is unable to be run, make sure your script runs on your computer before submitting"
+                    "message": "Script is unable to be run, make sure your script runs on your computer before submitting"
                 }
             )
         )

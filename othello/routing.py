@@ -24,9 +24,9 @@ application = ProtocolTypeRouter(
         "websocket": AuthMiddlewareStack(
             URLRouter(
                 [
-                    path("play/<int:game_id>", GamePlayingConsumer),
-                    path("watch/<int:game_id>", GameConsumer),
-                    path("<path:path>", WebsocketCloseConsumer),
+                    path("play/<int:game_id>", GamePlayingConsumer.as_asgi()),
+                    path("watch/<int:game_id>", GameConsumer.as_asgi()),
+                    path("<path:path>", WebsocketCloseConsumer.as_asgi()),
                 ]
             )
         )
