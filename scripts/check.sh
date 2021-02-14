@@ -8,4 +8,4 @@ for cmd in flake8 isort mypy pylint; do
     fi
 done
 
-flake8 othello && isort --recursive --check othello && mypy othello && pylint othello
+flake8 othello && isort --check othello && mypy othello && pylint othello
