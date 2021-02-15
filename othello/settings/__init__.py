@@ -239,8 +239,3 @@ if not DEBUG:
         integrations=[DjangoIntegration(), CeleryIntegration()],
         send_default_pii=True,
     )
-
-TESTING = "test" in sys.argv
-if TESTING:
-    DATABASES["default"]["ENGINE"] = "django.db.backends.sqlite3"
-    DATABASES["default"]["NAME"] = ":memory:"

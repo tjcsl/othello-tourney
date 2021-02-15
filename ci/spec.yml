@@ -26,8 +26,10 @@ defaults:
     name: Set up pip cache
     uses: actions/cache@v2
     with:
-      path: ~/.cache/pip
-      key: pip-${{ matrix.python-version }}
+      path: |
+        ~/.cache/pip
+        ~/.cache/pipenv
+      key: ${{ matrix.python-version }}
 
   setup_venv: &setup_venv
     name: Set up venv
@@ -60,11 +62,32 @@ jobs:
       matrix:
         python-version: *python_versions
 
+    services:
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+        options: --entrypoint redis-server
+
+      postgres:
+        image: postgres:alpine
+        env:
+          POSTGRES_USER: othello
+          POSTGRES_DB: othello
+          POSTGRES_PASSWORD: pwd
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 6s --health-timeout 5s --health-retries 9
+
     steps:
       - *repo_setup
       - *python_setup
       - *setup_pip_cache
       - *setup_venv
+
+      - name: Copy secret.py
+        run: cp othello/settings/secret.sample.py othello/settings/secret.py
 
       - name: Migrate database
         run: pipenv run python3 manage.py migrate
