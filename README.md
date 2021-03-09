@@ -1,5 +1,8 @@
 # Othello
 
+[![CI](https://github.com/tjcsl/othello-tourney/actions/workflows/ci.yml/badge.svg?branch=master&event=push)](https://github.com/tjcsl/othello-tourney/actions/workflows/ci.yml)
+[![Coverage Status](https://coveralls.io/repos/github/tjcsl/othello-tourney/badge.svg?branch=master)](https://coveralls.io/github/tjcsl/othello-tourney?branch=master)
+
 ## Getting Started
 
 The Othello server models require a PostgreSQL database and will not work with SQLite. 
