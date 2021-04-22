@@ -1,4 +1,5 @@
 import logging
+from typing import List, Tuple
 
 from celery import shared_task
 
@@ -38,13 +39,15 @@ def run_tournament(tournament_id: int) -> None:
         logger.error(f"Trying to run tournament that does not exist {tournament_id}")
         raise e
 
-    submissions = TournamentPlayer.objects.bulk_create(
+    submissions: List[TournamentPlayer] = TournamentPlayer.objects.bulk_create(
         [TournamentPlayer(tournament=t, submission=s) for s in t.include_users.all()]
     )
     bye_player = TournamentPlayer.objects.create(tournament=t, submission=t.bye_player)
 
     for round_num in range(t.num_rounds):
-        matches = make_pairings(submissions, bye_player)
+        matches: List[Tuple[TournamentPlayer, TournamentPlayer]] = make_pairings(
+            submissions, bye_player
+        )
         t.refresh_from_db()
         if t.terminated:
             t.delete()
@@ -52,6 +55,10 @@ def run_tournament(tournament_id: int) -> None:
             return
         t.played = round_num + 1
         t.save(update_fields=["played"])
+        logger.warning(f"Tournament {tournament_id} Round {round_num+1} start")
+        for match in matches:
+            logger.warning(f"{match[0]}({match[0].ranking}) v. {match[1]}({match[1].ranking})")
+        logger.info("\n")
         for round_matches in chunks(matches, settings.CONCURRENT_GAME_LIMIT):
             games = [
                 t.games.create(
@@ -67,7 +74,7 @@ def run_tournament(tournament_id: int) -> None:
                 for game in round_matches
             ]
             tasks = {game: run_tournament_game.delay(game.id) for game in games}
-            while len(tasks) != 0:
+            while len(tasks):
                 finished_games = []
                 for game, task in tasks.items():
                     if task.ready():
@@ -75,10 +82,12 @@ def run_tournament(tournament_id: int) -> None:
                             p = t.players.get(submission=game.game.black)
                             p.ranking += 1
                             p.save(update_fields=["ranking"])
+                            tmp = "BLACK"
                         elif task.result == Player.WHITE.value:
                             p = t.players.get(submission=game.game.white)
                             p.ranking += 1
                             p.save(update_fields=["ranking"])
+                            tmp = "WHITE"
                         else:
                             b, w = (
                                 t.players.get(submission=game.game.black),
@@ -88,10 +97,25 @@ def run_tournament(tournament_id: int) -> None:
                             w.ranking += 0.5
                             b.save(update_fields=["ranking"])
                             w.save(update_fields=["ranking"])
-                        finished_games.append(game)
+                            tmp = "TIE"
 
-                for game in finished_games:
-                    del tasks[game]
+                        logger.warning(
+                            f"Tournament {tournament_id}, Round {round_num + 1}, {tmp}: {game.black} v. {game.white}"
+                        )
+                        finished_games.append(
+                            game
+                        )  # keep track of all finished games in auxiliary list
+
+                for (
+                    game
+                ) in (
+                    finished_games
+                ):  # need to use list to delete after iterating through dictionary
+                    del tasks[
+                        game
+                    ]  # cannot delete during dictionary iteration (edit while access error)
+        logger.warning(f"Tournament {tournament_id}, Round {round_num+1} complete")
+
     t.finished = True
     t.save(update_fields=["finished"])
     logger.info(f"Tournament {tournament_id} has now finished, sending emails")

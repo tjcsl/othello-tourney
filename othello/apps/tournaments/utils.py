@@ -27,7 +27,9 @@ def make_pairings(
     return matches
 
 
-def get_winners(players: list) -> Tuple[TournamentPlayer, TournamentPlayer, TournamentPlayer]:
+def get_winners(
+    players: List[TournamentPlayer],
+) -> Tuple[TournamentPlayer, TournamentPlayer, TournamentPlayer]:
     first, second, third = (-1, None), (-1, None), (-1, None)
     for player in players:
         r = player.ranking
