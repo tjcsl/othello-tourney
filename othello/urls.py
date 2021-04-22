@@ -1,3 +1,4 @@
+from django.contrib import admin
 from django.urls import include, path
 
 from .apps.errors.views import handle_500_view
