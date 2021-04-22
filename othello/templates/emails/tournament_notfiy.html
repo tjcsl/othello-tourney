@@ -1,0 +1,22 @@
+<h4 style="color: #33a122">
+    Hello! This is an automated message from the Othello Tournament Server.
+</h4>
+<h5>
+    You are receiving this email because your AI was selected to participate in an Othello Tournament
+    <br>
+    If you receive this email multiple times this means the tournament has been rescheduled. The most recent email is always the most accurate
+</h5>
+<h5>
+    The tournament is schedule to start at {{ start_time }}
+    <br>
+    At that time the server will automatically select your latest submission for use in the tournament.<br>
+    <strong style="color: red">Submissions will be locked at the start of the tournament and any new submissions will be disregarded!</strong>
+    <br><br>
+    When the tournament starts you can view your rankings and those of your classmates <a style="color: #a06633" href="{{ base_url }}{{ ranking_url }}">here</a>
+</h5>
+<h5>
+    If you have any questions email your AI teacher or <a style="color: #a06633" href="mailto:{{ dev_email }}">{{ dev_email }}</a>
+    <br><br>
+    Good Luck!
+</h5>
+{% include "emails/footer.html" %}
