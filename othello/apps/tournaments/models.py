@@ -57,7 +57,7 @@ class TournamentPlayer(models.Model):
 
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name="players")
     submission = models.ForeignKey(Submission, on_delete=models.CASCADE)
-    ranking = models.DecimalField(default=0, decimal_places=1, max_digits=15)
+    ranking = models.FloatField(default=0)
 
     def __str__(self) -> str:
         return self.submission.get_game_name()
