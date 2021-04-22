@@ -30,7 +30,7 @@ CHANNEL_LAYERS = {
 }
 
 INSTALLED_APPS = [
-    "django.contrib.admin",
+    "othello.apps.OthelloAdminConfig",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
