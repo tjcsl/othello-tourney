@@ -11,7 +11,7 @@ from django.views.generic.list import ListView
 from ..auth.decorators import management_only
 from .forms import TournamentCreateForm, TournamentManagementForm
 from .models import Tournament
-from .tasks import run_tournament
+from .tasks import run_tournament, tournament_notify_email
 
 
 class TournamentListView(ListView):
@@ -66,6 +66,7 @@ def create(request: HttpRequest) -> HttpResponse:
                         "If this was a mistake, you can delete the Tournament and recreate it.",
                         extra_tags="warning",
                     )
+                tournament_notify_email(t.id)
             except Exception as e:
                 messages.error(
                     request,
@@ -130,6 +131,8 @@ def management(request: HttpRequest, tournament_id: Optional[int] = None) -> Htt
                         tournament.include_users.all().exclude(id__in=removed_users)
                     )
             tournament.save()
+            if cd.get("reschedule", None):
+                tournament_notify_email(tournament.id)
             messages.success(
                 request,
                 "Successfully made changes to tournament!",

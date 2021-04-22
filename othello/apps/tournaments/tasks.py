@@ -18,6 +18,50 @@ logger = logging.getLogger("othello")
 
 
 @shared_task
+def tournament_notify_email(tournament_id: int):
+    try:
+        t = Tournament.objects.get(id=tournament_id)
+    except Tournament.DoesNotExist as e:
+        logger.error(f"Trying to access tournament that does not exist {tournament_id}")
+        raise e
+
+    email_send(
+        "emails/tournament_notify.txt",
+        "emails/tournament_notify.html",
+        {
+            "start_time": t.start_time,
+            "base_url": "https://othello.tjhsst.edu",
+            "ranking_url": reverse_lazy("tournaments:current"),
+            "dev_email": settings.DEVELOPER_EMAIL,
+        },
+        "Tournament is scheduled!",
+        [x.user.email for x in t.include_users],
+        bcc=True
+    )
+
+
+def tournament_start_email(tournament_id: int):
+    try:
+        t = Tournament.objects.get(id=tournament_id)
+    except Tournament.DoesNotExist as e:
+        logger.error(f"Trying to access tournament that does not exist {tournament_id}")
+        raise e
+    admins = get_user_model().objects.filter(Q(is_teacher=True) | Q(is_staff=True) | Q(is_superuser=True))
+    email_send(
+        "emails/tournament_started.txt",
+        "emails/tournament_start.html",
+        {
+            "base_url": "https://othello.tjhsst.edu",
+            "ranking_url": reverse_lazy("tournaments:current"),
+            "dev_email": settings.DEVELOPER_EMAIL,
+        },
+        "Tournament has started!",
+        [x.user.email for x in t.include_users] + [admin.email for admin in admins],
+        bcc=True
+    )
+
+
+@shared_task
 def run_tournament_game(tournament_game_id: int) -> str:
     try:
         t_game = TournamentGame.objects.get(id=tournament_game_id)
@@ -33,6 +77,7 @@ def run_tournament_game(tournament_game_id: int) -> str:
 
 @shared_task
 def run_tournament(tournament_id: int) -> None:
+    tournament_start_email(tournament_id)
     try:
         t = Tournament.objects.get(id=tournament_id)
     except Tournament.DoesNotExist as e:

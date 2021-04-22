@@ -1,0 +1,15 @@
+Hello! This is an automated message from the Othello Tournament Server.
+
+You are receiving this email because your AI was selected to participate in an Othello Tournament
+
+The tournament has now started and submissions are now locked.
+You can view your rankings and those of your classmates at {{ base_url }}{{ ranking_url }}
+
+
+You will receive an email at the conclusion of the tournament if your AI places in the top 3.
+
+If you have any questions email your AI teacher or {{ dev_email }}
+
+Good Luck!
+
+{% include "emails/footer.html" %}
