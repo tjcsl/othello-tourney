@@ -98,7 +98,7 @@ def management(request: HttpRequest, tournament_id: Optional[int] = None) -> Htt
             if cd.get("terminate", False):
                 tid = tournament.id
                 if tournament in Tournament.objects.filter_in_progress():
-                    tournament.terminated = False
+                    tournament.terminated = True
                     tournament.save(update_fields=["terminated"])
                 else:
                     tournament.delete()
