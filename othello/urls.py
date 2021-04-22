@@ -1,9 +1,6 @@
-from django.contrib import admin
 from django.urls import include, path
 
 from .apps.errors.views import handle_500_view
-
-admin.site.site_header = "Othello Database Administration"
 
 urlpatterns = [
     path("admin/", admin.site.urls),
