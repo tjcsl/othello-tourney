@@ -4,7 +4,6 @@ from typing import List, Tuple
 from celery import shared_task
 
 from django.conf import settings
-from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.urls import reverse_lazy
 
@@ -12,7 +11,7 @@ from ..games.models import Game
 from ..games.tasks import Player, run_game
 from .emails import email_send
 from .models import Tournament, TournamentGame, TournamentPlayer
-from .utils import chunks, make_pairings, get_updated_ranking
+from .utils import chunks, get_updated_ranking, make_pairings
 
 logger = logging.getLogger("othello")
 
