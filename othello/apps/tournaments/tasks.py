@@ -35,7 +35,7 @@ def tournament_notify_email(tournament_id: int):
             "dev_email": settings.DEVELOPER_EMAIL,
         },
         "Tournament is scheduled!",
-        [x.user.email for x in t.include_users],
+        [x.user.email for x in t.include_users.all()],
         bcc=True,
     )
 
@@ -49,14 +49,14 @@ def tournament_start_email(tournament_id: int):
     admins = get_user_model().objects.filter(Q(is_teacher=True) | Q(is_staff=True) | Q(is_superuser=True))
     email_send(
         "emails/tournament_started.txt",
-        "emails/tournament_start.html",
+        "emails/tournament_started.html",
         {
             "base_url": "https://othello.tjhsst.edu",
             "ranking_url": reverse_lazy("tournaments:current"),
             "dev_email": settings.DEVELOPER_EMAIL,
         },
         "Tournament has started!",
-        [x.user.email for x in t.include_users] + [admin.email for admin in admins],
+        [x.user.email for x in t.include_users.all()] + [admin.email for admin in admins],
         bcc=True,
     )
 
@@ -140,7 +140,7 @@ def run_tournament(tournament_id: int) -> None:
                             w.save(update_fields=["ranking"])
                             tmp = "TIE"
 
-                        logger.warning(f"Tournament {tournament_id}, Round {round_num + 1}, {tmp}: {game.black} v. {game.white}")
+                        logger.warning(f"Tournament {tournament_id}, Round {round_num + 1}, {tmp}: {game.game.black} v. {game.game.white}")
                         finished_games.append(game)  # keep track of all finished games in auxiliary list
 
                 for game in finished_games:  # need to use list to delete after iterating through dictionary
