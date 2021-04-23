@@ -24,7 +24,7 @@ tippy(".yourself", {
     placement: "right"
 })
 
-tippy("#inlude_users_file_help", {
+tippy("#include_users_file_help", {
     content: "Upload a CSV file with each included user in a separate entry, users should be split by newline." +
         " Users read from this file will be added to the above field.",
     placement: "right"
@@ -33,6 +33,12 @@ tippy("#inlude_users_file_help", {
 tippy("#runoff-help", {
     content: "Enables time hoarding every move. " +
          "(ex. If the time limit is 5s but your script takes 4s one turn, you will get 6s next round)",
+    placement: "right"
+})
+
+tippy("#bye-help", {
+    content: "If are an odd amount of players participating in the tournament, the odd person out will be matched against this player." +
+        "This player should very likely be an AI implementing a random choice algorithm",
     placement: "right"
 })
 
