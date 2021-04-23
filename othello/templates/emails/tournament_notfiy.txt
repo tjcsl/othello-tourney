@@ -5,9 +5,8 @@ If you receive this email multiple times this means the tournament has been resc
 
 The tournament is schedule to start at {{ start_time }}
 
-At that time the server will automatically select your latest submission for use in the tournament.<br>
-Submissions will be locked at the start of the tournament and any new submissions will be disregarded!
-
+At that time the server will automatically select your latest submission for use in the tournament.
+At this time submissions have been locked. Your latest submission to the server is the one that will participate.
 
 When the tournament starts you can view your rankings and those of your classmates {{ base_url }}{{ ranking_url }}
 
