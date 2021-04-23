@@ -172,7 +172,7 @@ LOGGING = {
     },
     "handlers": {
         "file": {
-            "class": "logging.FileHandler",
+            "class": "logging.handlers.RotatingFileHandler",
             "filename": os.path.join(BASE_DIR, "logs/info.log"),
             "formatter": "verbose",
         },

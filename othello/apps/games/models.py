@@ -33,7 +33,7 @@ class Submission(models.Model):
 
     objects: Any = SubmissionQuerySet.as_manager()
 
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="user", null=True)
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="submissions", null=True)
     name = models.CharField(max_length=500, null=True)
     created_at = models.DateTimeField(auto_now=True)
     code = models.FileField(upload_to=_save_path, default=None)
@@ -94,8 +94,8 @@ class Game(models.Model):
     objects: Any = GameQuerySet.as_manager()
     created_at = models.DateTimeField(auto_now=True)
 
-    black = models.ForeignKey(Submission, on_delete=models.PROTECT, related_name="black")
-    white = models.ForeignKey(Submission, on_delete=models.PROTECT, related_name="white")
+    black = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="black")
+    white = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="white")
     time_limit = models.IntegerField(default=5, validators=[validate_game_time_limit])
     runoff = models.BooleanField(default=False)
 
