@@ -12,7 +12,7 @@ from ..games.models import Game
 from ..games.tasks import Player, run_game
 from .emails import email_send
 from .models import Tournament, TournamentGame, TournamentPlayer
-from .utils import chunks, get_winners, make_pairings, get_updated_ranking
+from .utils import chunks, make_pairings, get_updated_ranking
 
 logger = logging.getLogger("othello")
 
