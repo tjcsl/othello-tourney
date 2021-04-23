@@ -4,6 +4,11 @@
 {% block head %}
     <link rel="stylesheet" href="{% static 'css/tournaments/create.css' %}">
     <script type="text/javascript" src="{% static 'js/tournaments/create.js' %}"></script>
+    <style>
+        .selectize-control {
+            width: 10vw;
+        }
+    </style>
 {% endblock %}
 {% block main %}
     <div class="row">
@@ -30,6 +35,7 @@
                 <p class="row" style="margin-left: 0; margin-bottom: 0">
                     {{ form.bye_player.label }}
                     {{ form.bye_player }}
+                    <i class="fa fa-question-circle" id="bye-help"></i>
                 </p>
                 <br>
                 <br>
@@ -43,7 +49,7 @@
                 <p>
                     Include Users:
                     <input type="file" id="includeUsersFile" name="Upload CSV">
-                    <i id="inlude_users_file_help" class="fa fa-question-circle"></i>
+                    <i id="include_users_file_help" class="fa fa-question-circle"></i>
                 </p>
                 <input type="submit">
             </form>
