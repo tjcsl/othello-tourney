@@ -1,5 +1,5 @@
-import random
 import logging
+import random
 from typing import Generator, List, Tuple, TypeVar
 
 from .models import TournamentPlayer
@@ -13,9 +13,14 @@ def chunks(v: List[T], n: int) -> Generator[List[T], None, None]:
         yield v[i: i + n]
 
 
+def get_updated_ranking(player: TournamentPlayer) -> float:
+    player.refresh_from_db()
+    return player.ranking
+
+
 def make_pairings(players: List[TournamentPlayer], bye_player: TournamentPlayer) -> List[Tuple[TournamentPlayer, TournamentPlayer]]:
     matches = []
-    players = sorted(players, key=lambda x: -x.ranking)
+    players = sorted(players, key=get_updated_ranking)
 
     for i in range(0, len(players), 2):
         if i + 1 >= len(players):
@@ -33,7 +38,7 @@ def get_winners(
 ) -> Tuple[TournamentPlayer, TournamentPlayer, TournamentPlayer]:
     first, second, third = (-1, None), (-1, None), (-1, None)
     for player in players:
-        r = player.ranking
+        r = get_updated_ranking(player)
         if r > first[0]:
             first = (r, player)
         elif r > second[0]:
