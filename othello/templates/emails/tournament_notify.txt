@@ -14,4 +14,4 @@ If you have any questions email your AI teacher or {{ dev_email }}
 
 
 Good Luck!
-{% include "emails/footer.html" %}
+{% include "emails/footer.txt" %}
