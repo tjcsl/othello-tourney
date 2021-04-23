@@ -12,7 +12,7 @@ from ..games.models import Game
 from ..games.tasks import Player, run_game
 from .emails import email_send
 from .models import Tournament, TournamentGame, TournamentPlayer
-from .utils import chunks, get_winners, make_pairings
+from .utils import chunks, get_winners, make_pairings, get_updated_ranking
 
 logger = logging.getLogger("othello")
 
@@ -139,7 +139,14 @@ def run_tournament(tournament_id: int) -> None:
                             b.save(update_fields=["ranking"])
                             w.save(update_fields=["ranking"])
                             tmp = "TIE"
-
+                        b, w = (
+                            t.players.get(submission=game.game.black),
+                            t.players.get(submission=game.game.white),
+                        )
+                        b.cumulative += get_updated_ranking(b)
+                        w.cumulative += get_updated_ranking(w)
+                        b.save(update_fields=["cumulative"])
+                        w.save(update_fields=["cumulative"])
                         logger.warning(f"Tournament {tournament_id}, Round {round_num + 1}, {tmp}: {game.game.black} v. {game.game.white}")
                         finished_games.append(game)  # keep track of all finished games in auxiliary list
 

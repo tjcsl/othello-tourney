@@ -19,6 +19,15 @@
         Tournament games are started automatically in batches and can only be watched. Games started through the <a href="{% url 'games:play' %}">Play</a> page are not tournament games.
         You can view currently playing tournament games on the <a href="{% url 'games:watch' %}">Watch</a> page. Tournament games will be prepended with a "Tournament: ".
     </p>
+    <h4>
+        Tiebreakers
+    </h4>
+    <p>
+        A cumulative system is used to break ties if they occur. This system maintains a combined score of wins, losses, and draws to create a cumulative score at the end of the tournament.
+        <br>
+        For example, if there are 5 rounds and you go Win, Win, Loss, Tie, Win. Your rank will be 1 after Round 1, 2 after Round 2, 2 after Round 3, 2.5 after Round 4, and 3.5 after Round 5.
+        Cumulatively, this adds up to 11. In the event of a tie, winners will be decided based upon their cumulative scores
+    </p>
     <h3>
         Viewing Tournament Rankings
     </h3>
