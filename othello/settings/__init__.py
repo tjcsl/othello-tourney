@@ -1,5 +1,4 @@
 import os
-import sys
 
 import sentry_sdk
 from celery.schedules import crontab
@@ -204,7 +203,7 @@ EMAIL_USE_TLS = True
 
 EMAIL_SUBJECT_PREFIX = "[Othello]"
 EMAIL_FROM = "othello-noreply@tjhsst.edu"
-FORCE_EMAIL_SEND = True
+FORCE_EMAIL_SEND = False
 DEVELOPER_EMAIL = "othello@tjhsst.edu"
 
 

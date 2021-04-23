@@ -67,11 +67,11 @@ def create(request: HttpRequest) -> HttpResponse:
                         "If this was a mistake, you can delete the Tournament and recreate it.",
                         extra_tags="warning",
                     )
-                tournament_notify_email(t.id)
+                tournament_notify_email.delay(t.id)
             except Exception as e:
                 messages.error(
                     request,
-                    "An unexpected error occured when trying to create a tournament, try again later",
+                    "An unexpected error occurred when trying to create a tournament, try again later",
                     extra_tags="danger",
                 )
                 raise e
