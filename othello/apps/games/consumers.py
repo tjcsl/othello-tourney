@@ -36,9 +36,7 @@ class GameConsumer(JsonWebsocketConsumer):
         self.connected = True
         self.accept()
 
-        async_to_sync(self.channel_layer.group_add)(
-            self.game.channels_group_name, self.channel_name
-        )
+        async_to_sync(self.channel_layer.group_add)(self.game.channels_group_name, self.channel_name)
 
     def disconnect(self, code: int) -> None:
         self.connected = False
@@ -64,16 +62,8 @@ class GameConsumer(JsonWebsocketConsumer):
         if self.connected:
             self.game.refresh_from_db()
             log: GameLog = self.game.logs.get(id=object_id)
-            has_access: bool = (
-                log.game.black.user == self.scope["user"]
-                if log.player == Player.BLACK.value
-                else log.game.white.user == self.scope["user"]
-            )
-            if (
-                has_access
-                or (log.player == Player.BLACK.value and self.is_black_yourself)
-                or (log.player == Player.WHITE.value and self.is_white_yourself)
-            ):
+            has_access: bool = log.game.black.user == self.scope["user"] if log.player == Player.BLACK.value else log.game.white.user == self.scope["user"]
+            if has_access or (log.player == Player.BLACK.value and self.is_black_yourself) or (log.player == Player.WHITE.value and self.is_white_yourself):
                 self.send_json(serialize_game_log(log))
 
     def send_error(self, object_id: int) -> None:

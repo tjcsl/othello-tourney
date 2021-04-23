@@ -12,9 +12,7 @@ class IonOauth2(BaseOAuth2):
         return ["read"]
 
     def get_user_details(self, response):
-        profile = self.get_json(
-            "https://ion.tjhsst.edu/api/profile", params={"access_token": response["access_token"]}
-        )
+        profile = self.get_json("https://ion.tjhsst.edu/api/profile", params={"access_token": response["access_token"]})
         # fields used to populate/update User model
         return {
             "id": profile["id"],

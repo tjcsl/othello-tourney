@@ -20,9 +20,7 @@ LEGACY_MOVES = {(i + 11 + 2 * (i // 8)): i for i in range(64)}
 
 def legacy_board_convert(board: str) -> str:
     table = {ord(Player.WHITE.value): "o", ord(Player.BLACK.value): "@"}
-    return (
-        "?" * 11 + "??".join(board[i: i + 8].translate(table) for i in range(0, 64, 8)) + "?" * 11
-    )
+    return "?" * 11 + "??".join(board[i: i + 8].translate(table) for i in range(0, 64, 8)) + "?" * 11
 
 
 class PlayerRunner:
@@ -82,11 +80,7 @@ class PlayerRunner:
     @capture_generator_value
     def get_move(
         self, board: str, player: Player, time_limit: int, last_move: Move
-    ) -> Generator[
-        str,
-        None,
-        Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]],
-    ]:
+    ) -> Generator[str, None, Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]], ]:
         if self.process.poll():
             print(self.process.communicate())
             return -1, ServerError.PROCESS_EXITED, -1
@@ -97,9 +91,7 @@ class PlayerRunner:
         else:
             player = player.value
 
-        self.process.stdin.write(
-            f"{str(time_limit)}\n{player}\n{''.join(board)}\n".encode("latin-1")
-        )
+        self.process.stdin.write(f"{str(time_limit)}\n{player}\n{''.join(board)}\n".encode("latin-1"))
         self.process.stdin.flush()
         move, extra_time = -1, 0
 
@@ -111,9 +103,7 @@ class PlayerRunner:
             if (timeout := total_timeout - (time.time() - start)) <= 0:
                 return -1, ServerError.TIMEOUT, -1
 
-            files_ready = select.select(
-                [self.process.stdout, self.process.stderr], [], [], timeout
-            )[0]
+            files_ready = select.select([self.process.stdout, self.process.stderr], [], [], timeout)[0]
             if self.process.stderr in files_ready:
                 yield self.process.stderr.read(8192).decode("latin-1")
             if self.process.stdout in files_ready:
@@ -150,11 +140,7 @@ class YourselfRunner:
     @capture_generator_value
     def get_move(
         self, board: str, player: Player, time_limit: int, last_move: Move
-    ) -> Generator[
-        str,
-        None,
-        Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]],
-    ]:
+    ) -> Generator[str, None, Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]], ]:
         yield "Choose your move!"
         start = time.time()
         while True:

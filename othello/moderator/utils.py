@@ -59,9 +59,7 @@ def import_strategy(path: str):
     )
 
 
-bit_or: Callable[[Iterable[int]], int] = partial(
-    reduce, operator.__or__
-)  # mimics builtin "sum" function except with bitwise OR
+bit_or: Callable[[Iterable[int]], int] = partial(reduce, operator.__or__)  # mimics builtin "sum" function except with bitwise OR
 
 
 def is_on(x: int, pos: int) -> int:

@@ -127,9 +127,7 @@ def management(request: HttpRequest, tournament_id: Optional[int] = None) -> Htt
                 if tournament in Tournament.objects.filter_in_progress():
                     tournament.players.filter(id__in=removed_users).delete()
                 else:
-                    tournament.include_users.set(
-                        tournament.include_users.all().exclude(id__in=removed_users)
-                    )
+                    tournament.include_users.set(tournament.include_users.all().exclude(id__in=removed_users))
             tournament.save()
             if cd.get("reschedule", None):
                 tournament_notify_email(tournament.id)
@@ -141,8 +139,7 @@ def management(request: HttpRequest, tournament_id: Optional[int] = None) -> Htt
             if cd.get("using_legacy", False):
                 messages.warning(
                     request,
-                    "Warning: One of more participating users is using legacy code!"
-                    " If this was a mistake, you can delete the Tournament and recreate it.",
+                    "Warning: One of more participating users is using legacy code!" " If this was a mistake, you can delete the Tournament and recreate it.",
                     extra_tags="warning",
                 )
         else:
@@ -153,9 +150,7 @@ def management(request: HttpRequest, tournament_id: Optional[int] = None) -> Htt
     if tournament in Tournament.objects.filter_future():
         page_obj = Paginator(tournament.include_users.all(), 10).get_page(request.GET.get("page"))
     else:
-        page_obj = Paginator(tournament.players.all().order_by("-ranking"), 10).get_page(
-            request.GET.get("page")
-        )
+        page_obj = Paginator(tournament.players.all().order_by("-ranking"), 10).get_page(request.GET.get("page"))
     return render(
         request,
         "tournaments/manage.html",

@@ -11,9 +11,7 @@ def chunks(v: List[T], n: int) -> Generator[List[T], None, None]:
         yield v[i: i + n]
 
 
-def make_pairings(
-    players: List[TournamentPlayer], bye_player: TournamentPlayer
-) -> List[Tuple[TournamentPlayer, TournamentPlayer]]:
+def make_pairings(players: List[TournamentPlayer], bye_player: TournamentPlayer) -> List[Tuple[TournamentPlayer, TournamentPlayer]]:
     matches = []
     players = sorted(players, key=lambda x: -x.ranking)
 

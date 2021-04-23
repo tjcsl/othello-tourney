@@ -13,9 +13,7 @@ logger = logging.getLogger("othello")
 def import_strategy_sandboxed(path: str) -> Optional[Dict[str, str]]:
     cmd_args = ["python3", "-u", settings.IMPORT_DRIVER, path]
     if not settings.DEBUG:
-        cmd_args = get_sandbox_args(
-            cmd_args, whitelist=[os.path.dirname(path)], readonly=[os.path.dirname(path)]
-        )
+        cmd_args = get_sandbox_args(cmd_args, whitelist=[os.path.dirname(path)], readonly=[os.path.dirname(path)])
 
     p = subprocess.Popen(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     try:
@@ -29,9 +27,7 @@ def import_strategy_sandboxed(path: str) -> Optional[Dict[str, str]]:
             return json.loads(error.decode("latin-1"))
         except json.JSONDecodeError:
             logger.error(f"Failed to import/load strategy file {traceback.format_exc()}")
-            return {
-                "message": "Script is unable to be run, make sure your script runs on your computer before submitting"
-            }
+            return {"message": "Script is unable to be run, make sure your script runs on your computer before submitting"}
 
 
 def get_sandbox_args(

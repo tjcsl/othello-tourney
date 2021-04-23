@@ -36,7 +36,7 @@ def tournament_notify_email(tournament_id: int):
         },
         "Tournament is scheduled!",
         [x.user.email for x in t.include_users],
-        bcc=True
+        bcc=True,
     )
 
 
@@ -57,7 +57,7 @@ def tournament_start_email(tournament_id: int):
         },
         "Tournament has started!",
         [x.user.email for x in t.include_users] + [admin.email for admin in admins],
-        bcc=True
+        bcc=True,
     )
 
 
@@ -84,15 +84,11 @@ def run_tournament(tournament_id: int) -> None:
         logger.error(f"Trying to run tournament that does not exist {tournament_id}")
         raise e
 
-    submissions: List[TournamentPlayer] = TournamentPlayer.objects.bulk_create(
-        [TournamentPlayer(tournament=t, submission=s) for s in t.include_users.all()]
-    )
+    submissions: List[TournamentPlayer] = TournamentPlayer.objects.bulk_create([TournamentPlayer(tournament=t, submission=s) for s in t.include_users.all()])
     bye_player = TournamentPlayer.objects.create(tournament=t, submission=t.bye_player)
 
     for round_num in range(t.num_rounds):
-        matches: List[Tuple[TournamentPlayer, TournamentPlayer]] = make_pairings(
-            submissions, bye_player
-        )
+        matches: List[Tuple[TournamentPlayer, TournamentPlayer]] = make_pairings(submissions, bye_player)
         t.refresh_from_db()
         if t.terminated:
             t.delete()
@@ -144,21 +140,11 @@ def run_tournament(tournament_id: int) -> None:
                             w.save(update_fields=["ranking"])
                             tmp = "TIE"
 
-                        logger.warning(
-                            f"Tournament {tournament_id}, Round {round_num + 1}, {tmp}: {game.black} v. {game.white}"
-                        )
-                        finished_games.append(
-                            game
-                        )  # keep track of all finished games in auxiliary list
+                        logger.warning(f"Tournament {tournament_id}, Round {round_num + 1}, {tmp}: {game.black} v. {game.white}")
+                        finished_games.append(game)  # keep track of all finished games in auxiliary list
 
-                for (
-                    game
-                ) in (
-                    finished_games
-                ):  # need to use list to delete after iterating through dictionary
-                    del tasks[
-                        game
-                    ]  # cannot delete during dictionary iteration (edit while access error)
+                for game in finished_games:  # need to use list to delete after iterating through dictionary
+                    del tasks[game]  # cannot delete during dictionary iteration (edit while access error)
         logger.warning(f"Tournament {tournament_id}, Round {round_num+1} complete")
 
     t.finished = True
@@ -192,10 +178,5 @@ def run_tournament(tournament_id: int) -> None:
             "dev_email": settings.DEVELOPER_EMAIL,
         },
         " Tournament Completed",
-        [
-            x.email
-            for x in get_user_model().objects.filter(
-                Q(is_teacher=True) | Q(is_staff=True) | Q(is_superuser=True)
-            )
-        ],
+        [x.email for x in get_user_model().objects.filter(Q(is_teacher=True) | Q(is_staff=True) | Q(is_superuser=True))],
     )

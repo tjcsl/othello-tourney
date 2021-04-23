@@ -47,11 +47,7 @@ def upload(request: HttpRequest) -> HttpResponse:
             for error in errors:
                 messages.error(request, error["message"], extra_tags="danger")
 
-    return (
-        render(request, "games/upload.html", {"success": success})
-        if success
-        else redirect("games:upload")
-    )
+    return render(request, "games/upload.html", {"success": success}) if success else redirect("games:upload")
 
 
 @login_required
@@ -67,9 +63,7 @@ def download(request: HttpRequest) -> Union[HttpResponse, FileResponse]:
                 filename=f"{submission.get_submission_name()}.py",
             )
         except BaseException as e:
-            messages.error(
-                request, "Unable to download script, try again later", extra_tags="danger"
-            )
+            messages.error(request, "Unable to download script, try again later", extra_tags="danger")
             raise e
     else:
         for errors in form.errors.get_json_data().values():
