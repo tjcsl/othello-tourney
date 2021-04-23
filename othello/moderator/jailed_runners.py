@@ -27,18 +27,12 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
         except Exception:  # noqa
             pipe_to_parent.send(traceback.format_exc())
 
-    def get_move(
-        self, board: str, player: str, time_limit: int
-    ) -> Union[Tuple[int, str, int], Tuple[ServerError, str, int]]:
+    def get_move(self, board: str, player: str, time_limit: int) -> Union[Tuple[int, str, int], Tuple[ServerError, str, int]]:
         best_move, is_running = mp.Value("i", -1), mp.Value("i", 1)
 
         to_child, to_self = mp.Pipe()
         try:
-            args = (
-                ("".join(board), player, best_move, is_running)
-                if self.nargs == 4
-                else ("".join(board), player, best_move, is_running, time_limit)
-            )
+            args = ("".join(board), player, best_move, is_running) if self.nargs == 4 else ("".join(board), player, best_move, is_running, time_limit)
             p = mp.Process(
                 target=self.play_wrapper,
                 args=args,
@@ -61,9 +55,7 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
             return ServerError.UNEXPECTED, "Server Error", -1
 
 
-class JailedRunner(
-    LocalRunner
-):  # Called from subprocess, no access to django channels/main application
+class JailedRunner(LocalRunner):  # Called from subprocess, no access to django channels/main application
     def run(self):
         while True:
             self.handle(sys.stdin, sys.stdout, sys.stderr)

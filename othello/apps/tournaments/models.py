@@ -48,9 +48,7 @@ class Tournament(models.Model):
         return "Tournament at {}".format(self.start_time.strftime("%Y-%m-%d %H:%M:%S"))
 
     def __repr__(self) -> str:
-        return "<Tournament @ {}, {}>".format(
-            self.start_time.strftime("%Y-%m-%d %H:%M:%S"), self.finished
-        )
+        return "<Tournament @ {}, {}>".format(self.start_time.strftime("%Y-%m-%d %H:%M:%S"), self.finished)
 
 
 class TournamentPlayer(models.Model):
@@ -65,9 +63,7 @@ class TournamentPlayer(models.Model):
 
 class TournamentGame(models.Model):
 
-    tournament = models.ForeignKey(
-        Tournament, on_delete=models.CASCADE, null=False, blank=False, related_name="games"
-    )
+    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, null=False, blank=False, related_name="games")
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=False, blank=False)
 

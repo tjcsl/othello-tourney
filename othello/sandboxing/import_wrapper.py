@@ -18,19 +18,9 @@ def main() -> None:
     except AttributeError:
         sys.exit(json.dumps({"message": "Cannot find attribute Strategy.best_strategy in file"}))
     except AssertionError:
-        sys.exit(
-            json.dumps(
-                {"message": "Attribute Strategy.best_strategy has an invalid amount of parameters"}
-            )
-        )
+        sys.exit(json.dumps({"message": "Attribute Strategy.best_strategy has an invalid amount of parameters"}))
     except Exception:
-        sys.stderr.write(
-            json.dumps(
-                {
-                    "message": "Script is unable to be run, make sure your script runs on your computer before submitting"
-                }
-            )
-        )
+        sys.stderr.write(json.dumps({"message": "Script is unable to be run, make sure your script runs on your computer before submitting"}))
         sys.exit(1)
     sys.exit(0)
 

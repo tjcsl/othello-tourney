@@ -22,9 +22,7 @@ task_logger = get_task_logger(__name__)
 
 def send_through_game_channel(game: Game, event_type: str, object_id: int) -> int:
     task_logger.debug(f"sending {event_type}")
-    async_to_sync(get_channel_layer().group_send)(
-        game.channels_group_name, {"type": event_type, "object_id": object_id}
-    )
+    async_to_sync(get_channel_layer().group_send)(game.channels_group_name, {"type": event_type, "object_id": object_id})
 
 
 def check_heartbeat(game: Game) -> bool:
@@ -54,11 +52,7 @@ def run_game(game_id: int) -> Optional[str]:
     file_deleted = None
 
     try:
-        black_runner = (
-            YourselfRunner(game, settings.YOURSELF_TIMEOUT)
-            if game.black == yourself
-            else PlayerRunner(game.black, settings.JAILEDRUNNER_DRIVER)
-        )
+        black_runner = YourselfRunner(game, settings.YOURSELF_TIMEOUT) if game.black == yourself else PlayerRunner(game.black, settings.JAILEDRUNNER_DRIVER)
     except OSError:
         logger.error(f"Cannot find submission code file! {game.black.code.path}")
         black_runner = None
@@ -68,11 +62,7 @@ def run_game(game_id: int) -> Optional[str]:
             error_msg=ServerError.FILE_DELETED.value[1],
         )
     try:
-        white_runner = (
-            YourselfRunner(game, settings.YOURSELF_TIMEOUT)
-            if game.white == yourself
-            else PlayerRunner(game.white, settings.JAILEDRUNNER_DRIVER)
-        )
+        white_runner = YourselfRunner(game, settings.YOURSELF_TIMEOUT) if game.white == yourself else PlayerRunner(game.white, settings.JAILEDRUNNER_DRIVER)
     except OSError:
         logger.error(f"Cannot find submission code file! {game.white.code.path}")
         white_runner = None
@@ -107,13 +97,9 @@ def run_game(game_id: int) -> Optional[str]:
 
             try:
                 if current_player == Player.BLACK:
-                    running_turn = player_black.get_move(
-                        board, current_player, black_time_limit, last_move
-                    )
+                    running_turn = player_black.get_move(board, current_player, black_time_limit, last_move)
                 elif current_player == Player.WHITE:
-                    running_turn = player_white.get_move(
-                        board, current_player, white_time_limit, last_move
-                    )
+                    running_turn = player_white.get_move(board, current_player, white_time_limit, last_move)
             except BaseException as e:
                 logger.error(f"Error when getting move {game_id}, {current_player}, {str(e)}")
                 task_logger.error(str(e))
@@ -135,17 +121,13 @@ def run_game(game_id: int) -> Optional[str]:
                     white_time_limit = game.time_limit + extra_time
 
             if error != 0:
-                game_err = game.errors.create(
-                    player=current_player.value, error_code=error.value[0], error_msg=error.value[1]
-                )
+                game_err = game.errors.create(player=current_player.value, error_code=error.value[0], error_msg=error.value[1])
                 if isinstance(error, ServerError):
                     game.forfeit = False
                     game.outcome = "T"
                 elif isinstance(error, UserError):
                     game.forfeit = True
-                    game.outcome = (
-                        Player.BLACK.value if current_player == Player.WHITE else Player.WHITE.value
-                    )
+                    game.outcome = Player.BLACK.value if current_player == Player.WHITE else Player.WHITE.value
                 game.playing = False
                 game.save(update_fields=["forfeit", "outcome", "playing"])
                 send_through_game_channel(game, "game.error", game_err.id)
@@ -157,16 +139,12 @@ def run_game(game_id: int) -> Optional[str]:
                 else:
                     game_over = True
             except InvalidMoveError as e:
-                game_err = game.errors.create(
-                    player=current_player.value, error_code=e.code, error_msg=e.message
-                )
+                game_err = game.errors.create(player=current_player.value, error_code=e.code, error_msg=e.message)
                 game.forfeit, game.playing = True, False
                 game.outcome = current_player.opposite_player().value
                 game.save(update_fields=["forfeit", "outcome", "playing"])
                 send_through_game_channel(game, "game.error", game_err.id)
-                task_logger.info(
-                    f"{game_id}: {current_player.value} submitted invalid move {submitted}"
-                )
+                task_logger.info(f"{game_id}: {current_player.value} submitted invalid move {submitted}")
                 break
 
             last_move = game.moves.create(
@@ -197,6 +175,4 @@ def run_game(game_id: int) -> Optional[str]:
 @shared_task
 def delete_old_games() -> None:
     logger.info("Deleting stale games")
-    Game.objects.filter(is_tournament=False).filter(
-        Q(playing=False) | Q(created_at__lt=datetime.now() - timedelta(hours=settings.STALE_GAME))
-    ).delete()
+    Game.objects.filter(is_tournament=False).filter(Q(playing=False) | Q(created_at__lt=datetime.now() - timedelta(hours=settings.STALE_GAME))).delete()

@@ -33,9 +33,7 @@ class SubmissionForm(forms.ModelForm):
             cd["name"] = cd["code"].name
         if not os.path.exists(os.path.join(settings.MEDIA_ROOT, self.user.short_name)):
             os.mkdir(os.path.join(settings.MEDIA_ROOT, self.user.short_name))
-        with NamedTemporaryFile(
-            "wb+", dir=os.path.join(settings.MEDIA_ROOT, self.user.short_name)
-        ) as f:
+        with NamedTemporaryFile("wb+", dir=os.path.join(settings.MEDIA_ROOT, self.user.short_name)) as f:
             for chunk in cd["code"].chunks():
                 f.write(chunk)
             f.seek(0)
@@ -61,9 +59,7 @@ class GameForm(forms.Form):
     choices = Submission.objects.latest()
     black = forms.ModelChoiceField(label="Black:", queryset=choices, initial="Yourself")
     white = forms.ModelChoiceField(label="White:", queryset=choices, initial="Yourself")
-    time_limit = forms.IntegerField(
-        label="Time Limit (secs):", initial=5, min_value=1, max_value=settings.MAX_TIME_LIMIT
-    )
+    time_limit = forms.IntegerField(label="Time Limit (secs):", initial=5, min_value=1, max_value=settings.MAX_TIME_LIMIT)
     runoff = forms.BooleanField(initial=False, required=False)
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:

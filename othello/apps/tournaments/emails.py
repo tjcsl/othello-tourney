@@ -17,9 +17,7 @@ def email_send(
     text_content, html_content = text.render(data), html.render(data)
     subject = settings.EMAIL_SUBJECT_PREFIX + subject
     if bcc:
-        msg = EmailMultiAlternatives(
-            subject, text_content, settings.EMAIL_FROM, [], headers={}, bcc=emails
-        )
+        msg = EmailMultiAlternatives(subject, text_content, settings.EMAIL_FROM, [], headers={}, bcc=emails)
     else:
         msg = EmailMultiAlternatives(subject, text_content, settings.EMAIL_FROM, emails, headers={})
     msg.attach_alternative(html_content, "text/html")

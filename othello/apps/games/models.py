@@ -18,9 +18,7 @@ PLAYER_CHOICES = (
 
 
 def _save_path(instance, filename: str) -> AnyStr:
-    return os.path.join(
-        instance.user.short_name if instance.user else instance.name, f"{uuid.uuid4()}.py"
-    )
+    return os.path.join(instance.user.short_name if instance.user else instance.name, f"{uuid.uuid4()}.py")
 
 
 class SubmissionQuerySet(models.QuerySet):
@@ -35,9 +33,7 @@ class Submission(models.Model):
 
     objects: Any = SubmissionQuerySet.as_manager()
 
-    user = models.ForeignKey(
-        get_user_model(), on_delete=models.CASCADE, related_name="user", null=True
-    )
+    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="user", null=True)
     name = models.CharField(max_length=500, null=True)
     created_at = models.DateTimeField(auto_now=True)
     code = models.FileField(upload_to=_save_path, default=None)
@@ -82,10 +78,7 @@ class GameQuerySet(models.QuerySet):
     def wins_for_user(self, submission: Submission) -> int:
         return (
             self.filter(playing=False, is_tournament=True)
-            .filter(
-                Q(white=submission, outcome=Player.WHITE.value)
-                | Q(black=submission, outcome=Player.BLACK.value)
-            )
+            .filter(Q(white=submission, outcome=Player.WHITE.value) | Q(black=submission, outcome=Player.BLACK.value))
             .count()
         )
 

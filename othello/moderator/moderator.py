@@ -13,9 +13,7 @@ class InvalidMoveError(RuntimeError):
 
     def __init__(self, board: str, player: str, move: int) -> None:
         self.code = utils.UserError.INVALID_MOVE.value[0]
-        self.message = utils.UserError.INVALID_MOVE.value[1].format(
-            move=move, player=constants.PLAYERS[player].value, board=utils.binary_to_string(board)
-        )
+        self.message = utils.UserError.INVALID_MOVE.value[1].format(move=move, player=constants.PLAYERS[player].value, board=utils.binary_to_string(board))
 
     def __str__(self) -> str:
         return self.message
@@ -23,9 +21,7 @@ class InvalidMoveError(RuntimeError):
 
 class Moderator:
     def __init__(self):
-        self.board: Dict[
-            int, int
-        ] = constants.INITIAL  # bitboards representation of the initial othello board
+        self.board: Dict[int, int] = constants.INITIAL  # bitboards representation of the initial othello board
         self.game_over: bool = False
         self.current_player: int = constants.BLACK  # black moves first
 
@@ -56,13 +52,7 @@ class Moderator:
         """
         if self.is_game_over():
             score = self.score()
-            return (
-                constants.PLAYERS[constants.BLACK].value
-                if score > 0
-                else constants.PLAYERS[constants.WHITE].value
-                if score < 0
-                else "T"
-            )
+            return constants.PLAYERS[constants.BLACK].value if score > 0 else constants.PLAYERS[constants.WHITE].value if score < 0 else "T"
 
     def possible_moves(self, player: Optional[int] = None) -> int:
         """
@@ -76,15 +66,10 @@ class Moderator:
         """
         if player is None:
             player = self.current_player
-        discriminator = utils.bit_not(
-            self.board[player] | self.board[1 ^ player]
-        )  # A bitboard where all the empty indices are turned "on"
+        discriminator = utils.bit_not(self.board[player] | self.board[1 ^ player])  # A bitboard where all the empty indices are turned "on"
         # The discriminator is a bitboard that represents all the currently empty spaces on the board.
         # This bitboard is used as a "dummy check" since a player can only move to an empty tile
-        moves = utils.bit_or(
-            utils.fill(self.board[player], self.board[1 ^ player], d) & discriminator
-            for d in constants.MASKS
-        )
+        moves = utils.bit_or(utils.fill(self.board[player], self.board[1 ^ player], d) & discriminator for d in constants.MASKS)
         # For each cardinal direction, do a fill in that direction, bitwise AND the result with the discriminator
         # Then bitwise OR all the returned values from all the fills.
         # Think of a "fill" as tracing an Othello bracket in that direction.
@@ -117,11 +102,7 @@ class Moderator:
         for i in constants.MASKS:
             c = utils.fill(move, board[opponent], i)
             if c & board[self.current_player] != 0:
-                c = (
-                    (c & constants.MASKS[i * -1]) << i * -1
-                    if i < 0
-                    else (c & constants.MASKS[i * -1]) >> i
-                )
+                c = (c & constants.MASKS[i * -1]) << i * -1 if i < 0 else (c & constants.MASKS[i * -1]) >> i
                 board[self.current_player] |= c
                 board[opponent] &= utils.bit_not(c)
         self.board = board
@@ -144,8 +125,7 @@ class Moderator:
         An Othello game is over if neither player can move.
         """
         return self.board[0] & self.board[1] == constants.FULL_BOARD or not (
-            self.possible_moves(player=self.current_player)
-            or self.possible_moves(player=1 ^ self.current_player)
+            self.possible_moves(player=self.current_player) or self.possible_moves(player=1 ^ self.current_player)
         )
 
     def is_valid_move(self, attempted_move: int) -> bool:
