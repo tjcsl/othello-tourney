@@ -24,6 +24,7 @@
                         <th>Ranking</th>
                         <th>User</th>
                         <th>Points</th>
+                        <th>Cumulative</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -32,6 +33,7 @@
                         <td>{{ forloop.counter }}</td>
                         <td>{{ player }}</td>
                         <td>{{ player.ranking }}</td>
+                        <td>{{ player.cumulative }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

@@ -31,19 +31,3 @@ def make_pairings(players: List[TournamentPlayer], bye_player: TournamentPlayer)
         matches.append((black, white))
 
     return matches
-
-
-def get_winners(
-    players: List[TournamentPlayer],
-) -> Tuple[TournamentPlayer, TournamentPlayer, TournamentPlayer]:
-    first, second, third = (-1, None), (-1, None), (-1, None)
-    for player in players:
-        r = get_updated_ranking(player)
-        if r > first[0]:
-            first = (r, player)
-        elif r > second[0]:
-            second = (r, player)
-        elif r > third[0]:
-            third = (r, player)
-
-    return first[1], second[1], third[1]

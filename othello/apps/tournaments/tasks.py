@@ -34,7 +34,7 @@ def tournament_notify_email(tournament_id: int):
             "ranking_url": reverse_lazy("tournaments:current"),
             "dev_email": settings.DEVELOPER_EMAIL,
         },
-        "Tournament is scheduled!",
+        " Tournament is scheduled!",
         [x.user.email for x in t.include_users.all()],
         bcc=True,
     )
@@ -55,7 +55,7 @@ def tournament_start_email(tournament_id: int):
             "ranking_url": reverse_lazy("tournaments:current"),
             "dev_email": settings.DEVELOPER_EMAIL,
         },
-        "Tournament has started!",
+        " Tournament has started!",
         [x.user.email for x in t.include_users.all()] + [admin.email for admin in admins],
         bcc=True,
     )
@@ -158,7 +158,7 @@ def run_tournament(tournament_id: int) -> None:
     t.save(update_fields=["finished"])
     logger.info(f"Tournament {tournament_id} has now finished, sending emails")
 
-    winners = [x.submission.user for x in get_winners(submissions)]
+    winners = t.players.all().order_by("-ranking", "-cumulative")[:3]
     for pos, winner in enumerate(winners):
         email_send(
             "emails/winner.txt",
