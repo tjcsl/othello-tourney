@@ -31,7 +31,7 @@ def detail(request: HttpRequest, tournament_id: Optional[int] = None) -> HttpRes
         t = Tournament.objects.filter_in_progress().first()
 
     if t is not None:
-        players = t.players.exclude(submission=t.bye_player).order_by("-ranking")
+        players = t.players.exclude(submission=t.bye_player).order_by("-ranking", "-cumulative")
         page_obj = Paginator(players, 10).get_page(request.GET.get("page"))
     else:
         players = None
