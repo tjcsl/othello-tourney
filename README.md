@@ -36,7 +36,7 @@ You only need to start the services once (either with `docker-compose` or the sh
 
 ### Vagrant
 
-The recommended VM provider is [Virtualbox](https://www.virtualbox.org/wiki/Downloads), but you can use any provider listed [here](https://www.virtualbox.org/wiki/Downloads). However, the process describe below assumes you are using Virtualbox as the provider
+The recommended VM provider is [Virtualbox](https://www.virtualbox.org/wiki/Downloads). However, the process describe below assumes you are using Virtualbox as the provider
 
 You will need the Virtualbox Guest Additions for Vagrant, install them by running:
   * `vagrant plugin install vagrant-vbguest` (may differ for Windows users)
@@ -104,6 +104,6 @@ Note: If using `vagrant` this command must be run inside the Vagrant VM.
 
 Keep the code pretty :) 
 
-Run this command once in a while to clean up the code:
+Run this command before committing or CI checks will fail 
 
   * `pipenv run ./scripts/format.sh`
