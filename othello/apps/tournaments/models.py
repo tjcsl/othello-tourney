@@ -58,6 +58,10 @@ class TournamentPlayer(models.Model):
     ranking = models.FloatField(default=0)
     cumulative = models.FloatField(default=0)
 
+    @property
+    def user(self):
+        return self.submission.user
+
     def __str__(self) -> str:
         return self.submission.get_game_name()
 
