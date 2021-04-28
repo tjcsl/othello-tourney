@@ -23,7 +23,7 @@ class User(AbstractUser):
     def save(self, *args, **kwargs):
         existing_user = User.objects.filter(username=self.username, is_imported=True).first()
         if existing_user:
-            from ..games.models import Submission
+            from ..games.models import Submission  # cannot import at top of file b/c Submission references User (circular import)
 
             Submission.objects.filter(user=existing_user).update(user=self)
             existing_user.delete()
