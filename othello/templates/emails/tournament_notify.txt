@@ -1,17 +1,17 @@
 Hello! This is an automated message from the Othello Tournament Server.
 
-You are receiving this email because your AI was selected to participate in an Othello Tournament
-If you receive this email multiple times this means the tournament has been rescheduled. The most recent email is always the most accurate
+You are receiving this email because your AI was selected to participate in an Othello tournament.
+If you receive this email multiple times, the tournament has been rescheduled. The most recent email is always the most accurate.
 
-The tournament is schedule to start at {{ start_time }}
+The tournament is scheduled to start at {{ start_time }}
 
 At that time the server will automatically select your latest submission for use in the tournament.
 At this time submissions have been locked. Your latest submission to the server is the one that will participate.
 
-When the tournament starts you can view your rankings and those of your classmates {{ base_url }}{{ ranking_url }}
+When the tournament starts, you can view your rankings and those of your classmates {{ base_url }}{{ ranking_url }}.
 
-If you have any questions email your AI teacher or {{ dev_email }}
+If you have any questions email your AI teacher or {{ dev_email }}.
 
 
-Good Luck!
+Good luck!
 {% include "emails/footer.txt" %}
