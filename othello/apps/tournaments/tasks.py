@@ -4,6 +4,7 @@ from typing import List, Tuple
 from celery import shared_task
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.db.models import Q
 from django.urls import reverse_lazy
 
@@ -157,20 +158,21 @@ def run_tournament(tournament_id: int) -> None:
     t.save(update_fields=["finished"])
     logger.info(f"Tournament {tournament_id} has now finished, sending emails")
 
-    winners = t.players.all().order_by("-ranking", "-cumulative")[:3]
+    winners: List[TournamentPlayer] = t.players.all().order_by("-ranking", "-cumulative")[:3]
+    tournament_winner: TournamentPlayer = winners[0]
     for pos, winner in enumerate(winners):
         email_send(
             "emails/winner.txt",
             "emails/winner.html",
             {
-                "name": winner.short_name,
+                "name": winner.user.short_name,
                 "rank": pos + 1,
                 "base_url": "https://othello.tjhsst.edu",
                 "ranking_url": reverse_lazy("tournaments:detail", kwargs={"tournament_id": tournament_id}),
                 "dev_email": settings.DEVELOPER_EMAIL,
             },
             " Congratulations!",
-            [winner.email],
+            [winner.user.email],
         )
     email_send(
         "emails/tournament_finished.txt",
@@ -178,7 +180,7 @@ def run_tournament(tournament_id: int) -> None:
         {
             "tournament_id": tournament_id,
             "start_time": t.start_time,
-            "winners": [f"{x.get_full_name()} ({x.short_name})" for x in winners],
+            "winners": [f"{x.user.get_full_name()} ({x.user.short_name})" for x in winners],
             "base_url": "https://othello.tjhsst.edu",
             "ranking_url": reverse_lazy("tournaments:detail", kwargs={"tournament_id": tournament_id}),
             "dev_email": settings.DEVELOPER_EMAIL,
@@ -186,3 +188,5 @@ def run_tournament(tournament_id: int) -> None:
         " Tournament Completed",
         [x.email for x in get_user_model().objects.filter(Q(is_teacher=True) | Q(is_staff=True) | Q(is_superuser=True))],
     )
+    tournament_winner.submission.tournament_win_year = t.start_time.year
+    tournament_winner.submission.save(update_fields=["tournament_win_year"])
