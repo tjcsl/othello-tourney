@@ -14,9 +14,9 @@
                 <br>
             {% endif %}
             <h4 style="text-decoration: underline">Tournament #{{ tournament.id }}</h4>
-            <h6>Started at: {{ tournament.start_time }}</h6>
-            <h6>{{ players|length }} Players Participating</h6>
-            <h6>Rounds (Played/Remaining): {{ tournament.played }}/{{ tournament.num_rounds }}</h6>
+            <h6>{% if future %}Starting{% else %}Started{% endif %} at: {{ tournament.start_time }}</h6>
+            <h6>{{ num_players }} Players Participating</h6>
+            <h6>Rounds (Played/Remaining): {{ tournament.played }}/{{ tournament.num_rounds }} {% if future %}<strong style="color:red">*Tournament has not started yet</strong>{% endif %}</h6>
             <h6>Game Time Limit: {{ tournament.game_time_limit }}s</h6>
             <h6></h6>
             <div class="table-responsive">
@@ -36,7 +36,7 @@
                     <tbody>
                         {% for player in players %}
                             <tr>
-                                <td>{{ forloop.counter }}</td>
+                                <td>{{ forloop.counter|add:offset }}</td>
                                 <td>{{ player }}</td>
                                 {% if future %}
                                     <td>0</td>
@@ -52,16 +52,16 @@
                             </tr>
                     </tbody>
                 </table>
-                {% if page_obj.has_other_pages %}
+                {% if players.has_other_pages %}
                     <ul class="pagination">
                         <li><a href="?page=1">&laquo;First</a></li>
-                        {% if page_obj.has_previous %}
-                            <li><a href="?page={{ page_obj.previous_page_number }}">&lsaquo;Previous</a></li>
+                        {% if players.has_previous %}
+                            <li><a href="?page={{ players.previous_page_number }}">&lsaquo;Previous</a></li>
                         {% endif %}
-                        {% if page_obj.has_next %}
-                            <li><a href="?page={{ page_obj.next_page_number }}">Next&rsaquo;</a></li>
+                        {% if players.has_next %}
+                            <li><a href="?page={{ players.next_page_number }}">Next&rsaquo;</a></li>
                         {% endif %}
-                        <li><a href="?page={{ page_obj.paginator.num_pages }}">Last&raquo;</a></li>
+                        <li><a href="?page={{ players.paginator.num_pages }}">Last&raquo;</a></li>
                     </ul>
                 {% endif %}
                 <input type="submit" value="Save Changes" id="manage_submit" form="manage-form">
