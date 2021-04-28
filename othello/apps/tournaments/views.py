@@ -32,15 +32,17 @@ def detail(request: HttpRequest, tournament_id: Optional[int] = None) -> HttpRes
 
     if t is not None:
         players = t.players.exclude(submission=t.bye_player).order_by("-ranking", "-cumulative")
-        page_obj = Paginator(players, 10).get_page(request.GET.get("page"))
+        page_obj = Paginator(players, 10).get_page(request.GET.get("page", "1"))
+        offset = 10 * (page_obj.number - 1)
     else:
         players = None
         page_obj = None
+        offset = 0
 
     return render(
         request,
         "tournaments/detail.html",
-        {"tournament": t, "players": players, "page_obj": page_obj},
+        {"tournament": t, "players": players, "page_obj": page_obj, "offset": offset},
     )
 
 
@@ -112,9 +114,10 @@ def management(request: HttpRequest, tournament_id: Optional[int] = None) -> Htt
                 return redirect("tournaments:create")
 
             if time := cd.get("reschedule", None):
-                AsyncResult(tournament.celery_task_id).forget()
+                AsyncResult(tournament.celery_task_id).revoke()
                 tournament.start_time = time
                 task = run_tournament.apply_async([tournament.id], eta=time)
+                tournament_notify_email.delay(tournament.id)
                 tournament.celery_task_id = task.id
             if num_rounds := cd.get("num_rounds", None):
                 tournament.num_rounds = num_rounds
@@ -149,18 +152,21 @@ def management(request: HttpRequest, tournament_id: Optional[int] = None) -> Htt
                     messages.error(request, error["message"], extra_tags="danger")
 
     if tournament in Tournament.objects.filter_future():
-        page_obj = Paginator(tournament.include_users.all(), 10).get_page(request.GET.get("page"))
+        page_obj = Paginator(tournament.include_users.all(), 10).get_page(request.GET.get("page", 1))
     else:
-        page_obj = Paginator(tournament.players.all().order_by("-ranking"), 10).get_page(request.GET.get("page"))
+        page_obj = Paginator(tournament.players.all().order_by("-ranking"), 10).get_page(request.GET.get("page", 1))
+
     return render(
         request,
         "tournaments/manage.html",
         {
             "tournament": tournament,
+            "num_players": tournament.include_users.count(),
             "players": page_obj,
             "form": TournamentManagementForm(tournament),
             "future": tournament in Tournament.objects.filter_future(),
             "bye_player": tournament.bye_player,
+            "offset": 10 * (page_obj.number - 1),
         },
     )
 
