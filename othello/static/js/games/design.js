@@ -13,6 +13,22 @@ function helps(){
     }
 }
 
+function winnerTippy(elem){
+    const instance = tippy(elem);
+    instance.setProps({
+        content: "This player placed first in a previous Othello tournament",
+        placement: 'right'
+    })
+    instance.show(50);
+}
+
+function tournament_winner(data, escape){
+    if(data.text.includes("T-")){
+        return `<div onmouseenter="winnerTippy(this)"><p>&#x1F31F; ${escape(data.text)}</p></div>`;
+    }
+    return `<div>${escape(data.text)}</div>`;
+}
+
 window.onload = function () {
     helps()
     $("#id_black").selectize({
@@ -20,13 +36,21 @@ window.onload = function () {
         onChange: function (val) {
             showYourselfHelp(val, "#black-help");
         },
-        sortField: [{'field': 'text', 'direction': 'desc'}]
+        sortField: [{'field': 'text', 'direction': 'desc'}],
+        render:{
+            option: tournament_winner,
+            item: tournament_winner
+        }
     });
     $("#id_white").selectize({
         maxItems: 1,
         onChange: function (val) {
             showYourselfHelp(val, "#white-help");
         },
-        sortField: [{'field': 'text', 'direction': 'desc'}]
+        sortField: [{'field': 'text', 'direction': 'desc'}],
+        render:{
+            option: tournament_winner,
+            item: tournament_winner,
+        }
     });
 };
