@@ -9,9 +9,7 @@ function readUsers(text){
         else
             add_error(`Cannot find entry for user ${file_users[i].trim()}`)
     }
-
 }
-
 
 window.onload = function () {
     $("option").each(function () {
