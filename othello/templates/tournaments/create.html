@@ -8,6 +8,11 @@
         .selectize-control {
             width: 10vw;
         }
+        #user_group .selectize-input{
+            overflow-y: scroll;
+            height: 25vh !important;
+            width: 20vw;
+        }
     </style>
 {% endblock %}
 {% block main %}
@@ -39,7 +44,7 @@
                 </p>
                 <br>
                 <br>
-                <p class="row" style="margin-left: 0; margin-bottom: 0">
+                <p id="user_group" class="row" style="margin-left: 0; margin-bottom: 0">
                     {{ form.include_users.label }}
                     {{ form.include_users }}
                 </p>
@@ -55,7 +60,7 @@
             </form>
         </div>
         <div class="align-content-center col-lg-5" id="right-side">
-            <div style="height: 50%">
+            <div style="height: 40%">
                 <h4>In Progress Tournaments</h4>
                 <ul>
                     {% for tournament in in_progress %}
@@ -65,7 +70,7 @@
                     {% endfor %}
                 </ul>
             </div>
-            <div style="height: 50%">
+            <div style="height: 40%">
                 <h4>Scheduled Tournaments</h4>
                 <ul>
                     {% for tournament in future %}

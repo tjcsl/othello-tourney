@@ -24,8 +24,8 @@ class TournamentCreateForm(forms.ModelForm):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(TournamentCreateForm, self).__init__(*args, **kwargs)
-        self.fields["include_users"].label_from_instance = Submission.get_game_name
-        self.fields["bye_player"].label_from_instance = Submission.get_game_name
+        self.fields["include_users"].label_from_instance = Submission.get_user_name
+        self.fields["bye_player"].label_from_instance = Submission.get_user_name
 
     def clean(self) -> None:
         cd = self.cleaned_data
