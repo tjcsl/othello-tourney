@@ -20,7 +20,7 @@ def get_updated_ranking(player: TournamentPlayer) -> float:
 
 def make_pairings(players: List[TournamentPlayer], bye_player: TournamentPlayer) -> List[Tuple[TournamentPlayer, TournamentPlayer]]:
     matches = []
-    players = sorted(players, key=get_updated_ranking)
+    players = sorted(players, key=get_updated_ranking, reverse=True)
 
     for i in range(0, len(players), 2):
         if i + 1 >= len(players):
