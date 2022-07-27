@@ -36,7 +36,7 @@
     .gameContainer-center{
         order: 0;
         justify-content: center;
-        margin-left: 8vw;
+        margin: auto
     }
     .gameContainer-left {
         order: 1;
@@ -46,10 +46,10 @@
         margin-left: 0;
     }
     #black-logs {
-        margin-left: 0;
+        margin: auto
     }
     #white-logs {
-        margin-right: 0;
+        margin: auto
     }
 }
 
@@ -68,7 +68,7 @@
 }
 
 .canvasContainer {
-    margin-bottom: 20px;
+    margin: auto;
     max-width: 100%
 }
 
