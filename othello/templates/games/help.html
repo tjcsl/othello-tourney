@@ -201,6 +201,21 @@ class Strategy:
         <span style="color: red">Warning:</span> When your code is uploaded, it is stored under a different, randomly-generated filename. Submitting two Python files and expecting to be able to import the other file by name is infeasible.
     </p>
     <h3>
+        Replaying Past Games
+    </h3>
+    <p>
+        After either <a href="{% url 'games:play' %}">Playing</a> or <a href="{% url 'games:watch' %}">Watching</a> a Game you may download a text-formatted version of the game using the "Download Game" button below the game board.
+        You may choose to download the Game in a format that is pretty-printed and easy to interpret visually or in a format that is more easily parsed programmatically. The exact specifications for both formats, and a preview, are shown
+        when downloading a Game.
+    </p>
+    <p>
+        In addition to downloading Games, you can upload this file to the <a href="{% url 'games:replay' %}">Replay Page</a> and more closely interact with the downloaded game file.
+        After uploading the game file, you will be able to step forward and step back through all the turns played in that game.
+    </p>
+    <p>
+        <span style="color: red">Note:</span> Logging data is not saved in game files and will not be displayed during replays
+    </p>
+    <h3>
         Other Info
     </h3>
     <p>
