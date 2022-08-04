@@ -156,3 +156,9 @@ textarea {
 .err_log {
     color: #ff2600;
 }
+
+button:disabled,
+button[disabled] {
+    border: #818181 2px solid;
+    background: #898989;
+}

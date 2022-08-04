@@ -9,7 +9,7 @@ tippy("#watch-help", {
 });
 
 tippy("#pretty-help", {
-    content: "Prints board in readable format, line below board is [black_score]-[white_score] [player]",
+    content: "Prints board in readable format, line below board is [black_score]-[white_score] [player] to [move]",
     placement: "top",
 });
 

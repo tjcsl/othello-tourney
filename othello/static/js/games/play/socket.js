@@ -46,7 +46,7 @@ function add_listeners(socket){
             download(`${rCanvas.black_name}_${rCanvas.white_name}_formatted.txt`, $("#parseableHistory").text());
         });
 
-    setInterval(function () {
+    const heartbeatInterval = setInterval(function () {
         socket.send(JSON.stringify({"message": "ping"}))
     }, heartbeat_interval*1000)
 
@@ -58,6 +58,7 @@ function add_listeners(socket){
     socket.onclose = function () {
         $("#black-logs-area").append(`<pre class="err_log">Disconnected from server</pre>`);
         $("#white-logs-area").append(`<pre class="err_log">Disconnected from server</pre>`);
+        clearInterval(heartbeatInterval);
     };
 
     socket.onmessage = function (message) {
