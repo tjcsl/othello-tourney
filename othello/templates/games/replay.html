@@ -37,20 +37,14 @@
                 <br>
                 <div class="row">
                     <div class="col">
-                        <button>Play</button>
-                        <button>Pause</button>
-                        <label for="speedRange" class="form-label">Playback Speed</label>
-                        <input type="range" class="form-range" id="speedRange">
+                        <button id="reuploadButton" type="button" data-toggle="modal" data-target="#replayModal" onclick="clearErrors()">Reupload Game File</button>
                     </div>
                     <div class="col-md-auto">
-                        <button>Step Back</button>
-                        <button>Step Forward</button>
+                        <button id="stepBack" disabled>Step Back</button>
+                        <button id="stepForward" disabled>Step Forward</button>
                     </div>
                 </div>
                 <br>
-                <div class="downloadHistory">
-                    <button id="downloadHistoryButton" type="button" data-toggle="modal" data-target="#replayModal" onclick="clearErrors()">Reupload Game File</button>
-                </div>
             </div>
         </div>
         <div class="gameContainer-right col area-log-container" id="white-logs" data-toggle="tooltip" title="Double click to collapse">

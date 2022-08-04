@@ -1,13 +1,31 @@
+let rCanvas;
 let gameReplay;
 
 function noFileUploaded(){
+    disableButtons();
     $("#black-logs-area").append(`<pre class="err_log">No Game File Uploaded</pre>`);
     $("#white-logs-area").append(`<pre class="err_log">No Game File Uploaded</pre>`);
 }
 
 function errorParsing(){
+    disableButtons();
     $("#black-logs-area").append(`<pre class="err_log">Error Parsing File at Specified Format</pre>`);
     $("#white-logs-area").append(`<pre class="err_log">Error Parsing File at Specified Format</pre>`);
+}
+
+function logDisabled(){
+    $("#black-logs-area").append(`<pre class="err_log">Logs Disabled During Replay</pre>`);
+    $("#white-logs-area").append(`<pre class="err_log">Logs Disabled During Replay</pre>`);
+}
+
+function enableButtons(){
+    $("#stepForward").prop("disabled", false);
+    $("#stepBack").prop("disabled", false);
+}
+
+function disableButtons(){
+    $("#stepForward").prop("disabled", true);
+    $("#stepBack").prop("disabled", true);
 }
 
 function clearErrors(){
@@ -100,13 +118,44 @@ function parseReplay(text, isParseable){
     // { black: name, white: name, game: [{board: '', possible: [int], move: int, player: char, black_score: int, white_score: int}]}
 }
 
+function drawBoardAtState(gameIndex){
+    if(gameIndex === 0){
+        drawBoard(rCanvas, gameReplay.game[0].board, gameReplay.game[0].possible, BLACK_NM, rCanvas.animArray, 36);
+    }else {
+        let player = gameReplay.game[gameIndex].player === BLACK_CH ? BLACK_NM : WHITE_NM;
+        drawBoard(rCanvas, gameReplay.game[gameIndex].board, gameReplay.game[gameIndex].possible, player, rCanvas.animArray, gameReplay.game[gameIndex].move)
+    }
+}
+
+function startReplay(){
+    if(!gameReplay)
+        return errorParsing();
+    logDisabled();
+    enableButtons();
+    rCanvas.black_name = gameReplay.black;
+    rCanvas.white_name = gameReplay.white;
+    drawBoard(rCanvas, gameReplay.game[0].board, gameReplay.game[0].possible, BLACK_NM, rCanvas.animArray, 36);
+
+    let gameIndex = 0;
+    $("#stepForward").click(function (){
+        gameIndex = Math.min(++gameIndex, gameReplay.game.length-1);
+        drawBoardAtState(gameIndex);
+    })
+    $("#stepBack").click(function (){
+        gameIndex = Math.max(--gameIndex, 0);
+        drawBoardAtState(gameIndex);
+    })
+
+}
+
 async function handleUpload(){
-    console.log('called');
+    rCanvas = init("", "");
     const isParseable = $("#replayParseable").is(":checked");
 
     const file = document.getElementById("replayFile").files[0];
     if(!file){
         noFileUploaded();
+        gameReplay = false;
         return;
     }
     const text = await file.text();
@@ -116,14 +165,13 @@ async function handleUpload(){
     }catch (e){
         errorParsing();
     }
-    if(!gameReplay)
-        errorParsing();
+    startReplay();
 }
 
 window.onload = function () {
     $("#replayModal").modal('show');
     
-    let rCanvas = init("", "");
+    rCanvas = init("", "");
     $(".canvasContainer").width($("#canvas").width());
     $(window).on('resize', function () {
         rCanvas.resize();
