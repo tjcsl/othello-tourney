@@ -300,7 +300,7 @@ function generate_pretty_history() {
             board = board.replaceAt(HISTORY[i].possible[j], '*')
         }
         out += prettyPrint(board);
-        out += `${HISTORY[i].board.split(BLACK_CH).length - 1}-${HISTORY[i].board.split(WHITE_CH).length - 1} ${HISTORY[i].player}\n\n`;
+        out += `${HISTORY[i].board.split(BLACK_CH).length - 1}-${HISTORY[i].board.split(WHITE_CH).length - 1} ${HISTORY[i].player} to ${HISTORY[i].tile}\n\n`;
     }
     $("#prettyHistory").text(out);
 }
