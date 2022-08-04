@@ -8,11 +8,12 @@
     <script type="text/javascript" src="{% static 'js/games/canvas.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/board.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/base.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/games/replay/socket.js' %}"></script>
-    <script type="text/javascript">
-        const game = JSON.parse('{{ game|safe_json }}');
-        const is_watching = JSON.parse('{{ is_watching|safe_json }}');
-    </script>
+    <script type="text/javascript" src="{% static 'js/games/replay/replay.js' %}"></script>
+    <style>
+        .modal-dialog .modal-content {
+            height: fit-content;
+        }
+    </style>
 {% endblock %}
 
 
@@ -33,7 +34,22 @@
                     <p style="visibility: hidden">WWW</p>
                     <p id="player-white" class="player-score"></p>
                 </div>
+                <br>
+                <div class="row">
+                    <div class="col">
+                        <button>Play</button>
+                        <button>Pause</button>
+                        <label for="speedRange" class="form-label">Playback Speed</label>
+                        <input type="range" class="form-range" id="speedRange">
+                    </div>
+                    <div class="col-md-auto">
+                        <button>Step Back</button>
+                        <button>Step Forward</button>
+                    </div>
+                </div>
+                <br>
                 <div class="downloadHistory">
+                    <button id="downloadHistoryButton" type="button" data-toggle="modal" data-target="#replayModal" onclick="clearErrors()">Reupload Game File</button>
                 </div>
             </div>
         </div>
@@ -43,33 +59,31 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="downloadModal">
-        <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal fade" id="replayModal">
+        <div class="modal-dialog modal-md modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4>Download Game</h4>
+                    <h4>Upload Game File</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="column" id="input_pretty">
-                            <h4>
-                                <label for="pretty">Pretty  <i id="pretty-help" class="fa fa-question-circle" style="font-size: 24px"></i></label>
-                                <button id="pretty_download" class="download_history">Download</button>
-                            </h4>
-                                <textarea id="prettyHistory" disabled></textarea>
-                        </div>
-                        <div class="column" id="input_parseable">
-                            <h4>
-                                <label for="parseable">Parseable  <i id="parseable-help" class="fa fa-question-circle" style="font-size: 24px"></i></label>
-                                <button id="parseable_download" class="download_history">Download</button>
-                            </h4>
-                                <textarea id="parseableHistory" disabled></textarea>
-                        </div>
+                <div class="modal-body container">
+                    <div class="row-sm">
+                        <h4>Select Format</h4>
+                    </div>
+                    <div class="row-sm">
+                        <label>
+                            <input id="replayParseable" type="radio" name="editList" value="always" checked/>  Parseable
+                        </label>
+                        <label>
+                            <input id="replayPretty" type="radio" name="editList" value="never"/>   Pretty
+                        </label>
+                    </div>
+                    <div class="row-sm">
+                        <input type="file" id="replayFile">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn" data-dismiss="modal">Close</button>
+                    <button id="submitReplay" type="button" class="btn" data-dismiss="modal">Submit Replay</button>
                 </div>
             </div>
         </div>
