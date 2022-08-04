@@ -8,11 +8,10 @@
     <script type="text/javascript" src="{% static 'js/games/canvas.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/board.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/base.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/games/play/socket.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/games/replay/socket.js' %}"></script>
     <script type="text/javascript">
         const game = JSON.parse('{{ game|safe_json }}');
         const is_watching = JSON.parse('{{ is_watching|safe_json }}');
-        const heartbeat_interval = {{ settings.CLIENT_HEARTBEAT_INTERVAL }};
     </script>
 {% endblock %}
 
@@ -34,10 +33,7 @@
                     <p style="visibility: hidden">WWW</p>
                     <p id="player-white" class="player-score"></p>
                 </div>
-                <p style="color: red">Time Hoarding {% if game.runoff %}Enabled{% else %}Disabled{%endif%}</p>
-                <p>Time Limit: {{ game.time_limit }}s</p>
                 <div class="downloadHistory">
-                    <button id="downloadHistoryButton" type="button" data-toggle="modal" data-target="#downloadModal">Download Game</button>
                 </div>
             </div>
         </div>

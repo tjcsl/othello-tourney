@@ -117,6 +117,10 @@ def watch(request: HttpRequest, game_id: Optional[int] = None) -> HttpResponse:
     return render(request, "games/watch_list.html", {"games": Game.objects.running()})
 
 
+def replay(request: HttpRequest) -> HttpResponse:
+    return render(request, "games/replay.html")
+
+
 def about(request: HttpRequest) -> HttpResponse:
     return render(request, "games/about.html")
 
