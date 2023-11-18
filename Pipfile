@@ -14,12 +14,12 @@ django-extensions = "~=3.1.1"
 ipython = "*"
 psutil = "~=5.8.0"
 psycopg2 = "~=2.8.6"
-pyOpenSSL = "~=20.0.1"
 redis = "~=3.5.3"
 sentry-sdk = "*"
 service_identity = "~=18.1.0"
 social-auth-app-django = "~=4.0.0"
 sqlparse = "~=0.4.2"
+pyopenssl = "*"
 
 [dev-packages]
 flake8 = "~=3.9.2"
