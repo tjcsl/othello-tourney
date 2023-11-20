@@ -13,12 +13,16 @@ from typing import Any, TextIO, Tuple, Union
 
 from .utils import ServerError, import_strategy
 
+MOVES_10x10 = {(i + 11 + 2 * (i // 8)): i for i in range(64)}
+
 
 class LocalRunner:  # Called from JailedRunner, inherits accessibility restrictions
     def __init__(self, script_path: str) -> None:
         self.path = script_path
         self.strat, self.nargs = import_strategy(script_path)
         self.logging = getattr(self.strat, "logging", False)
+        self.board_10x10 = getattr(self.strat, "use_10x10_board", False)
+        self.moves_10x10 = getattr(self.strat, "use_10x10_moves", False)
 
     def play_wrapper(self, *game_args: Any, pipe_to_parent: mp.Pipe) -> None:
         try:
@@ -32,7 +36,10 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
 
         to_child, to_self = mp.Pipe()
         try:
-            args = ("".join(board), player, best_move, is_running) if self.nargs == 4 else ("".join(board), player, best_move, is_running, time_limit)
+            board = "".join(board)
+            if self.board_10x10:
+                board = "?" * 11 + "??".join(board[i : i + 8] for i in range(0, 64, 8)) + "?" * 11
+            args = (board, player, best_move, is_running) if self.nargs == 4 else (board, player, best_move, is_running, time_limit)
             p = mp.Process(
                 target=self.play_wrapper,
                 args=args,
@@ -49,6 +56,8 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
                 if p.is_alive():
                     p.terminate()
                 extra_time = 0
+            if self.moves_10x10:
+                best_move.value = MOVES_10x10.get(best_move.value, best_move.value)
             return best_move.value, to_self.recv() if to_self.poll() else None, max(0, extra_time)
         except mp.ProcessError:
             traceback.print_exc()

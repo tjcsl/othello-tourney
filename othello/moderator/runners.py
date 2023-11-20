@@ -15,12 +15,16 @@ from .constants import Player
 from .utils import ServerError, UserError, capture_generator_value
 
 # Legacy moves have a padding of "#"s around all four sides of the grid.
-LEGACY_MOVES = {(i + 11 + 2 * (i // 8)): i for i in range(64)}
+MOVES_10x10 = {(i + 11 + 2 * (i // 8)): i for i in range(64)}
 
 
-def legacy_board_convert(board: str) -> str:
+def convert_to_10x10(board: str) -> str:
+    return "?" * 11 + "??".join(board[i : i + 8] for i in range(0, 64, 8)) + "?" * 11
+
+
+def convert_to_legacy(board: str) -> str:
     table = {ord(Player.WHITE.value): "o", ord(Player.BLACK.value): "@"}
-    return "?" * 11 + "??".join(board[i: i + 8].translate(table) for i in range(0, 64, 8)) + "?" * 11
+    return convert_to_10x10(board).translate(table)
 
 
 class PlayerRunner:
@@ -80,13 +84,13 @@ class PlayerRunner:
     @capture_generator_value
     def get_move(
         self, board: str, player: Player, time_limit: int, last_move: Move
-    ) -> Generator[str, None, Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]], ]:
+    ) -> Generator[str, None, Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]],]:
         if self.process.poll():
             print(self.process.communicate())
             return -1, ServerError.PROCESS_EXITED, -1
 
         if self.is_legacy:
-            board = legacy_board_convert(board)
+            board = convert_to_legacy(board)
             player = player.to_legacy()
         else:
             player = player.value
@@ -113,14 +117,14 @@ class PlayerRunner:
                     print(f"GOT MOVE {player} {move};{extra_time}")
 
                     if self.is_legacy:
-                        if move not in LEGACY_MOVES:
+                        if move not in MOVES_10x10:
                             return -1, UserError.READ_INVALID, -1
                     else:
                         if move < 0 or move >= 64:
                             return -1, UserError.READ_INVALID, -1
                 except (ValueError, IndexError):
                     return -1, UserError.READ_INVALID, -1
-        return (move, 0, extra_time) if not self.is_legacy else (LEGACY_MOVES[move], 0, extra_time)
+        return (move, 0, extra_time) if not self.is_legacy else (MOVES_10x10[move], 0, extra_time)
 
 
 class YourselfRunner:
@@ -140,7 +144,7 @@ class YourselfRunner:
     @capture_generator_value
     def get_move(
         self, board: str, player: Player, time_limit: int, last_move: Move
-    ) -> Generator[str, None, Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]], ]:
+    ) -> Generator[str, None, Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]],]:
         yield "Choose your move!"
         start = time.time()
         while True:
