@@ -2,44 +2,125 @@
 {% block title %}Othello: About Uploading{% endblock %}
 {% block main %}
     <h3>
-        File specification
+        File Specification
     </h3>
     <p>
-        A valid Othello AI consists of a Python file, version 3+, with a class called <code>Strategy</code> containing a method called <code>best_strategy</code> with the arguments <code>board, player, best_move, still_running</code> in that order.
-        <code>best_move</code> and <code>still_running</code> are <code>multiprocessing.Value</code> objects.
-        They can be accessed and modified by doing <code>best_move.value=34</code> or <code>print(still_running.value)</code>.
-        The <code>still_running</code> variable will start as 1 but will change to 0 when your processing time is about to run out.
+        A valid Othello AI consists of a Python file, version 3+, with a class called <code>Strategy</code> containing a method called <code>best_strategy</code>.
+    </p>
+    <h5 style="text-decoration: underline">
+        Minimal example
+    </h5>
+    <pre>
+        <code>
+def choose_move(board, player, still_running, time_limit):
+    # Implement this method
+    return 0
+
+
+class Strategy:
+    # Uncomment the below flags as needed
+    # logging = True
+    # uses_10x10_board = True
+    # uses_10x10_moves = True
+
+    def best_strategy(self, board, player, best_move, still_running, time_limit):
+        move = choose_move(board, player, still_running, time_limit)
+        best_move.value = move</code>
+    </pre>
+    <h5 style="text-decoration: underline">
+        Method specification
+    </h5>
+    <p>
+        The <code>best_strategy</code> method must accept the following 4 arguments:
+    </p>
+    <ul>
+        <li>
+            <code>board</code> - a string of length 64, containing characters from the set <code>{'.', 'x', 'o'}</code>.
+        </li>
+        <li>
+            <code>player</code> - a character from the set <code>{'x', 'o'}</code>.
+        </li>
+        <li>
+            <code>best_move</code> - a <code>multiprocessing.Value</code> object of type <code>int</code>.
+        </li>
+        <li>
+            <code>still_running</code> - a <code>multiprocessing.Value</code> object of type <code>int</code>.
+        </li>
+    </ul>
+    <p>
+        In the board provided, a <code>'.'</code> represents an empty space, <code>'x'</code> a black token, and <code>'o'</code> a white token.
+        The player is the color your script is playing as.
+        Once you have determined your best move, set <code>best_move.value</code> to the index of the board where you wish to place your token.
+    <p>
+        Note: You do not need to import the <code>multiprocessing</code> library to use <code>multiprocessing.Value</code> objects.
+    </p>
+    <h5 style="text-decoration: underline">
+        Time management
+    </h5>
+    <p>
+        To know when you run out of time, you can use <code>still_running.value</code>, which starts as 1 but changes to 0 when you near the time limit.
     </p>
     <p>
-        You do not need to import the <code>multiprocessing</code> library to access these objects
+        Alternatively, <code>best_strategy</code> can accept an optional 5th argument, <code>time_limit</code>.
+        If included in your method header, it will be set to an integer representing the amount of time (in seconds) that your script has to determine the best move.
     </p>
     <p>
-        In addition to the method specification above, the <code>best_strategy</code> method can accept an additional parameter that would represent the time limit.
-        In this case the method header would be <code>def best_strategy(self, board, player, best_move, still_running, time_limit)</code>.
-        If you choose to include the additional parameter, an integer representing the amount of time allocated to your script will be passed to the function.
-    </p>
-    <p>
-        Note: The <code>best_strategy</code> method has to follow one of the above specification.
-        Depending on the method header, the Othello server will choose the appropriate parameters to pass.
-    </p>
-    <p>
-         Note: Your script will be automatically cut off regardless of whether or not your code uses the <code>still_running</code> parameter
+        Note: If your game supports "Good Citizen" timing, exiting the <code>best_strategy</code> method before the time limit will give you extra time on the next turn.
     </p>
     <p>
         <span style="color: red">Warning: </span> All user code will be run in a daemonized <code>multiprocessing.Process</code>. This means your script
         cannot spawn any Processes of its own. If your code does spawn any <code>multiprocessing.Process</code> instances, it will error out.
     </p>
+    <h5 style="text-decoration: underline">
+        Enabling logging
+    </h5>
     <p>
-        The board will be a length-64 string of characters from the set <code>{'.', 'x', 'o'}</code>.
-        An <code>'.'</code> represents an empty space, <code>'x'</code> a black token, and <code>'o'</code> a white token.
-        A valid move is with in the range 0-63, inclusive, and represents an index on the board string where the current player will place a piece.
+        In addition to the specifications listed above, your <code>Strategy</code> class may contain a <code>logging</code> variable.
+        This variable, if used, must be an attribute of the <code>Strategy</code> class.
+        Therefore it should be defined within <code>Strategy</code>'s constructor (as <code>self.logging</code>) or inside the class but outside a class method (just <code>logging</code>).
+        For instance, <code>logging</code> cannot be defined in the <code>best_strategy</code> method of your <code>Strategy</code> class or in a helper method defined outside of <code>Strategy</code>.
     </p>
+    <p>
+        If set to <code>True</code>, you will see the output of any <code>print</code> statements on either side of the board when playing your script.
+        Output for scripts that are playing as black will appear on the left-hand side of the Othello board while the output for scripts that are playing as white will appear on the right-hand side of the Othello board.
+    </p>
+    <p>
+        If you omit the <code>logging</code> variable in your <code>Strategy</code> class, it will be assumed that you do not wish to output any <code>print</code> statements.
+    </p>
+    <p>
+        <span style="color: red">Warning:</span> If you set <code>logging = True</code> in your <code>Strategy</code> class, you will only be able to view script logs if you are currently logged in and own the running script.
+    </p>
+    <h5 style="text-decoration: underline">
+        Customizing board representation
+    </h5>
+    <p>
+        If you would like to be provided with a 10x10 board instead of the default 8x8 board, you can add a <code>uses_10x10_board</code> variable to your strategy class.
+        This variable works the same way as the <code>logging</code> variable, in that it must be an attribute of the <code>Strategy</code> class and will default to <code>False</code> if omitted.
+    </p>
+    <p>
+        You can also use a similar <code>uses_10x10_moves</code> variable to signify that your submitted <code>best_move.value</code> refers to indices in this 10x10 board.
+        If not used, the server will assume that your <code>best_move.value</code> refers to indices in the default 8x8 board.
+    </p>
+    <pre>
+        <code>
+                           ? ? ? ? ? ? ? ? ? ?
+  . . . . . . . .          ? . . . . . . . . ?
+  . . . . . . . .          ? . . . . . . . . ?
+  . . . . . . . .          ? . . . . . . . . ?
+  . . . o x . . .          ? . . . o x . . . ?
+  . . . x o . . .    =>    ? . . . x o . . . ?
+  . . . . . . . .          ? . . . . . . . . ?
+  . . . . . . . .          ? . . . . . . . . ?
+  . . . . . . . .          ? . . . . . . . . ?
+                           ? ? ? ? ? ? ? ? ? ?
+        </code>
+    </pre>
     <h5 style="text-decoration: underline">
         Scripts submitted before the 2020-21 school year are now invalid!
     </h5>
     <p>
-        Students who submitted before the 2020-21 school year must now revise their code to recognize the 8x8 board(instead of the previous 10x10 board)
-        and modify the set of characters to <code>{'.','x','o'}</code>(instead of the previous <code>{'.','@','o','?'}</code>) and resubmit their script.
+        Students who submitted before the 2020-21 school year must revise their code to recognize the new board (which uses <code>{'.','x','o'}</code> characters instead of <code>{'.','@','o'}</code> characters) on future submissions.
+        All past submissions will continue to run on the old board system to keep them playable.
     </p>
     <h3>
         Upload Errors
@@ -94,25 +175,6 @@
         </b>
     </p>
     <h3>
-        Logging
-    </h3>
-    <p>
-        In addition to the specifications listed above, your <code>Strategy</code> class may contain a <code>logging</code> variable.
-        This variable, if used, must be an attribute of the <code>Strategy</code> class.
-        Therefore it should be defined within <code>Strategy</code>'s constructor (as <code>self.logging</code>) or inside the class but outside a class method (just <code>logging</code>).
-        For instance, <code>logging</code> cannot be defined in the <code>best_strategy</code> method of your <code>Strategy</code> class or in a helper method defined outside of <code>Strategy</code>.
-    </p>
-    <p>
-        If set to <code>True</code>, you will see the output of any <code>print</code> statements on either side of the board when playing your script.
-        Output for scripts that are playing as black will appear on the left-hand side of the Othello board while the output for scripts that are playing as white will appear on the right-hand side of the Othello board.
-    </p>
-    <p>
-        If you omit the <code>logging</code> variable in your <code>Strategy</code> class, it will be assumed that you do not wish to output any <code>print</code> statements.
-    </p>
-    <p>
-        <span style="color: red">Warning:</span> If you set <code>logging = True</code> in your <code>Strategy</code> class, you will only be able to view your logging output only if you are currently logged in. If logged in, you will be able to see your logs whenever your script is being played, including if you are watching your script. Unauthenticated users and users who do not own the running script will not be able to view the logs.
-    </p>
-    <h3>
         Playing Games and Errors
     </h3>
     <p>
@@ -151,29 +213,7 @@
         a game but then close the window with the game still running, the game will be terminated and end in a tie.
     </p>
     <h3>
-        Example code
-    </h3>
-    <p>
-        To get you started, here is the most basic form of AI, random choice:
-    <pre>
-        <code>
-import random
-import time
-
-class Strategy:
-    # implement all the required methods on your own
-    logging = True # turns on logging
-    def best_strategy(self, board, player, best_move, running):
-        time.sleep(1)
-        if running.value:
-            best_move.value = random.choice(self.legal_moves(board, player))
-            # Note: It is not required for your Strategy class to have a "legal_moves" method,
-            # but you must determine legal moves yourself. The server will NOT accept invalid moves.
-        </code>
-    </pre>
-    </p>
-    <h3>
-        Multiple files
+        Multiple Submissions
     </h3>
     <p>
         You may submit code any amount of times, and the Othello server will record and store all your submissions. If you wish, you may retrieve any previously submitted script from the upload page.
