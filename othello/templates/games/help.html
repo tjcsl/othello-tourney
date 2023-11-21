@@ -10,8 +10,7 @@
     <h5 style="text-decoration: underline">
         Minimal example
     </h5>
-    <pre>
-        <code>
+    <pre><code>
 def choose_move(board, player, still_running, time_limit):
     # Implement this method
     return 0
@@ -25,8 +24,9 @@ class Strategy:
 
     def best_strategy(self, board, player, best_move, still_running, time_limit):
         move = choose_move(board, player, still_running, time_limit)
-        best_move.value = move</code>
-    </pre>
+        best_move.value = move
+
+</code></pre>
     <h5 style="text-decoration: underline">
         Method specification
     </h5>
@@ -95,11 +95,12 @@ class Strategy:
     </h5>
     <p>
         If you would like to be provided with a 10x10 board instead of the default 8x8 board, you can add a <code>uses_10x10_board</code> variable to your strategy class.
-        This variable works the same way as the <code>logging</code> variable, in that it must be an attribute of the <code>Strategy</code> class and will default to <code>False</code> if omitted.
+        This will surround the 8x8 board with an additional layer of <code>'?'</code> characters, as shown below.
+        Similar to the <code>logging</code> variable, <code>uses_10x10_board</code> must be an attribute of the <code>Strategy</code> class and will default to <code>False</code> if omitted.
     </p>
     <p>
-        You can also use a similar <code>uses_10x10_moves</code> variable to signify that your submitted <code>best_move.value</code> refers to indices in this 10x10 board.
-        If not used, the server will assume that your <code>best_move.value</code> refers to indices in the default 8x8 board.
+        You can also use the <code>uses_10x10_moves</code> variable to signify that your submitted <code>best_move.value</code> refers to indices in this 10x10 board representation.
+        If not used, the server will assume that your <code>best_move.value</code> refers to indices in the default 8x8 board, irrespective of whether or not <code>uses_10x10_board</code> is enabled.
     </p>
     <pre>
         <code>
