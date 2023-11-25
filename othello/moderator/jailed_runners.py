@@ -21,8 +21,8 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
         self.path = script_path
         self.strat, self.nargs = import_strategy(script_path)
         self.logging = getattr(self.strat, "logging", False)
-        self.board_10x10 = getattr(self.strat, "use_10x10_board", False)
-        self.moves_10x10 = getattr(self.strat, "use_10x10_moves", False)
+        self.board_10x10 = getattr(self.strat, "uses_10x10_board", False)
+        self.moves_10x10 = getattr(self.strat, "uses_10x10_moves", False)
 
     def play_wrapper(self, *game_args: Any, pipe_to_parent: mp.Pipe) -> None:
         try:
