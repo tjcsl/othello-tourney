@@ -33,8 +33,5 @@ django-stubs = "~=1.7.0"
 coverage = "~=5.5"
 PyYAML = "~=5.4.1"
 
-[requires]
-python_version = ">=3.8"
-
 [pipenv]
 allow_prereleases = true
