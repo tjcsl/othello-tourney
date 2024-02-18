@@ -19,7 +19,7 @@ MOVES_10x10 = {(i + 11 + 2 * (i // 8)): i for i in range(64)}
 
 
 def convert_to_10x10(board: str) -> str:
-    return "?" * 11 + "??".join(board[i : i + 8] for i in range(0, 64, 8)) + "?" * 11
+    return "?" * 11 + "??".join(board[i: i + 8] for i in range(0, 64, 8)) + "?" * 11
 
 
 def convert_to_legacy(board: str) -> str:
@@ -84,7 +84,7 @@ class PlayerRunner:
     @capture_generator_value
     def get_move(
         self, board: str, player: Player, time_limit: int, last_move: Move
-    ) -> Generator[str, None, Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]],]:
+    ) -> Generator[str, None, Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]], ]:
         if self.process.poll():
             print(self.process.communicate())
             return -1, ServerError.PROCESS_EXITED, -1
@@ -144,7 +144,7 @@ class YourselfRunner:
     @capture_generator_value
     def get_move(
         self, board: str, player: Player, time_limit: int, last_move: Move
-    ) -> Generator[str, None, Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]],]:
+    ) -> Generator[str, None, Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]], ]:
         yield "Choose your move!"
         start = time.time()
         while True:

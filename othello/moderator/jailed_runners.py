@@ -38,7 +38,7 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
         try:
             board = "".join(board)
             if self.board_10x10:
-                board = "?" * 11 + "??".join(board[i : i + 8] for i in range(0, 64, 8)) + "?" * 11
+                board = "?" * 11 + "??".join(board[i: i + 8] for i in range(0, 64, 8)) + "?" * 11
             args = (board, player, best_move, is_running) if self.nargs == 4 else (board, player, best_move, is_running, time_limit)
             p = mp.Process(
                 target=self.play_wrapper,
