@@ -1,5 +1,5 @@
 import logging
-from typing import TypeVar, Iterator, Tuple, Iterable
+from typing import Iterable, Iterator, Tuple, TypeVar
 
 from .models import TournamentPlayer
 

@@ -2,7 +2,7 @@ import random
 from typing import List, Tuple
 
 from othello.apps.tournaments.models import TournamentPlayer
-from othello.apps.tournaments.utils import get_updated_ranking, logger, chunks
+from othello.apps.tournaments.utils import chunks, get_updated_ranking, logger
 
 Players = List[TournamentPlayer]
 Pairings = List[Tuple[TournamentPlayer, ...]]
