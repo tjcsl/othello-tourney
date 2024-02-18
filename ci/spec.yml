@@ -12,27 +12,19 @@ defaults:
     - 3.8
     - 3.9
 
-  python_setup: &python_setup
-    name: Set up Python ${{ matrix.python-version }}
-    uses: actions/setup-python@v2
-    with:
-      python-version: ${{ matrix.python-version }}
-
   repo_setup: &repo_setup
     name: Set up repo
     uses: actions/checkout@v2
 
-  setup_pip_cache: &setup_pip_cache
-    name: Set up pip cache
-    uses: actions/cache@v2
+  python_setup: &python_setup
+    name: Set up Python ${{ matrix.python-version }}
+    uses: actions/setup-python@v5
     with:
-      path: |
-        ~/.cache/pip
-        ~/.cache/pipenv
-      key: ${{ matrix.python-version }}
+      python-version: ${{ matrix.python-version }}
+      cache: pipenv
 
-  setup_venv: &setup_venv
-    name: Set up venv
+  install_deps: &install_deps
+    name: Install dependencies
     run: |
       set -e
       pip install pipenv
@@ -49,8 +41,7 @@ jobs:
     steps:
       - *repo_setup
       - *python_setup
-      - *setup_pip_cache
-      - *setup_venv
+      - *install_deps
 
       - name: Check formatting with format.sh
         run: pipenv run ./scripts/format.sh && test -z "$(git status --porcelain=v1 .)"
@@ -83,8 +74,7 @@ jobs:
     steps:
       - *repo_setup
       - *python_setup
-      - *setup_pip_cache
-      - *setup_venv
+      - *install_deps
 
       - name: Copy secret.py
         run: cp othello/settings/secret.sample.py othello/settings/secret.py

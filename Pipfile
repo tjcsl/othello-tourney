@@ -34,7 +34,7 @@ coverage = "~=5.5"
 PyYAML = "~=5.4.1"
 
 [requires]
-python_version = "3.8"
+python_version = ">=3.8"
 
 [pipenv]
 allow_prereleases = true
