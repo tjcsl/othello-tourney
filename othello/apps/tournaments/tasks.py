@@ -12,7 +12,8 @@ from ..games.models import Game
 from ..games.tasks import Player, run_game
 from .emails import email_send
 from .models import Tournament, TournamentGame, TournamentPlayer
-from .utils import chunks, get_updated_ranking, make_pairings
+from .utils import chunks, get_updated_ranking
+from .pairings import pair
 
 logger = logging.getLogger("othello")
 
@@ -88,7 +89,7 @@ def run_tournament(tournament_id: int) -> None:
     bye_player = TournamentPlayer.objects.create(tournament=t, submission=t.bye_player)
 
     for round_num in range(t.num_rounds):
-        matches: List[Tuple[TournamentPlayer, TournamentPlayer]] = make_pairings(submissions, bye_player)
+        matches: List[Tuple[TournamentPlayer, ...]] = pair(submissions, bye_player)
         t.refresh_from_db()
         if t.terminated:
             t.delete()
