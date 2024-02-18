@@ -1,5 +1,5 @@
 import logging
-from typing import Iterable, Iterator, Tuple, TypeVar
+from typing import Iterator, List, TypeVar
 
 from .models import TournamentPlayer
 
@@ -7,9 +7,9 @@ T = TypeVar("T")
 logger = logging.getLogger("othello")
 
 
-def chunks(v: Iterable[T], n: int) -> Iterator[Tuple[T, ...]]:
-    # From https://stackoverflow.com/a/1625023
-    return zip(*(iter(v),) * n)
+def chunks(v: List[T], n: int) -> Iterator[List[T]]:
+    for i in range(0, len(v), n):
+        yield v[i: i + n]
 
 
 def get_updated_ranking(player: TournamentPlayer) -> float:
