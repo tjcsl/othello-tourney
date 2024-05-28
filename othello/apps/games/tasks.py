@@ -26,14 +26,14 @@ def send_through_game_channel(game: Game, event_type: str, object_id: int) -> in
 
 
 def check_heartbeat(game: Game) -> bool:
-    if game.is_tournament or game.is_ranked:
+    if game.is_tournament or game.is_ranked or game.is_gauntlet:
         return True
     game.refresh_from_db()
     return (timezone.now() - game.last_heartbeat).seconds < settings.CLIENT_HEARTBEAT_INTERVAL * 2
 
 
 def delete_game(game: Game) -> None:
-    if not game.is_tournament and not game.is_ranked:
+    if not game.is_tournament and not game.is_ranked and not game.is_gauntlet:
         game.delete()
 
 
