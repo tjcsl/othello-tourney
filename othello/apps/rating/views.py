@@ -16,6 +16,7 @@ from ..games.models import Submission, Game
 from .tasks import runGauntlet, runAllScrims, deleteAllRankedGames, getNextScrimTime
 from .models import Gauntlet, RankedManager
 from .forms import MultipleChoiceForm
+from ..auth.models import User
 
 logger = logging.getLogger("othello")
 
@@ -96,9 +97,15 @@ def gauntlet(request: HttpRequest) -> HttpResponse:
 
             # keep one gauntlet run saved. since we're making a new one, delete the old one
             submission = Submission.objects.filter(user=request.user).order_by("-created_at").first()
+            
+            # INSERT THE CORRECT GAUNTLET BOT HERE
+            gauntletUser = User.objects.filter(username="2024jliu").first()
+            gauntletBot = Submission.objects.filter(user=gauntletUser).first()
+            # ------------------------------------
+
             game1 = Game.objects.create(
-                black=submission,
-                white=submission,
+                black=gauntletBot,
+                white=gauntletBot,
                 time_limit=5,
                 playing=False,
                 last_heartbeat=timezone.now(),
@@ -106,8 +113,8 @@ def gauntlet(request: HttpRequest) -> HttpResponse:
                 is_gauntlet=True,
             )
             game2 = Game.objects.create(
-                black=submission,
-                white=submission,
+                black=gauntletBot,
+                white=gauntletBot,
                 time_limit=5,
                 playing=False,
                 last_heartbeat=timezone.now(),
@@ -115,8 +122,8 @@ def gauntlet(request: HttpRequest) -> HttpResponse:
                 is_gauntlet=True,
             )
             game3 = Game.objects.create(
-                black=submission,
-                white=submission,
+                black=gauntletBot,
+                white=gauntletBot,
                 time_limit=5,
                 playing=False,
                 last_heartbeat=timezone.now(),
@@ -143,6 +150,10 @@ def gauntlet(request: HttpRequest) -> HttpResponse:
                 myGauntlet.game3.black = submission
             else:
                 myGauntlet.game3.white = submission
+
+            myGauntlet.game1.save()
+            myGauntlet.game2.save()
+            myGauntlet.game3.save()
             myGauntlet.save()
 
         gauntlets = Gauntlet.objects.all().filter(finished=False).order_by("created_at")
