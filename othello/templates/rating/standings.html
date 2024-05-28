@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Othello: Standings{% endblock %}
+{% block head %}
+    <link href="{% static 'css/tournaments/tables.css' %}" type="text/css" rel="stylesheet">
+{% endblock %}
+{% block main %}
+    <h3>
+        Overall Standings
+    </h3>
+    <p>The next batch of ranked matches is scheduled to be {{next_time}}</p>
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>Ranking</th>
+                    <th>User</th>
+                    <th>Rating</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for player in page_obj %}
+                <tr>
+                    <td>{{ forloop.counter|add:offset }}</td>
+                    <td>{{ player }}</td>
+                    <td>{{ player.rating }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if page_obj.has_other_pages %}
+            <ul class="pagination">
+                <li><a href="?page=1">&laquo;First</a></li>
+                {% if page_obj.has_previous %}
+                    <li><a href="?page={{ page_obj.previous_page_number }}">&lsaquo;Previous</a></li>
+                {% endif %}
+                {% if page_obj.has_next %}
+                    <li><a href="?page={{ page_obj.next_page_number }}">Next&rsaquo;</a></li>
+                {% endif %}
+                <li><a href="?page={{ page_obj.paginator.num_pages }}">Last&raquo;</a></li>
+            </ul>
+        {% endif %}
+    </div>
+{% endblock %}

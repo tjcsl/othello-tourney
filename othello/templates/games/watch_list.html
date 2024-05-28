@@ -18,6 +18,12 @@
                     {% if game.is_tournament %}
                         <b style="color: #33a122">Tournament Game: </b>
                     {% endif %}
+                    {% if game.is_ranked %}
+                        <b style="color: #33a122">Ranked Game: </b>
+                    {% endif %}
+                    {% if game.is_gauntlet %}
+                        <b style="color: #33a122">Gauntlet Game: </b>
+                    {% endif %}
                     {{ game }}
                 </a>
                 <br>

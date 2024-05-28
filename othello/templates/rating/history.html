@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+{% load extras %}
+{% block title %}Othello: Ranked Match History{% endblock %}
+{% block head %}
+    <link href="{% static 'css/tournaments/tables.css' %}" type="text/css" rel="stylesheet">
+{% endblock %}
+{% block main %}
+    <h3>
+        Ranked Match History
+    </h3>
+    <p>Matches from the most recent ranked match batch are shown.</p>
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Black</th>
+                    <th>White</th>
+                    <th>Score <i class="fa fa-question-circle score" id="black-help"></i></th>
+                    <th>Black Rating</th>
+                    <th>White Rating</th>
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for game in games %}
+                <tr>
+                    <td>{{game.created_at}}</td>
+                    <td>{{game.black}}</td>
+                    <td>{{game.white}}</td>
+                    <td>{{game|parseScore}}</td>
+                    <td>{{game|parseBlack}}</td>
+                    <td>{{game|parseWhite}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

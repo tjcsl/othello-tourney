@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Othello: Manage{% endblock %}
+{% block main %}
+    <h3>
+        Admin Panel
+    </h3>
+    <div class="container-fluid centered">
+        <div class="playform align-content-center">
+            <p>
+                Auto ranked games batch enabled: {{ manager.auto_run }}
+                <br>
+                Next auto run time: {{ manager.next_auto_run }}
+                <br>
+                Batch is running: {{ manager.running }}
+            </p>
+            <br>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="checkbox" required>
+                Confirm
+                <br><br>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

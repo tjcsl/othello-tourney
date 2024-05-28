@@ -26,14 +26,14 @@ def send_through_game_channel(game: Game, event_type: str, object_id: int) -> in
 
 
 def check_heartbeat(game: Game) -> bool:
-    if game.is_tournament:
+    if game.is_tournament or game.is_ranked:
         return True
     game.refresh_from_db()
     return (timezone.now() - game.last_heartbeat).seconds < settings.CLIENT_HEARTBEAT_INTERVAL * 2
 
 
 def delete_game(game: Game) -> None:
-    if not game.is_tournament:
+    if not game.is_tournament and not game.is_ranked:
         game.delete()
 
 
@@ -80,92 +80,101 @@ def run_game(game_id: int) -> Optional[str]:
         send_through_game_channel(game, "game.error", file_deleted.id)
         raise RuntimeError("Cannot find a submission code file!")
 
-    error = 0
-    with black_runner as player_black, white_runner as player_white:
-        last_move = game.moves.create(board=INITIAL_BOARD, player="-", possible=[26, 19, 44, 37])
-        send_through_game_channel(game, "game.update", game_id)
-        exception = None
+    #print("IM HERE NOW")
 
-        while not mod.is_game_over():
-            if not check_heartbeat(game) or not game.playing:
-                game.playing = False
-                game.outcome = "T"
-                game.forfeit = False
-                game.save(update_fields=["playing", "outcome", "forfeit"])
-                return "no ping"
-            board, current_player = mod.get_game_state()
-
-            try:
-                if current_player == Player.BLACK:
-                    running_turn = player_black.get_move(board, current_player, black_time_limit, last_move)
-                elif current_player == Player.WHITE:
-                    running_turn = player_white.get_move(board, current_player, white_time_limit, last_move)
-            except BaseException as e:
-                logger.error(f"Error when getting move {game_id}, {current_player}, {str(e)}")
-                task_logger.error(str(e))
-                exception = e
-
-            for log in running_turn:
-                print(log)
-                game_log = game.logs.create(player=current_player.value, message=log)
-                send_through_game_channel(game, "game.log", game_log.id)
-            submitted_move, error, extra_time = running_turn.return_value
-
-            if exception is not None:
-                error = ServerError.UNEXPECTED
-
-            if game.runoff:
-                if current_player == Player.BLACK:
-                    black_time_limit = game.time_limit + extra_time
-                else:
-                    white_time_limit = game.time_limit + extra_time
-
-            if error != 0:
-                game_err = game.errors.create(player=current_player.value, error_code=error.value[0], error_msg=error.value[1])
-                if isinstance(error, ServerError):
-                    game.forfeit = False
-                    game.outcome = "T"
-                elif isinstance(error, UserError):
-                    game.forfeit = True
-                    game.outcome = Player.BLACK.value if current_player == Player.WHITE else Player.WHITE.value
-                game.playing = False
-                game.save(update_fields=["forfeit", "outcome", "playing"])
-                send_through_game_channel(game, "game.error", game_err.id)
-                break
-
-            try:
-                if submitted := mod.submit_move(submitted_move):
-                    possible = submitted
-                else:
-                    game_over = True
-            except InvalidMoveError as e:
-                game_err = game.errors.create(player=current_player.value, error_code=e.code, error_msg=e.message)
-                game.forfeit, game.playing = True, False
-                game.outcome = current_player.opposite_player().value
-                game.save(update_fields=["forfeit", "outcome", "playing"])
-                send_through_game_channel(game, "game.error", game_err.id)
-                task_logger.info(f"{game_id}: {current_player.value} submitted invalid move {submitted}")
-                break
-
-            last_move = game.moves.create(
-                player=current_player.value,
-                move=submitted_move,
-                board=mod.get_board(),
-                possible=possible,
-            )
-            if game_over:
-                game.forfeit = False
-                game.outcome = mod.outcome()
-                game.score = mod.score()
-                game.save(update_fields=["forfeit", "score", "outcome", "playing"])
-                task_logger.info(f"GAME {game_id} OVER")
-                break
+    try:
+        error = 0
+        with black_runner as player_black, white_runner as player_white:
+            last_move = game.moves.create(board=INITIAL_BOARD, player="-", possible=[26, 19, 44, 37])
             send_through_game_channel(game, "game.update", game_id)
+            exception = None
+
+            while not mod.is_game_over():
+                if not check_heartbeat(game) or not game.playing:
+                    game.playing = False
+                    game.outcome = "T"
+                    game.forfeit = False
+                    game.save(update_fields=["playing", "outcome", "forfeit"])
+                    return "no ping"
+                board, current_player = mod.get_game_state()
+                #print(board)
+
+                try:
+                    if current_player == Player.BLACK:
+                        running_turn = player_black.get_move(board, current_player, black_time_limit, last_move)
+                    elif current_player == Player.WHITE:
+                        running_turn = player_white.get_move(board, current_player, white_time_limit, last_move)
+                except BaseException as e:
+                    logger.error(f"Error when getting move {game_id}, {current_player}, {str(e)}")
+                    task_logger.error(str(e))
+                    exception = e
+
+                for log in running_turn:
+                    print(log)
+                    game_log = game.logs.create(player=current_player.value, message=log)
+                    send_through_game_channel(game, "game.log", game_log.id)
+                submitted_move, error, extra_time = running_turn.return_value
+
+                if exception is not None:
+                    error = ServerError.UNEXPECTED
+
+                if game.runoff:
+                    if current_player == Player.BLACK:
+                        black_time_limit = game.time_limit + extra_time
+                    else:
+                        white_time_limit = game.time_limit + extra_time
+
+                if error != 0:
+                    game_err = game.errors.create(player=current_player.value, error_code=error.value[0], error_msg=error.value[1])
+                    if isinstance(error, ServerError):
+                        game.forfeit = False
+                        game.outcome = "T"
+                    elif isinstance(error, UserError):
+                        game.forfeit = True
+                        game.outcome = Player.BLACK.value if current_player == Player.WHITE else Player.WHITE.value
+                    game.playing = False
+                    game.save(update_fields=["forfeit", "outcome", "playing"])
+                    send_through_game_channel(game, "game.error", game_err.id)
+                    break
+
+                try:
+                    if submitted := mod.submit_move(submitted_move):
+                        possible = submitted
+                    else:
+                        game_over = True
+                except InvalidMoveError as e:
+                    game_err = game.errors.create(player=current_player.value, error_code=e.code, error_msg=e.message)
+                    game.forfeit, game.playing = True, False
+                    game.outcome = current_player.opposite_player().value
+                    game.save(update_fields=["forfeit", "outcome", "playing"])
+                    send_through_game_channel(game, "game.error", game_err.id)
+                    task_logger.info(f"{game_id}: {current_player.value} submitted invalid move {submitted}")
+                    break
+
+                last_move = game.moves.create(
+                    player=current_player.value,
+                    move=submitted_move,
+                    board=mod.get_board(),
+                    possible=possible,
+                )
+                if game_over:
+                    game.forfeit = False
+                    game.outcome = mod.outcome()
+                    game.score = mod.score()
+                    game.save(update_fields=["forfeit", "score", "outcome", "playing"])
+                    task_logger.info(f"GAME {game_id} OVER")
+                    break
+                send_through_game_channel(game, "game.update", game_id)
+    except BaseException as error:
+        print(error)
+        
     game.playing = False
     game.save(update_fields=["playing"])
     send_through_game_channel(game, "game.update", game_id)
     black_runner.stop()
     white_runner.stop()
+
+    # print("DONE", game.playing, game.score)
 
     if error != 0 and isinstance(error, ServerError):
         if error.value[0] != -8:

@@ -9,6 +9,10 @@ class User(AbstractUser):
     is_student = models.BooleanField(default=True, null=False)
     is_imported = models.BooleanField(default=False, null=False)
 
+    #rating
+    is_gauntlet_running = models.BooleanField(default=False, null=False)
+    last_gauntlet_run = models.DateTimeField(null=True)
+
     @property
     def has_management_permission(self) -> bool:
         return self.is_teacher or self.is_staff or self.is_superuser

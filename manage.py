@@ -3,6 +3,8 @@
 import os
 import sys
 
+import sys
+print(sys.version)
 
 def main():
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'othello.settings')
