@@ -13,10 +13,12 @@ from django.core.paginator import Paginator
 from celery.result import AsyncResult
 
 from ..games.models import Submission, Game
-from .tasks import runGauntlet, runAllScrims, deleteAllRankedGames, getNextScrimTime
+from .tasks import runGauntlet, deleteAllRankedGames
 from .models import Gauntlet, RankedManager
 from .forms import MultipleChoiceForm
 from ..auth.models import User
+
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
 
 logger = logging.getLogger("othello")
 
@@ -99,7 +101,7 @@ def gauntlet(request: HttpRequest) -> HttpResponse:
             submission = Submission.objects.filter(user=request.user).order_by("-created_at").first()
             
             # INSERT THE CORRECT GAUNTLET BOT HERE
-            gauntletUser = User.objects.filter(username="2024jliu").first()
+            gauntletUser = User.objects.filter(username="warden").first()
             gauntletBot = Submission.objects.filter(user=gauntletUser).first()
             # ------------------------------------
 
@@ -182,7 +184,7 @@ def deleteGauntlet(request: HttpRequest) -> HttpResponse:
 
 def history(request: HttpRequest) -> HttpResponse:
     if request.method == "GET":
-        games = list(Game.objects.filter(is_ranked=True).order_by("-created_at"))
+        games = list(Game.objects.filter(is_ranked=True, playing=False).order_by("-created_at"))
 
         return render(
             request,
@@ -211,42 +213,44 @@ def standings(request: HttpRequest) -> HttpResponse:
 @management_only
 def manage(request: HttpRequest) -> HttpResponse:
     manager = RankedManager.objects.first()
-    
+
     if request.method == 'POST':
         form = MultipleChoiceForm(request.POST)
         if form.is_valid():
             selected_choice = form.cleaned_data['choices']
-            #print(selected_choice)
-            if selected_choice == 'runbatch':
-                AsyncResult(manager.celery_task_id).revoke(terminate=True)
-                if sys.platform == 'win32':
-                    runAllScrims()
-                else:
-                    runAllScrims.delay()
-            elif selected_choice == 'deletegames':
+            if selected_choice == 'deletegames':
                 deleteAllRankedGames()
             elif selected_choice == 'deletegauntlets':
                 Gauntlet.objects.all().delete()
             elif selected_choice == 'disableauto':
                 manager.auto_run = False
-                AsyncResult(manager.celery_task_id).revoke(terminate=True)
-                manager.save()
-
-                # print(AsyncResult(manager.celery_task_id).failed())
-                # print(AsyncResult(manager.celery_task_id).state)
-
                 manager.save()
             elif selected_choice == 'enableauto':
                 manager.auto_run = True
                 manager.next_auto_run = getNextScrimTime()
+                manager.save()
+            elif selected_choice == 'initranked':
+                #create 1 single ranked manager object
+                RankedManager.objects.all().delete()
+                manager = RankedManager.objects.create(
+                    auto_run = False,
+                    running = False,
+                    next_auto_run = timezone.now(),
+                )
                 
-                if AsyncResult(manager.celery_task_id).state != "PENDING":
-                    logger.warning("queueing batch for later")
-                    task = runAllScrims.apply_async([], eta=manager.next_auto_run)
-                    manager.celery_task_id = task.id
-                    manager.save()
-            
-            
+                #create scheduler that runs once a minute
+                interval, _ = IntervalSchedule.objects.get_or_create(
+                    every=60,
+                    period=IntervalSchedule.SECONDS,
+                )
+
+                PeriodicTask.objects.all().delete()
+                PeriodicTask.objects.create(
+                    interval = interval,
+                    name = "RankedScheduler",
+                    task = "othello.apps.rating.tasks.rankedSchedulerProcess",
+                )
+                #celery -A othello beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
     else:
         form = MultipleChoiceForm()
     return render(request, 'rating/manage.html', {'form': form, "manager": manager})

@@ -4,6 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+celery = "~=5.2.2"
 channels = "~=3.0.3"
 channels-redis = "~=3.2.0"
 daphne = "~=3.0.1"
@@ -19,9 +20,7 @@ service_identity = "~=18.1.0"
 social-auth-app-django = "~=4.0.0"
 sqlparse = "~=0.4.2"
 pyopenssl = "*"
-colorama = "*"
-celery = "==5.2.7"
-gevent = "*"
+django-celery-beat = "*"
 
 [dev-packages]
 flake8 = "~=3.9.2"

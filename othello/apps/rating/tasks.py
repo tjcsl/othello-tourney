@@ -1,6 +1,8 @@
 import logging, random, time, sys
 from datetime import datetime, timedelta
 from typing import Optional
+from django.utils import timezone
+
 
 from asgiref.sync import async_to_sync
 from celery import shared_task
@@ -170,123 +172,85 @@ def doPairing(n):
     
     return pairs
 
-
 def deleteAllRankedGames():
     games = Game.objects.filter(is_ranked=True)
     games.delete()
     #games.save()
 
-def getNextScrimTime():
-    #batches happen monday, wednesday, friday, 4pm
-    today = datetime.today()
-    mon = (-today.weekday() + 7) % 7
-    wed = (2-today.weekday()+7) % 7
-    fri = (4-today.weekday()+7) % 7
-
-    if mon == 0 or wed == 0 or fri == 0:
-        if datetime.now().hour >= 16: # if its after 4pm, then we dont want to run today
-            if mon == 0: mon = 1000
-            if wed == 0: wed = 1000
-            if fri == 0: fri = 1000
-
-    if mon < wed and mon < fri:
-        logger.warning("Next run is monday")
-        today += timedelta(days=mon)
-    elif wed < mon and wed < fri:
-        logger.warning("Next run is wednesday")
-        today += timedelta(days=wed)
-    elif fri < mon and fri < wed:
-        logger.warning("Next run is friday")
-        today += timedelta(days=fri)
-
-    today = today.replace(hour=16, minute=0, second=0, microsecond=0)
-
-    return today
+gameQueue = []
+lastTime = datetime.now()
+# will not run the first task, to prevent a bunch of tasks built up all being run at once
 
 @shared_task
-def runAllScrims():
-    manager = RankedManager.objects.first()
-    if manager.running:
-        logger.warning("Did not run a batch since one already is running")
+def rankedSchedulerProcess():
+    global lastTime
+
+    if datetime.now() - lastTime < timedelta(seconds=45):
+        print("skipping")
         return
-
-    manager.running = True
-    manager.save()
-
-    deleteAllRankedGames()
     
-    players = Submission.objects.rated()
-    matches = doPairing(players.count())
-    submissions = list(players)
-
-    # print(matches, submissions)
-
-    for round_matches in chunks(matches, 1 if sys.platform == "win32" else settings.CONCURRENT_GAME_LIMIT):
-            games = []
-            
-            for i, j in round_matches:
-                submissions[i].refresh_from_db()
-                submissions[j].refresh_from_db()
-                game = Game.objects.create(
-                    black=submissions[i],
-                    white=submissions[j],
-                    blackRating=submissions[i].rating,
-                    whiteRating=submissions[j].rating,
-                    time_limit=5,
-                    playing=True,
-                    is_ranked=True
-                )
-                games.append(game)
-                logger.warning(f"Upcoming matches: {str(game)}")
-                run_game.delay(game.id)
-            
-            # tasks = {game: run_game.delay(game.id) for game in games}
-            # return
-
-            for it in range(1000): # if this doesn't finish in 15 minutes, just moves on
-                running = False
-                for game in games:
-                                #tasks = {game: run_tournament_game.delay(game.id) for game in games}
-                    game.refresh_from_db()
-                    running = running or game.playing
-                # print("check ", running)
-                if not running: break
-                time.sleep(1)
-
-            running = False
-            for game in games:
-                running = running or game.playing
-            if running:
-                logger.warn("Some games didn't finish. Very bad.")
-            
-            for game in games:
-                r1 = game.black.rating
-                r2 = game.white.rating
-                if r1 >= r2:
-                    delta = calculateElo(r1, r2, game.score)
-                    game.ratingDelta = delta
-                    r1 += delta
-                    r2 -= delta
-                else:
-                    delta = calculateElo(r2, r1, -game.score)
-                    game.ratingDelta = -delta
-                    r1 -= delta
-                    r2 += delta
-                game.black.rating = r1
-                game.white.rating = r2
-                game.black.save()
-                game.white.save()
-                
-                game.save()
-
-    manager.running = False
+    lastTime = datetime.now()
     
-    # THIS IS NOT TESTED - has the precondition that this is the only task queued, so its safe to queue another runAllScrims
+    manager = RankedManager.objects.first()
+    if manager.game and not manager.game.playing:
+        game = manager.game
+        # the game finished, let's update ELO
+        r1 = game.black.rating
+        r2 = game.white.rating
+        if r1 >= r2:
+            delta = calculateElo(r1, r2, game.score)
+            game.ratingDelta = delta
+            r1 += delta
+            r2 -= delta
+        else:
+            delta = calculateElo(r2, r1, -game.score)
+            game.ratingDelta = -delta
+            r1 -= delta
+            r2 += delta
+        game.black.rating = r1
+        game.white.rating = r2
+        game.black.save()
+        game.white.save()  
+        game.save()
+        manager.running = False
+    elif manager.game and manager.game.playing:
+        return
+    
     if manager.auto_run:
-        logger.warning("queueing batch for later")
-        manager.next_auto_run = getNextScrimTime()
-        task = runAllScrims.apply_async([], eta=manager.next_auto_run)
-        manager.celery_task_id = task.id
+        global gameQueue
+        if len(gameQueue) == 0: # then we have to queue the players!
+            players = Submission.objects.rated()
+            if players.count() < 2: 
+                logger.warn("Too few players eligble for ranked!")
+                return
+            matches = doPairing(players.count())
+            submissions = list(players)
+            for tpl in matches:
+                gameQueue.append((submissions[tpl[0]], submissions[tpl[1]]))
+            logger.warn(f"Created game queue: {str(gameQueue)}")
 
-    manager.save()
-    return
+        if not manager.running:
+            black = gameQueue[-1][0]
+            white = gameQueue[-1][1]
+            logger.warn(f"Queueing ranked game --> {black} vs. {white}")
+            
+            game = Game.objects.create(
+                black=black,
+                white=white,
+                blackRating=black.rating,
+                whiteRating=white.rating,
+                time_limit=5,
+                playing=True,
+                last_heartbeat=timezone.now(),
+                runoff=False,
+                is_ranked=True,
+            )
+
+            manager.game = game
+            manager.running = True
+            manager.save()
+
+            run_game.delay(manager.game.id)
+            gameQueue.pop()
+
+    manager.save()    

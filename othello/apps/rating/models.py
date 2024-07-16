@@ -55,16 +55,13 @@ class RankedManager(models.Model):
     auto_run = models.BooleanField(default=False, null=False)
     next_auto_run = models.DateTimeField()
     running = models.BooleanField(default=False, null=False)
-    celery_task_id = models.CharField(max_length=48, default="")
+    game = models.ForeignKey(Game, on_delete=models.PROTECT, related_name="g", null=True, blank=True, default=None)
 
     def __str__(self) -> str:
         return f"Auto Run {self.auto_run}, Next Auto {self.next_auto_run}, Running {self.running}"
 
     def __repr__(self) -> str:
         return f"Auto Run {self.auto_run}, Next Auto {self.next_auto_run}, Running {self.running}"
-
-
-
 
 # class RankedGame(models.Model):
 

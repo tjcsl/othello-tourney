@@ -1,6 +1,6 @@
 import json
 import logging
-import os, sys
+import os
 import subprocess
 import traceback
 from typing import Dict, List, Optional
@@ -11,9 +11,6 @@ logger = logging.getLogger("othello")
 
 
 def import_strategy_sandboxed(path: str) -> Optional[Dict[str, str]]:
-    if sys.platform == "win32":
-        return None
-
     cmd_args = ["python3", "-u", settings.IMPORT_DRIVER, path]
     if not settings.DEBUG:
         cmd_args = get_sandbox_args(cmd_args, whitelist=[os.path.dirname(path)], readonly=[os.path.dirname(path)])

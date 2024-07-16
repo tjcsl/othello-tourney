@@ -30,6 +30,7 @@ CHANNEL_LAYERS = {
 
 INSTALLED_APPS = [
     "othello.apps.OthelloAdminConfig",
+    "django_celery_beat",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
