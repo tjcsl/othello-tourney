@@ -2,6 +2,7 @@ from django import template
 
 register = template.Library()
 
+
 @register.filter
 def parseBlack(game):
     if game.ratingDelta >= 0:
@@ -10,6 +11,7 @@ def parseBlack(game):
         return f"{game.blackRating} - {abs(game.ratingDelta)}"
     return "ERROR"
 
+
 @register.filter
 def parseWhite(game):
     if game.ratingDelta > 0:
@@ -17,6 +19,7 @@ def parseWhite(game):
     elif game.ratingDelta <= 0:
         return f"{game.whiteRating} + {abs(game.ratingDelta)}"
     return "ERROR"
+
 
 @register.filter
 def parseScore(game):

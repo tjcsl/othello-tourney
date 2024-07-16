@@ -32,12 +32,13 @@ class SubmissionQuerySet(models.QuerySet):
         """
         Returns a set of all the rated submissions for all users
         """
-        #return self.filter(**kwargs).order_by("user", "-created_at").distinct("user").order_by("-rating")
-        g1 = self.latest() #Submission.objects.filter(user__in=Subquery(self.latest().values('user')))
+        # return self.filter(**kwargs).order_by("user", "-created_at").distinct("user").order_by("-rating")
+        g1 = self.latest()  # Submission.objects.filter(user__in=Subquery(self.latest().values('user')))
         g2 = self.filter(gauntlet=True)
         g3 = g2.intersection(g1)
         g3 = g3.order_by("-rating")
         return g3
+
 
 class Submission(models.Model):
 
@@ -48,10 +49,10 @@ class Submission(models.Model):
     created_at = models.DateTimeField(auto_now=True)
     code = models.FileField(upload_to=_save_path, default=None)
 
-    #Rating Info
+    # Rating Info
     rating = models.IntegerField(default=400, null=False)
     gauntlet = models.BooleanField(default=False, null=False)
-    
+
     is_legacy = models.BooleanField(default=False)
     tournament_win_year = models.IntegerField(default=-1)
 
@@ -118,7 +119,7 @@ class Game(models.Model):
     score = models.IntegerField(default=0)
     ratingDelta = models.IntegerField(default=0)
 
-    #rating values for both sides before rating delta is applied
+    # rating values for both sides before rating delta is applied
     blackRating = models.IntegerField(null=True, default=0)
     whiteRating = models.IntegerField(null=True, default=0)
 

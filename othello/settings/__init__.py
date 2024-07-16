@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     "othello.apps.auth.apps.AuthConfig",
     "othello.apps.games.apps.GamesConfig",
     "othello.apps.tournaments.apps.TournamentsConfig",
-    "othello.apps.rating.apps.RatingConfig"
+    "othello.apps.rating.apps.RatingConfig",
 ]
 
 MIDDLEWARE = [

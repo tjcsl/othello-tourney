@@ -80,7 +80,7 @@ def run_game(game_id: int) -> Optional[str]:
         send_through_game_channel(game, "game.error", file_deleted.id)
         raise RuntimeError("Cannot find a submission code file!")
 
-    #print("IM HERE NOW")
+    # print("IM HERE NOW")
 
     try:
         error = 0
@@ -97,7 +97,7 @@ def run_game(game_id: int) -> Optional[str]:
                     game.save(update_fields=["playing", "outcome", "forfeit"])
                     return "no ping"
                 board, current_player = mod.get_game_state()
-                #print(board)
+                # print(board)
 
                 try:
                     if current_player == Player.BLACK:
@@ -167,7 +167,7 @@ def run_game(game_id: int) -> Optional[str]:
                 send_through_game_channel(game, "game.update", game_id)
     except BaseException as error:
         print(error)
-        
+
     game.playing = False
     game.save(update_fields=["playing"])
     send_through_game_channel(game, "game.update", game_id)

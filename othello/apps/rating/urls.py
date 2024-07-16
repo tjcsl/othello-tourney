@@ -10,5 +10,5 @@ urlpatterns = [
     path("standings", views.standings, name="standings"),
     path("history", views.history, name="history"),
     path("manage", views.manage, name="manage"),
-    path("deleteGauntlet", views.deleteGauntlet, name="deleteGauntlet")
+    path("deleteGauntlet", views.deleteGauntlet, name="deleteGauntlet"),
 ]

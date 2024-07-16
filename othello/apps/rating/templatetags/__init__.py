@@ -1,1 +1,1 @@
-#todo, make ranked games seperate from gauntlet games
+# todo, make ranked games seperate from gauntlet games

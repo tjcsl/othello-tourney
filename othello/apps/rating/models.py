@@ -1,16 +1,18 @@
+import random
 from typing import Any
 
+from django.contrib.auth import get_user_model
 from django.db import models
 from django.utils.timezone import now
 
+from ..auth.models import User
 from ..games.models import Game, Submission
 from ..games.validators import validate_game_time_limit
-from ..auth.models import User
-#from .validators import validate_tournament_rounds
 
-from django.contrib.auth import get_user_model
+# from .validators import validate_tournament_rounds
 
-import random
+
+
 
 class Gauntlet(models.Model):
     # objects: Any = TournamentSet().as_manager()
@@ -25,7 +27,7 @@ class Gauntlet(models.Model):
 
     celery_task_id = models.CharField(max_length=48, default="")
 
-    #asdf = models.ForeignKey(Submission, on_delete=models.PROTECT, null = False)
+    # asdf = models.ForeignKey(Submission, on_delete=models.PROTECT, null = False)
     submission = models.ForeignKey(
         Submission,
         blank=False,
@@ -35,21 +37,22 @@ class Gauntlet(models.Model):
         default=None,
     )
     pastRating = models.IntegerField(default=400)
-    
+
     # celery_task_id = models.CharField(max_length=48, default="")
     game1 = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="g1", null=False, blank=False, default=None)
     game2 = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="g2", null=False, blank=False, default=None)
     game3 = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="g3", null=False, blank=False, default=None)
 
-    mySide1 = models.CharField(default=random.choice(['x', 'o']), max_length=1)
-    mySide2 = models.CharField(default=random.choice(['x', 'o']), max_length=1)
-    mySide3 = models.CharField(default=random.choice(['x', 'o']), max_length=1)
+    mySide1 = models.CharField(default=random.choice(["x", "o"]), max_length=1)
+    mySide2 = models.CharField(default=random.choice(["x", "o"]), max_length=1)
+    mySide3 = models.CharField(default=random.choice(["x", "o"]), max_length=1)
 
     def __str__(self) -> str:
         return "gauntlet object"
 
     def __repr__(self) -> str:
         return f"gauntlet object {self.user} {self.created_at}"
+
 
 class RankedManager(models.Model):
     auto_run = models.BooleanField(default=False, null=False)
@@ -62,6 +65,7 @@ class RankedManager(models.Model):
 
     def __repr__(self) -> str:
         return f"Auto Run {self.auto_run}, Next Auto {self.next_auto_run}, Running {self.running}"
+
 
 # class RankedGame(models.Model):
 

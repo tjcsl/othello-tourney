@@ -9,7 +9,7 @@ class User(AbstractUser):
     is_student = models.BooleanField(default=True, null=False)
     is_imported = models.BooleanField(default=False, null=False)
 
-    #rating
+    # rating
     is_gauntlet_running = models.BooleanField(default=False, null=False)
     last_gauntlet_run = models.DateTimeField(null=True)
 
