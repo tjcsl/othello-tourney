@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Othello: About Rating{% endblock %}
+{% block main %}
+    <h3>
+        Othello Rating
+    </h3>
+    <p>
+        The rating is a metric used to measure an AI's performance. This server uses the Elo system.
+    </p>
+    <h5 style="text-decoration: underline">
+        How do I enter the rating?
+    </h5>
+    <p>
+        Because computing power is limited, only AIs past a certain threshold of skill will be included in the rating.
+        <br><br>
+        Specifically, this means that for your AI to be entered in the rating, it must first qualify through passing the gauntlet. The gauntlet is a series of 3 benchmark AIs. To pass the gauntlet, one game will be played against each, and your AI will have to win 3/3. 
+    </p>
+    <h5 style="text-decoration: underline">
+        How is rating calculated?
+    </h5>
+    <p>
+        A modified Elo system is used to prioritize wins while also rewarding higher token differences. The exact rating change code is shown below:
+        <pre><code>
+            def calculateElo(r1, r2, score):
+                # Let K = 32
+                # And r1 >= r2
+                assert r1 >= r2
+                p = (1 / (1 + 10 ** ((r1-r2) / 400)))
+                expected = 64 * (1-p) - 32
+
+                score = score*p + (32 if score > 0 else -32 if score < 0 else 0)
+                
+                delta = (32 / 64) * (score - expected)
+                return round(delta) 
+        </code></pre>
+    </p>
+    <h5 style="text-decoration: underline">
+        How do ranked matches work?
+    </h5>
+    <p>
+        Ranked matches will be run a few times a week. Tenatively, this is Monday, Wednesday, Friday at 4pm. You can view the next scheduled batch of rank games on the standings page.
+        <br><br>
+        For each ranked batch, qualified AIs will be matched against each other. Similarly rated AIs will be matched together. Each AI will play 2 games.
+    </p>
+    <br><br>
+    <p>Brought to you by 2024jliu & 2024dwei</p>
+{% endblock %}

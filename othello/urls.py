@@ -9,6 +9,7 @@ urlpatterns = [
     path("", include("othello.apps.games.urls", namespace="games")),
     path("oauth/", include("social_django.urls", namespace="social")),
     path("tournaments/", include("othello.apps.tournaments.urls", namespace="tournaments")),
+    path("rating/", include("othello.apps.rating.urls", namespace="rating")),
 ]
 
 handler500 = handle_500_view

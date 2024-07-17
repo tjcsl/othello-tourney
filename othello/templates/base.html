@@ -58,6 +58,20 @@
                             {% endif %}
                         </div>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
+                            Rating
+                        </a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="{% url 'rating:help' %}">Rating Help</a>
+                            <a class="dropdown-item" href="{% url 'rating:gauntlet' %}">Gauntlet</a>
+                            <a class="dropdown-item" href="{% url 'rating:standings' %}">Standings</a>
+                            <a class="dropdown-item" href="{% url 'rating:history' %}">Match History</a>
+                            {% if user|has_management_permissions %}
+                            <a class="dropdown-item" href="{% url 'rating:manage' %}">Admin Tools</a>
+                            {% endif %}
+                        </div>
+                    </li>
                     {% if user|has_management_permissions %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>

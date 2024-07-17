@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Othello: Gauntlet{% endblock %}
+{% block main %}
+    <h3>
+        The Gauntlet
+    </h3>
+    {% if queue %}
+    <p>
+        Your gauntlet is in queue.
+    </p>
+    {% else %}
+    <p>
+        Your gauntlet is running.
+        <br>
+        Game 1: {{ g1 }}
+        <br>
+        Game 2: {{ g2 }}
+        <br>
+        Game 3: {{ g3 }}
+    </p>
+    <br><br>
+    <a href="{% url 'rating:deleteGauntlet' %}">Terminate and delete this gauntlet</a>
+    {% endif %}
+    <!-- <p style="color: red">Time Hoarding {% if game.runoff %}Enabled{% else %}Disabled{%endif%}</p>
+                <p>Time Limit: {{ game.time_limit }}s</p> -->
+    
+
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Othello: Gauntlet{% endblock %}
+{% block main %}
+    <h3>
+        The Gauntlet
+    </h3>
+    <p>
+        Proceed below to run the gauntlet on your most recent submission.
+    </p>
+
+    <div class="container-fluid centered">
+        <div class="playform align-content-center">
+            <form action="{% url "rating:gauntlet" %}" method="post">
+                {% csrf_token %}
+                <p>{{ recent_submission }}<p>
+                <input type="checkbox" required>
+                I have read the Othello specification <a href="{% url 'games:help' %}">here</a>.
+                <br><br>
+                <input type="submit" value="Begin!"/>
+            </form>
+        </div>
+    </div>
+
+    {% if last_gauntlet %}
+    <h5 style="text-decoration: underline">
+        Most Recent Gauntlet
+    </h5>
+    <p>
+        Submission: {{ last_gauntlet.submission.name }} (Verification Status: {% if last_gauntlet.submission.gauntlet %}Passed!{% else %}Failed{% endif %})
+        <br>
+        Game 1: {{ g1 }}
+        <br>
+        Game 2: {{ g2 }}
+        <br>
+        Game 3: {{ g3 }}
+        
+    </p>
+    {% endif %}
+
+{% endblock %}

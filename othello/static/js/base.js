@@ -24,6 +24,12 @@ tippy(".yourself", {
     placement: "right"
 })
 
+tippy(".score", {
+    content: "The score shown assumes that the game ended with 64 tokens on the board. " +
+        "This doesn't always happen, so the score here might be wrong.",
+    placement: "right"
+})
+
 tippy("#include_users_file_help", {
     content: "Upload a CSV file with each included user in a separate entry, users should be split by newline." +
         " Users read from this file will be added to the above field.",

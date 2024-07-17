@@ -30,6 +30,7 @@ CHANNEL_LAYERS = {
 
 INSTALLED_APPS = [
     "othello.apps.OthelloAdminConfig",
+    "django_celery_beat",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     "othello.apps.auth.apps.AuthConfig",
     "othello.apps.games.apps.GamesConfig",
     "othello.apps.tournaments.apps.TournamentsConfig",
+    "othello.apps.rating.apps.RatingConfig",
 ]
 
 MIDDLEWARE = [
