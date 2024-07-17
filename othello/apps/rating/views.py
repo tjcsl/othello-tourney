@@ -232,7 +232,6 @@ def manage(request: HttpRequest) -> HttpResponse:
                 manager.save()
             elif selected_choice == "enableauto":
                 manager.auto_run = True
-                manager.next_auto_run = getNextScrimTime()
                 manager.save()
             elif selected_choice == "initranked":
                 # create 1 single ranked manager object
