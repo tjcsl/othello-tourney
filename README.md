@@ -55,7 +55,7 @@ The Othello server uses Ion OAuth, you will need to register an application [her
   * Acceptable hosts can be found in the `ALLOWED_HOSTS` list in `othello/settings/__init__.py`
   * url must be inputted exactly or OAuth will fail
 
-If you are using `docker` to host the Othello services, you will have to manually copy `othello/settings/secret.py.sample` to `othello/settings/secret.py`. If you are using `vagrant`, this is automatically done for you.
+If you are using `docker` to host the Othello services, you will have to manually copy `othello/settings/secret.py.sample` to `othello/settings/secret.py`. If you are using `vagrant`, this is done for you automatically.
 
 After registering an OAuth application enter the key and secret in the `SOCIAL_AUTH_ION_KEY` and `SOCIAL_AUTH_ION_SECRET` variables in `secret.py`
 

@@ -2,6 +2,7 @@ from typing import Any
 
 from django import forms
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
@@ -18,8 +19,8 @@ class TournamentCreateForm(forms.ModelForm):
 
     game_time_limit = forms.IntegerField(label="Game Time Limit: ", min_value=1, max_value=15)
     num_rounds = forms.IntegerField(label="Amount of Rounds: ", min_value=15, max_value=settings.MAX_ROUND_NUM)
-    include_users = forms.ModelMultipleChoiceField(label="Include Users: ", queryset=Submission.objects.latest())
-    bye_player = forms.ModelChoiceField(label="Bye Player: ", queryset=Submission.objects.latest())
+    include_users = forms.ModelMultipleChoiceField(label="Include Users: ", queryset=None)
+    bye_player = forms.ModelChoiceField(label="Bye Player: ", queryset=None)
     runoff = forms.BooleanField(label="Enable Time Hoarding?", initial=False, required=False)
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -27,14 +28,19 @@ class TournamentCreateForm(forms.ModelForm):
         self.fields["include_users"].label_from_instance = Submission.get_user_name
         self.fields["bye_player"].label_from_instance = Submission.get_user_name
 
+        qs = Submission.objects.latest().exclude(user=get_user_model().objects.get(username="Yourself"))
+
+        self.fields["include_users"].queryset = qs
+        self.fields["bye_player"].queryset = qs
+
     def clean(self) -> None:
         cd = self.cleaned_data
         if cd["start_time"] < timezone.now():
             raise ValidationError("A Tournament cannot take place in the past!")
-        if cd["include_users"].count() < 2:
-            raise ValidationError("A Tournament must include at least 2 players!")
         if cd["include_users"].filter(user__username="Yourself").exists() or cd["bye_player"].user.username == "Yourself":
             raise ValidationError('The "Yourself" player cannot participate in Tournaments!')
+        if cd["include_users"].count() < 2:
+            raise ValidationError("A Tournament must include at least 2 players!")
         if cd["include_users"].filter(id=cd["bye_player"].id).exists():
             raise ValidationError("The bye player cannot participate in the Tournament!")
         if cd["include_users"].filter(is_legacy=True).exists():
@@ -54,6 +60,7 @@ class TournamentManagementForm(forms.Form):
         super(TournamentManagementForm, self).__init__(*args, **kwargs)
         self.tournament = tournament
         self.status = "future" if tournament in Tournament.objects.filter_future() else "in_progress"
+        qs = Submission.objects.latest().exclude(user=get_user_model().objects.get(username="Yourself"))
 
         if self.status == "future":
             self.fields["remove_users"].queryset = tournament.include_users.all()
@@ -67,8 +74,8 @@ class TournamentManagementForm(forms.Form):
 
             self.fields["num_rounds"] = forms.IntegerField(max_value=settings.MAX_ROUND_NUM, required=False)
             self.fields["game_time_limit"] = forms.IntegerField(min_value=1, max_value=15, required=False)
-            self.fields["bye_user"] = forms.ModelChoiceField(queryset=Submission.objects.latest(), required=False)
-            self.fields["add_users"] = forms.ModelMultipleChoiceField(queryset=Submission.objects.latest(), required=False)
+            self.fields["bye_user"] = forms.ModelChoiceField(queryset=qs, required=False)
+            self.fields["add_users"] = forms.ModelMultipleChoiceField(queryset=qs, required=False)
             self.fields["bye_user"].label_from_instance = Submission.get_game_name
             self.fields["add_users"].label_from_instance = Submission.get_game_name
         else:
@@ -87,18 +94,16 @@ class TournamentManagementForm(forms.Form):
             if cd.get("add_users", False):
                 if cd["add_users"].filter(user__username="Yourself").exists():
                     raise ValidationError('The "Yourself" player cannot participate in Tournaments!')
-
                 if cd.get("bye_user", False):
                     if cd["add_users"].filter(id=cd["bye_user"].id).exists():
                         raise ValidationError("The bye player cannot participate in the Tournament!")
-
                 if cd["add_users"].filter(is_legacy=True).exists():
                     cd["using_legacy"] = True
 
             if cd.get("bye_player", False):
-                if self.tournament.include_users.filter(id=cd["bye_user"].id).exists():
-                    raise ValidationError("Cannot set a bye player that is already participating in the Tournament")
                 if cd["bye_user"].user.username == "Yourself":
                     raise ValidationError('The "Yourself" player cannot participate in Tournaments!')
+                if self.tournament.include_users.filter(id=cd["bye_user"].id).exists():
+                    raise ValidationError("Cannot set a bye player that is already participating in the Tournament")
                 if cd["bye_user"].filter(is_legacy=True).exists():
                     cd["using_legacy"] = True
