@@ -32,8 +32,8 @@ def swiss_pairing(players: Players, bye_player: TournamentPlayer) -> Pairings:
 
     tournament_matches = set()
     for game in tournament.games.all():
-        tournament_matches.add((game.black.id, game.white.id))
-        tournament_matches.add((game.white.id, game.black.id))
+        tournament_matches.add((game.game.black.id, game.game.white.id))
+        tournament_matches.add((game.game.white.id, game.game.black.id))
 
     for i in range(0, len(players)):
         if i + 1 >= len(players):
