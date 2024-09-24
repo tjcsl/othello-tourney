@@ -16,7 +16,7 @@
             For more information see <a href="{% url 'games:help' %}">About Uploading</a>.
         </p>
         {% else %}
-            <h4>You are logged in as {{ user.username }}.</h4>
+            <h4>You are logged in as {{ user.short_name }}.</h4>
             <br>
             <p>
               Before uploading, please read <a href="{% url 'games:help' %}">About Uploading</a> carefully. It will save you many headaches.

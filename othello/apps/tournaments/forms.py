@@ -17,15 +17,15 @@ class TournamentCreateForm(forms.ModelForm):
     )
 
     game_time_limit = forms.IntegerField(label="Game Time Limit: ", min_value=1, max_value=15)
-    num_rounds = forms.IntegerField(label="Amount of Rounds: ", min_value=15, max_value=settings.MAX_ROUND_NUM)
+    num_rounds = forms.IntegerField(label="Amount of Rounds: ", min_value=5, max_value=settings.MAX_ROUND_NUM)
     include_users = forms.ModelMultipleChoiceField(label="Include Users: ", queryset=Submission.objects.latest())
     bye_player = forms.ModelChoiceField(label="Bye Player: ", queryset=Submission.objects.latest())
     runoff = forms.BooleanField(label="Enable Time Hoarding?", initial=False, required=False)
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(TournamentCreateForm, self).__init__(*args, **kwargs)
-        self.fields["include_users"].label_from_instance = Submission.get_user_name
-        self.fields["bye_player"].label_from_instance = Submission.get_user_name
+        self.fields["include_users"].label_from_instance = Submission.get_user_username
+        self.fields["bye_player"].label_from_instance = Submission.get_user_username
 
     def clean(self) -> None:
         cd = self.cleaned_data

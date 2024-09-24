@@ -26,7 +26,7 @@ class SubmissionQuerySet(models.QuerySet):
         """
         Returns a set of all the latest submissions for all users
         """
-        return self.filter(**kwargs).order_by("user", "-created_at").distinct("user")
+        return self.filter(**kwargs).distinct("user").order_by("user", "-created_at")
 
 
 class Submission(models.Model):
@@ -51,6 +51,9 @@ class Submission(models.Model):
 
     def get_user_name(self) -> str:
         return self.user.short_name
+    
+    def get_user_username(self) -> str:
+        return self.user.username
 
     def get_game_name(self) -> str:
         return (

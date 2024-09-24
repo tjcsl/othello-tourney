@@ -89,7 +89,7 @@
         {% block main %}{% endblock %}
         <br>
         {% if user.is_authenticated %}
-            <p id="logout" class="logout">{{ user.username }} <a class="logout" href="{% url 'auth:logout' %}">Logout</a></p>
+            <p id="logout" class="logout">{{ user.short_name }} <a class="logout" href="{% url 'auth:logout' %}">Logout</a></p>
         {% endif %}
         </div>
     </body>

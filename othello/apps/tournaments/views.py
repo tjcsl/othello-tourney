@@ -28,7 +28,7 @@ def detail(request: HttpRequest, tournament_id: Optional[int] = None) -> HttpRes
     if tournament_id is not None:
         t = get_object_or_404(Tournament, id=tournament_id)
     else:
-        t = Tournament.objects.filter_in_progress().first()
+        t = Tournament.objects.filter_in_progress().last()
 
     if t is not None:
         players = t.players.exclude(submission=t.bye_player).order_by("-ranking", "-cumulative")
