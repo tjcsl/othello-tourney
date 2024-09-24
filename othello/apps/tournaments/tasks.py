@@ -1,5 +1,8 @@
 import logging
+import random
+from collections import deque
 from typing import List, Tuple
+from time import sleep
 
 from celery import shared_task
 
@@ -78,14 +81,24 @@ def run_tournament_game(tournament_game_id: int) -> str:
 
 @shared_task
 def run_tournament(tournament_id: int) -> None:
-    tournament_start_email(tournament_id)
     try:
         t = Tournament.objects.get(id=tournament_id)
     except Tournament.DoesNotExist as e:
         logger.error(f"Trying to run tournament that does not exist {tournament_id}")
         raise e
 
-    submissions: List[TournamentPlayer] = TournamentPlayer.objects.bulk_create([TournamentPlayer(tournament=t, submission=s) for s in t.include_users.all()])
+    if t.terminated:
+        t.delete()
+        logger.info(f"Tournament {tournament_id} has been terminated")
+        return
+
+    tournament_start_email(tournament_id)
+
+    include_users = list(t.include_users.all())
+    random.shuffle(include_users)
+    submissions: List[TournamentPlayer] = TournamentPlayer.objects.bulk_create(
+        [TournamentPlayer(tournament=t, submission=s) for s in include_users]
+    )
     bye_player = TournamentPlayer.objects.create(tournament=t, submission=t.bye_player)
 
     for round_num in range(t.num_rounds):
@@ -101,58 +114,67 @@ def run_tournament(tournament_id: int) -> None:
         for match in matches:
             logger.warning(f"{match[0]}({match[0].ranking}) v. {match[1]}({match[1].ranking})")
         logger.info("\n")
-        for round_matches in chunks(matches, settings.CONCURRENT_GAME_LIMIT):
-            games = [
-                t.games.create(
-                    game=Game.objects.create(
-                        black=game[0].submission,
-                        white=game[1].submission,
-                        time_limit=t.game_time_limit,
-                        playing=True,
-                        is_tournament=True,
-                        runoff=t.runoff_enabled,
-                    )
+        games = deque([
+            t.games.create(
+                game=Game.objects.create(
+                    black=game[0].submission,
+                    white=game[1].submission,
+                    time_limit=t.game_time_limit,
+                    playing=False,
+                    is_tournament=True,
+                    runoff=t.runoff_enabled,
                 )
-                for game in round_matches
-            ]
-            tasks = {game: run_tournament_game.delay(game.id) for game in games}
-            while len(tasks):
-                finished_games = []
-                for game, task in tasks.items():
-                    if task.ready():
-                        if task.result == Player.BLACK.value:
-                            p = t.players.get(submission=game.game.black)
-                            p.ranking += 1
-                            p.save(update_fields=["ranking"])
-                            tmp = "BLACK"
-                        elif task.result == Player.WHITE.value:
-                            p = t.players.get(submission=game.game.white)
-                            p.ranking += 1
-                            p.save(update_fields=["ranking"])
-                            tmp = "WHITE"
-                        else:
-                            b, w = (
-                                t.players.get(submission=game.game.black),
-                                t.players.get(submission=game.game.white),
-                            )
-                            b.ranking += 0.5
-                            w.ranking += 0.5
-                            b.save(update_fields=["ranking"])
-                            w.save(update_fields=["ranking"])
-                            tmp = "TIE"
+            )
+            for game in matches
+        ])
+
+        running_games = {}
+        while games or running_games:
+            finished_games = []
+            for _ in range(settings.CONCURRENT_GAME_LIMIT - len(running_games)):
+                if not games:
+                    break
+                game = games.popleft()
+                game.game.playing = True
+                game.game.save(update_fields=["playing"])
+                running_games[game] = run_tournament_game.delay(game.id)
+            for game, task in running_games.items():
+                if task.ready():
+                    if task.result == Player.BLACK.value:
+                        p = t.players.get(submission=game.game.black)
+                        p.ranking += 1
+                        p.save(update_fields=["ranking"])
+                        tmp = "BLACK"
+                    elif task.result == Player.WHITE.value:
+                        p = t.players.get(submission=game.game.white)
+                        p.ranking += 1
+                        p.save(update_fields=["ranking"])
+                        tmp = "WHITE"
+                    else:
                         b, w = (
                             t.players.get(submission=game.game.black),
                             t.players.get(submission=game.game.white),
                         )
-                        b.cumulative += get_updated_ranking(b)
-                        w.cumulative += get_updated_ranking(w)
-                        b.save(update_fields=["cumulative"])
-                        w.save(update_fields=["cumulative"])
-                        logger.warning(f"Tournament {tournament_id}, Round {round_num + 1}, {tmp}: {game.game.black} v. {game.game.white}")
-                        finished_games.append(game)  # keep track of all finished games in auxiliary list
+                        b.ranking += 0.5
+                        w.ranking += 0.5
+                        b.save(update_fields=["ranking"])
+                        w.save(update_fields=["ranking"])
+                        tmp = "TIE"
+                    b, w = (
+                        t.players.get(submission=game.game.black),
+                        t.players.get(submission=game.game.white),
+                    )
+                    b.cumulative += get_updated_ranking(b)
+                    w.cumulative += get_updated_ranking(w)
+                    b.save(update_fields=["cumulative"])
+                    w.save(update_fields=["cumulative"])
+                    logger.warning(f"Tournament {tournament_id}, Round {round_num + 1}, {tmp}: {game.game.black} v. {game.game.white}")
+                    finished_games.append(game)  # keep track of all finished games in auxiliary list
 
-                for game in finished_games:  # need to use list to delete after iterating through dictionary
-                    del tasks[game]  # cannot delete during dictionary iteration (edit while access error)
+            for game in finished_games:  # need to use list to delete after iterating through dictionary
+                del running_games[game]  # cannot delete during dictionary iteration (edit while access error)
+            sleep(1)
+
         logger.warning(f"Tournament {tournament_id}, Round {round_num+1} complete")
 
     t.finished = True

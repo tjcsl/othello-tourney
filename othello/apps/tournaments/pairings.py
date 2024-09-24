@@ -30,28 +30,37 @@ def swiss_pairing(players: Players, bye_player: TournamentPlayer) -> Pairings:
 
     logger.info(players)
 
-    tournament_matches = set()
-    for game in tournament.games.all():
-        tournament_matches.add((game.game.black.id, game.game.white.id))
-        tournament_matches.add((game.game.white.id, game.game.black.id))
+    played_games = set(
+        game
+        for tgame in tournament.games.all()
+        if bye_player.submission.id not in (game := (tgame.game.black.id, tgame.game.white.id))
+    )
+    players_this_round = set()
 
     for i in range(0, len(players)):
+        if players[i] in players_this_round:
+            continue
         if i + 1 >= len(players):
             break
         for j in range(i + 1, len(players)):
-            if (players[i].id, players[j].id) not in tournament_matches:
-                black = random.choice((players[i], players[j]))
-                white = players[i] if black == players[j] else players[j]
-                logger.info(f"RANK: {black}({black.ranking}), {white}({white.ranking})")
-                matches.append((black, white))
+            if players[j] not in players_this_round and (players[i].submission.id, players[j].submission.id) not in played_games:
+                matches.append((players[i], players[j]))
+                matches.append((players[j], players[i]))
+                if players[i] != bye_player:
+                    players_this_round.add(players[i])
+                if players[j] != bye_player:
+                    players_this_round.add(players[j])
                 break
         else:
+            # matches.append((players[i], bye_player))
+            # matches.append((bye_player, players[i]))
             return danish_pairing(players, bye_player)
 
     return matches
 
 
 def danish_pairing(players: Players, bye_player: TournamentPlayer) -> Pairings:
+    logger.warning("Using Danish Pairing")
     matches = []
     players = sorted(players, key=get_updated_ranking, reverse=True)
 
@@ -60,7 +69,6 @@ def danish_pairing(players: Players, bye_player: TournamentPlayer) -> Pairings:
             players.append(bye_player)
         black = random.choice((players[i], players[i + 1]))
         white = players[i] if black == players[i + 1] else players[i + 1]
-        logger.info(f"RANK: {black}({black.ranking}), {white}({white.ranking})")
         matches.append((black, white))
 
     return matches
