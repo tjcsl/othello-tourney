@@ -41,7 +41,6 @@ function playerSort(el) {
         username = el.text.match(/\(([^)]+)\)/)[1];
     }
     // sort descending by year, if it is part of the username, and then alphabetically
-    // if username begins with year, sort by year, then alphabetically
     if(username.match(/^\d{4}/)){
         // first four numbers are year
         let year = username.substring(0, 4);
@@ -73,8 +72,8 @@ window.onload = function () {
         }
     });
     $("#id_white").selectize({
-        maxItems: 1,
         options: players,
+        maxItems: 1,
         onChange: function (val) {
             showYourselfHelp(val, "#white-help");
         },

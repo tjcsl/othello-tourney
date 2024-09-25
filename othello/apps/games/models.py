@@ -27,7 +27,7 @@ class SubmissionQuerySet(models.QuerySet):
         """
         Returns a set of all the latest submissions for all users
         """
-        return self.filter(**kwargs).distinct("user")
+        return self.filter(**kwargs).distinct("user").order_by("user", "-created_at")
 
 
 class Submission(models.Model):
