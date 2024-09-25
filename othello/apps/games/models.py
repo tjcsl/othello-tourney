@@ -6,6 +6,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import Q
+from django.db.models.functions import Coalesce
 from django.utils import timezone
 
 from ...moderator.constants import Player
@@ -18,7 +19,7 @@ PLAYER_CHOICES = (
 
 
 def _save_path(instance, filename: str) -> AnyStr:
-    return os.path.join(instance.user.short_name if instance.user else instance.name, f"{uuid.uuid4()}.py")
+    return os.path.join(instance.user.username if instance.user else instance.name, f"{uuid.uuid4()}.py")
 
 
 class SubmissionQuerySet(models.QuerySet):
@@ -26,7 +27,7 @@ class SubmissionQuerySet(models.QuerySet):
         """
         Returns a set of all the latest submissions for all users
         """
-        return self.filter(**kwargs).distinct("user").order_by("user", "-created_at")
+        return self.filter(**kwargs).distinct("user")
 
 
 class Submission(models.Model):
@@ -51,7 +52,7 @@ class Submission(models.Model):
 
     def get_user_name(self) -> str:
         return self.user.short_name
-    
+
     def get_user_username(self) -> str:
         return self.user.username
 
@@ -59,9 +60,7 @@ class Submission(models.Model):
         return (
             f"T-{self.tournament_win_year} {self.get_user_name()}"
             if self.tournament_win_year != -1
-            else self.get_user_name()
-            if self.user is not None
-            else self.name
+            else self.get_user_name() if self.user is not None else self.name
         )
 
     def get_submitted_time(self) -> str:

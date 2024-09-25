@@ -1,8 +1,8 @@
 import logging
 import random
 from collections import deque
-from typing import List, Tuple
 from time import sleep
+from typing import List, Tuple
 
 from celery import shared_task
 
@@ -96,9 +96,7 @@ def run_tournament(tournament_id: int) -> None:
 
     include_users = list(t.include_users.all())
     random.shuffle(include_users)
-    submissions: List[TournamentPlayer] = TournamentPlayer.objects.bulk_create(
-        [TournamentPlayer(tournament=t, submission=s) for s in include_users]
-    )
+    submissions: List[TournamentPlayer] = TournamentPlayer.objects.bulk_create([TournamentPlayer(tournament=t, submission=s) for s in include_users])
     bye_player = TournamentPlayer.objects.create(tournament=t, submission=t.bye_player)
 
     for round_num in range(t.num_rounds):
@@ -114,19 +112,21 @@ def run_tournament(tournament_id: int) -> None:
         for match in matches:
             logger.warning(f"{match[0]}({match[0].ranking}) v. {match[1]}({match[1].ranking})")
         logger.info("\n")
-        games = deque([
-            t.games.create(
-                game=Game.objects.create(
-                    black=game[0].submission,
-                    white=game[1].submission,
-                    time_limit=t.game_time_limit,
-                    playing=False,
-                    is_tournament=True,
-                    runoff=t.runoff_enabled,
+        games = deque(
+            [
+                t.games.create(
+                    game=Game.objects.create(
+                        black=game[0].submission,
+                        white=game[1].submission,
+                        time_limit=t.game_time_limit,
+                        playing=False,
+                        is_tournament=True,
+                        runoff=t.runoff_enabled,
+                    )
                 )
-            )
-            for game in matches
-        ])
+                for game in matches
+            ]
+        )
 
         running_games = {}
         while games or running_games:

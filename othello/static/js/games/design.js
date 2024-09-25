@@ -29,14 +29,44 @@ function tournament_winner(data, escape){
     return `<div>${escape(data.text)}</div>`;
 }
 
+// Sorry for this terrible code
+function playerSort(el) {
+    let username = el.text;
+    let winner = false;
+    if(el.text.includes("T-")){
+        winner = true;
+        username = username.replace(" ", "").substring(2);
+    }
+    if(el.text.includes("(")){
+        username = el.text.match(/\(([^)]+)\)/)[1];
+    }
+    // sort descending by year, if it is part of the username, and then alphabetically
+    // if username begins with year, sort by year, then alphabetically
+    if(username.match(/^\d{4}/)){
+        // first four numbers are year
+        let year = username.substring(0, 4);
+        year = 3000 - parseInt(year);
+        username = year + username.substring(4);
+    }
+    if (winner){
+        username = "0" + username;
+    }
+    return username;
+}
+
 window.onload = function () {
     helps()
+    let players = $("#id_black").children().toArray();
+    players = players.map(function(el) {
+        return {text: el.text, username: playerSort(el)};
+    });
     $("#id_black").selectize({
+        options: players,
         maxItems: 1,
         onChange: function (val) {
             showYourselfHelp(val, "#black-help");
         },
-        sortField: [{'field': 'text', 'direction': 'desc'}],
+        sortField: [{'field': 'username', 'direction': 'asc'}],
         render:{
             option: tournament_winner,
             item: tournament_winner
@@ -44,10 +74,11 @@ window.onload = function () {
     });
     $("#id_white").selectize({
         maxItems: 1,
+        options: players,
         onChange: function (val) {
             showYourselfHelp(val, "#white-help");
         },
-        sortField: [{'field': 'text', 'direction': 'desc'}],
+        sortField: [{'field': 'username', 'direction': 'asc'}],
         render:{
             option: tournament_winner,
             item: tournament_winner,
