@@ -31,9 +31,9 @@ class SubmissionForm(forms.ModelForm):
             raise ValidationError("Please upload a non-empty Python file!")
         if not cd["name"]:
             cd["name"] = cd["code"].name
-        if not os.path.exists(os.path.join(settings.MEDIA_ROOT, self.user.short_name)):
-            os.mkdir(os.path.join(settings.MEDIA_ROOT, self.user.short_name))
-        with NamedTemporaryFile("wb+", dir=os.path.join(settings.MEDIA_ROOT, self.user.short_name)) as f:
+        if not os.path.exists(os.path.join(settings.MEDIA_ROOT, self.user.username)):
+            os.mkdir(os.path.join(settings.MEDIA_ROOT, self.user.username))
+        with NamedTemporaryFile("wb+", dir=os.path.join(settings.MEDIA_ROOT, self.user.username)) as f:
             for chunk in cd["code"].chunks():
                 f.write(chunk)
             f.seek(0)
