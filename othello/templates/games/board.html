@@ -9,8 +9,9 @@
     <script type="text/javascript" src="{% static 'js/games/board.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/base.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/games/play/socket.js' %}"></script>
+    {{ game | json_script:"gameData" }}
     <script type="text/javascript">
-        const game = JSON.parse('{{ game|safe_json }}');
+        const game = JSON.parse($('#gameData').html());
         const is_watching = JSON.parse('{{ is_watching|safe_json }}');
         const heartbeat_interval = {{ settings.CLIENT_HEARTBEAT_INTERVAL }};
     </script>
