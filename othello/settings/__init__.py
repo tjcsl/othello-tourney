@@ -229,7 +229,7 @@ YOURSELF_TIMEOUT = 300  # seconds
 MAX_TIME_LIMIT = 15  # seconds
 
 # Tournament settings
-MAX_ROUND_NUM = 75  # amount of rounds
+MAX_ROUND_NUM = 1000  # amount of rounds
 CONCURRENT_GAME_LIMIT = 4  # max amount of games that can be played at any time
 
 try:
