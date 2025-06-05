@@ -65,8 +65,8 @@ def danish_pairing(players: Players, bye_player: TournamentPlayer) -> Pairings:
             players.append(bye_player)
         # black = random.choice((players[i], players[i + 1]))
         # white = players[i] if black == players[i + 1] else players[i + 1]
-        matches.append((black, white))
-        matches.append((white, black))
+        matches.append((players[i], players[i+1]))
+        matches.append((players[i+1], players[i]))
 
     return matches
 
