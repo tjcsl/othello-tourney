@@ -20,6 +20,11 @@ class TournamentSet(models.QuerySet):
 
 
 class Tournament(models.Model):
+    PAIRING_ALGORITHMS = (
+        ("random", "Random"),
+        ("swiss", "Swiss"),
+        ("danish", "Danish"),
+    )
 
     objects: Any = TournamentSet().as_manager()
 
@@ -38,6 +43,11 @@ class Tournament(models.Model):
         on_delete=models.PROTECT,
         related_name="bye",
         default=None,
+    )
+    pairing_algorithm = models.CharField(
+        choices=PAIRING_ALGORITHMS,
+        default="swiss",
+        max_length=20,
     )
 
     finished = models.BooleanField(default=False)

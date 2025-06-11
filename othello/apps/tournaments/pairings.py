@@ -1,7 +1,7 @@
 import random
 from typing import List, Tuple
 
-from othello.apps.tournaments.models import TournamentPlayer
+from othello.apps.tournaments.models import TournamentPlayer, Tournament
 from othello.apps.tournaments.utils import chunks, get_updated_ranking, logger
 
 Players = List[TournamentPlayer]
@@ -78,7 +78,5 @@ algorithms = {
 }
 
 
-def pair(players: Players, bye_player: TournamentPlayer, algorithm: str = "swiss") -> Pairings:
-    if algorithm not in algorithms:
-        raise ValueError(f"Invalid pairing algorithm: {algorithm}")
-    return algorithms[algorithm](players, bye_player)
+def pair(players: Players, bye_player: TournamentPlayer, tournament: Tournament) -> Pairings:
+    return algorithms[tournament.pairing_algorithm](players, bye_player)
