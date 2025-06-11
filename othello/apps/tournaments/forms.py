@@ -19,6 +19,7 @@ class TournamentCreateForm(forms.ModelForm):
     game_time_limit = forms.IntegerField(label="Game Time Limit: ", min_value=1, max_value=15)
     num_rounds = forms.IntegerField(label="Amount of Rounds: ", min_value=5, max_value=settings.MAX_ROUND_NUM)
     include_users = forms.ModelMultipleChoiceField(label="Include Users: ", queryset=Submission.objects.latest())
+    pairing_algorithm = forms.ChoiceField(label="Pairing Algorithm: ", choices=Tournament.PAIRING_ALGORITHMS, initial="swiss")
     bye_player = forms.ModelChoiceField(label="Bye Player: ", queryset=Submission.objects.latest())
     runoff = forms.BooleanField(label="Enable Time Hoarding?", initial=False, required=False)
 

@@ -100,7 +100,11 @@ def run_tournament(tournament_id: int) -> None:
     bye_player = TournamentPlayer.objects.create(tournament=t, submission=t.bye_player)
 
     for round_num in range(t.num_rounds):
-        matches: List[Tuple[TournamentPlayer, ...]] = pair(submissions, bye_player)
+        try:
+            matches: List[Tuple[TournamentPlayer, ...]] = pair(submissions, bye_player, t)
+        except Exception as e:
+            logger.error(f"Error in pairing for tournament {tournament_id}, round {round_num + 1}: {e}")
+            raise
         t.refresh_from_db()
         if t.terminated:
             t.delete()

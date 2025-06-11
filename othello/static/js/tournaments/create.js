@@ -25,6 +25,11 @@ window.onload = function () {
         maxItems: 1,
         sortField: [{'field': 'text', 'direction': 'desc'}]
     });
+    $("#id_pairing_algorithm").selectize({
+        maxItems: 1,
+        sortField: [{'field': 'text', 'direction': 'desc'}]
+    });
+
 
     $("#includeUsersFile").on('change', function () {
         let reader = new FileReader();
