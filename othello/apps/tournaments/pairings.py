@@ -12,7 +12,9 @@ def round_robin_pairing(players: Players, _bye_player: TournamentPlayer, **kwarg
     matches: Pairings = []
     for i in range(len(players)):
         for j in range(i + 1, len(players)):
-            matches.extend((players[i], players[j]) for _ in range(kwargs["round_robin_matches"]))
+            for _ in range(kwargs["round_robin_matches"]):
+                matches.append((players[i], players[j]))
+                matches.append((players[j], players[i]))
     return matches
 
 
