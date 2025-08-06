@@ -101,7 +101,12 @@ def run_tournament(tournament_id: int) -> None:
 
     for round_num in range(t.num_rounds):
         try:
-            matches: List[Tuple[TournamentPlayer, ...]] = pair(submissions, bye_player, t)
+            matches: List[Tuple[TournamentPlayer, ...]] = pair(
+                submissions,
+                bye_player,
+                t,
+                round_robin_matches=t.round_robin_matches,
+            )
         except Exception as e:
             logger.error(f"Error in pairing for tournament {tournament_id}, round {round_num + 1}: {e}")
             raise

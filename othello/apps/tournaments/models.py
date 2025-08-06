@@ -24,6 +24,7 @@ class Tournament(models.Model):
         ("random", "Random"),
         ("swiss", "Swiss"),
         ("danish", "Danish"),
+        ("round_robin", "Round Robin"),
     )
 
     objects: Any = TournamentSet().as_manager()
@@ -49,6 +50,7 @@ class Tournament(models.Model):
         default="swiss",
         max_length=20,
     )
+    round_robin_matches = models.IntegerField(default=2, help_text="How many matches to play between two players in a round robin tournament")
 
     finished = models.BooleanField(default=False)
     terminated = models.BooleanField(default=False)
