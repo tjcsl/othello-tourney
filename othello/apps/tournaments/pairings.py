@@ -1,14 +1,22 @@
 import random
 from typing import List, Tuple
 
-from othello.apps.tournaments.models import TournamentPlayer
+from othello.apps.tournaments.models import Tournament, TournamentPlayer
 from othello.apps.tournaments.utils import chunks, get_updated_ranking, logger
 
 Players = List[TournamentPlayer]
 Pairings = List[Tuple[TournamentPlayer, ...]]
 
 
-def random_pairing(players: Players, bye_player: TournamentPlayer) -> Pairings:
+def round_robin_pairing(players: Players, _bye_player: TournamentPlayer, **kwargs) -> Pairings:
+    matches: Pairings = []
+    for i in range(len(players)):
+        for j in range(i + 1, len(players)):
+            matches.extend((players[i], players[j]) for _ in range(kwargs["round_robin_matches"]))
+    return matches
+
+
+def random_pairing(players: Players, bye_player: TournamentPlayer, **kwargs) -> Pairings:
     randomized: Players = random.sample(players, len(players))
     if len(randomized) % 2 == 1:
         randomized.append(bye_player)
@@ -16,7 +24,7 @@ def random_pairing(players: Players, bye_player: TournamentPlayer) -> Pairings:
     return list(chunks(randomized, 2))
 
 
-def swiss_pairing(players: Players, bye_player: TournamentPlayer) -> Pairings:
+def swiss_pairing(players: Players, bye_player: TournamentPlayer, **kwargs) -> Pairings:
     tournament = players[0].tournament
 
     # Default to danish pairing if there are enough rounds
@@ -55,7 +63,7 @@ def swiss_pairing(players: Players, bye_player: TournamentPlayer) -> Pairings:
     return matches
 
 
-def danish_pairing(players: Players, bye_player: TournamentPlayer) -> Pairings:
+def danish_pairing(players: Players, bye_player: TournamentPlayer, **kwargs) -> Pairings:
     logger.warning("Using Danish Pairing")
     matches = []
     players = sorted(players, key=get_updated_ranking, reverse=True)
@@ -65,8 +73,8 @@ def danish_pairing(players: Players, bye_player: TournamentPlayer) -> Pairings:
             players.append(bye_player)
         # black = random.choice((players[i], players[i + 1]))
         # white = players[i] if black == players[i + 1] else players[i + 1]
-        matches.append((players[i], players[i+1]))
-        matches.append((players[i+1], players[i]))
+        matches.append((players[i], players[i + 1]))
+        matches.append((players[i + 1], players[i]))
 
     return matches
 
@@ -75,10 +83,9 @@ algorithms = {
     "random": random_pairing,
     "swiss": swiss_pairing,
     "danish": danish_pairing,
+    "round_robin": round_robin_pairing,
 }
 
 
-def pair(players: Players, bye_player: TournamentPlayer, algorithm: str = "swiss") -> Pairings:
-    if algorithm not in algorithms:
-        raise ValueError(f"Invalid pairing algorithm: {algorithm}")
-    return algorithms[algorithm](players, bye_player)
+def pair(players: Players, bye_player: TournamentPlayer, tournament: Tournament, **kwargs) -> Pairings:
+    return algorithms[tournament.pairing_algorithm](players, bye_player, **kwargs)

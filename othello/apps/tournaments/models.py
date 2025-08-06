@@ -20,6 +20,12 @@ class TournamentSet(models.QuerySet):
 
 
 class Tournament(models.Model):
+    PAIRING_ALGORITHMS = (
+        ("random", "Random"),
+        ("swiss", "Swiss"),
+        ("danish", "Danish"),
+        ("round_robin", "Round Robin"),
+    )
 
     objects: Any = TournamentSet().as_manager()
 
@@ -39,6 +45,12 @@ class Tournament(models.Model):
         related_name="bye",
         default=None,
     )
+    pairing_algorithm = models.CharField(
+        choices=PAIRING_ALGORITHMS,
+        default="swiss",
+        max_length=20,
+    )
+    round_robin_matches = models.IntegerField(default=2, help_text="How many matches to play between two players in a round robin tournament")
 
     finished = models.BooleanField(default=False)
     terminated = models.BooleanField(default=False)
