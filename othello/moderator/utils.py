@@ -87,11 +87,11 @@ def binary_to_string(board: str) -> str:
     """
     return "".join(
         [
-            constants.Player.WHITE.value
-            if is_on(board[0], 63 - i)
-            else constants.Player.BLACK.value
-            if is_on(board[1], 63 - i)
-            else constants.Player.EMPTY.value
+            (
+                constants.Player.WHITE.value
+                if is_on(board[0], 63 - i)
+                else constants.Player.BLACK.value if is_on(board[1], 63 - i) else constants.Player.EMPTY.value
+            )
             for i in range(64)
         ]
     )

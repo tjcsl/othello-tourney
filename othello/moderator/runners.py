@@ -82,9 +82,11 @@ class PlayerRunner:
             self.process = None
 
     @capture_generator_value
-    def get_move(
-        self, board: str, player: Player, time_limit: int, last_move: Move
-    ) -> Generator[str, None, Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]], ]:
+    def get_move(self, board: str, player: Player, time_limit: int, last_move: Move) -> Generator[
+        str,
+        None,
+        Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]],
+    ]:
         if self.process.poll():
             print(self.process.communicate())
             return -1, ServerError.PROCESS_EXITED, -1
@@ -142,9 +144,11 @@ class YourselfRunner:
         pass
 
     @capture_generator_value
-    def get_move(
-        self, board: str, player: Player, time_limit: int, last_move: Move
-    ) -> Generator[str, None, Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]], ]:
+    def get_move(self, board: str, player: Player, time_limit: int, last_move: Move) -> Generator[
+        str,
+        None,
+        Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]],
+    ]:
         yield "Choose your move!"
         start = time.time()
         while True:

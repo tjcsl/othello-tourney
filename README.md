@@ -23,11 +23,7 @@ Start by cloning this repository:
 
 To start the services(postgres, redis):
   * `cd config/docker`
-  * `docker-compose up -d`
-
-You can also run the services individually:
-  * `./config/docker/postgres.sh`
-  * `./config/docker/redis.sh`
+  * `docker compose up --build`
 
 You only need to start the services once (either with `docker-compose` or the shell scripts) and both ways will handle all the necessary configuration(passwords, port forwarding, etc.)
 
@@ -62,27 +58,21 @@ After registering an OAuth application enter the key and secret in the `SOCIAL_A
 
 ### Running the Othello server
 
-After you have setup your dev environment and configured Ion OAuth, you will need to install the project dependencies. 
+After you have setup your dev environment and configured Ion OAuth, you will need to install the project dependencies and run migrations.
 
-This project uses [Pipenv](https://pipenv.pypa.io/en/latest/) to manage dependencies, to install the dependencies run:
-  * `pipenv install --dev`
-  
-After installing the dependencies, run the model migrations
-  * `pipenv run python3 manage.py migrate`
+Local (no Docker):
+  - Install dependencies: `pipenv install --dev`
+  - Run migrations: `pipenv run python3 manage.py migrate`
+  - Run server: `pipenv run python3 manage.py runserver <host>:<port>`
 
-Note: Failure to do this will cause the game code to fail.
+Docker (recommended):
+  - From this repository root: `cd config/docker` then `docker compose up --build`
+  - The Docker setup starts `postgres`, `redis`, and the `othello_django` service. The Django container's entrypoint runs `manage.py migrate` automatically on startup, so you do not need to run migrations manually when using Docker.
 
-
-You can run the django server by running:
-  * `pipenv run python3 manage.py runserver <host>:<port>`
-
-Note: If you are using `vagrant`, host should be `0.0.0.0` and port should be `8000`. Vagrant on Linux has some issues forwarding traffic if the host is `127.0.0.1` or `localhost`, so `0.0.0.0` will have the most success. The only port forwarded from the vagrant VM is `8000` so no other port will work (unless you change the Vagrant config). 
-
-Note: If you are using `docker`, you can use any host/port combination as long as :
-  1) You can access the host and port
-  2) The resultant url is registered in the Ion OAuth application
-
-Afterwards, open the resultant url in a browser and you should see the Othello site.
+Notes:
+  - If you are using `vagrant`, host should be `0.0.0.0` and port should be `8000`.
+  - If you are using `docker`, the service exposes port `8000` by default; ensure the URL you register with Ion OAuth matches the host:port you use.
+  - Before starting with Docker you may need to copy `othello/settings/secret.py.sample` to `othello/settings/secret.py` so secrets and OAuth settings are present.
 
 
 ### Running the celery worker

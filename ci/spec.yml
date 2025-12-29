@@ -9,8 +9,7 @@ defaults:
 
 .anchors:
   python_versions: &python_versions
-    - 3.8
-    - 3.9
+    - 3.13
 
   repo_setup: &repo_setup
     name: Set up repo
