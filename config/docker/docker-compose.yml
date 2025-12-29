@@ -9,10 +9,32 @@ services:
     - POSTGRES_USER=othello
     - POSTGRES_PASSWORD=pwd
     volumes:
-    - "othello_pgdata:/var/lib/postgresql/data"
+    - "othello_pgdata:/var/lib/postgresql"
   othello_redis:
     image: redis:latest
     expose:
     - "6379"
+  othello_django:
+    build:
+      context: ../../
+      dockerfile: config/docker/Dockerfile
+    command: python3 manage.py runserver 0.0.0.0:8000
+    ports:
+    - "8000:8000"
+    environment:
+    - DJANGO_SETTINGS_MODULE=othello.settings
+    - DATABASE_HOST=othello_postgres
+    - DATABASE_PORT=5432
+    - DATABASE_NAME=othello
+    - DATABASE_USER=othello
+    - DATABASE_PASSWORD=pwd
+    - REDIS_HOST=othello_redis
+    - REDIS_PORT=6379
+    depends_on:
+    - othello_postgres
+    - othello_redis
+    volumes:
+    - ../../:/app
+    working_dir: /app
 volumes:
   othello_pgdata:
