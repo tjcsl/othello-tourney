@@ -64,17 +64,17 @@ After registering an OAuth application enter the key and secret in the `SOCIAL_A
 
 After you have setup your dev environment and configured Ion OAuth, you will need to install the project dependencies.
 
-This project uses [Pipenv](https://pipenv.pypa.io/en/latest/) to manage dependencies, to install the dependencies run:
-  * `pipenv install --dev`
+This project uses [uv](https://docs.astral.sh/uv/) to manage dependencies, to install the dependencies run:
+  * `uv sync`
 
 After installing the dependencies, run the model migrations
-  * `pipenv run python3 manage.py migrate`
+  * `uv run python3 manage.py migrate`
 
 Note: Failure to do this will cause the game code to fail.
 
 
 You can run the django server by running:
-  * `pipenv run python3 manage.py runserver <host>:<port>`
+  * `uv run python3 manage.py runserver <host>:<port>`
 
 Note: If you are using `vagrant`, host should be `0.0.0.0` and port should be `8000`. Vagrant on Linux has some issues forwarding traffic if the host is `127.0.0.1` or `localhost`, so `0.0.0.0` will have the most success. The only port forwarded from the vagrant VM is `8000` so no other port will work (unless you change the Vagrant config).
 
@@ -92,7 +92,7 @@ The Othello server uses [celery](https://docs.celeryproject.org/en/stable/gettin
 
 Start the celery worker by running:
 
-  * `pipenv run celery --app=othello worker --loglevel=INFO -B`
+  * `uv run celery --app=othello worker --loglevel=INFO -B`
 
 Note: You will need to keep this command running in the foreground until you need to restart it
 
@@ -106,4 +106,4 @@ Keep the code pretty :)
 
 Run this command before committing or CI checks will fail
 
-  * `pipenv run ./scripts/format.sh`
+  * `uv run pre-commit run --all-files`
