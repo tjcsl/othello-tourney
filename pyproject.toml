@@ -1,3 +1,32 @@
+[project]
+name = "othello"
+description = "An autograder for Computer Science Classes"
+readme = "README.md"
+authors = [
+    {name = "The TJHSST Computer Systems Lab", email = "othello@tjhsst.edu"},
+]
+requires-python = ">=3.13"
+version = "1.0"
+license = { file = "LICENSE" }
+dependencies = [
+    "celery>=5.6.2",
+    "channels>=4.3.2",
+    "channels-redis>=4.3.0",
+    "daphne>=4.2.1",
+    "django>=5.2.0,<6.0.0",
+    "django-celery-results>=2.6.0",
+    "django-extensions>=4.1",
+    "psutil>=7.2.1",
+    "psycopg[binary]>=3.3.2",
+    "redis>=7.1.0",
+    "social-auth-app-django>=5.7.0",
+]
+
+[dependency-groups]
+dev = [
+    "coverage>=7.13.1",
+]
+
 [tool.black]
 line-length = 160
 exclude = '''
