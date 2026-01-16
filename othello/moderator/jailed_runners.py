@@ -9,7 +9,7 @@ import sys
 import traceback
 from contextlib import redirect_stdout
 from time import perf_counter
-from typing import Any, TextIO, Tuple, Union
+from typing import Any, TextIO
 
 from .utils import ServerError, import_strategy
 
@@ -28,18 +28,24 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
         try:
             self.strat.best_strategy(*game_args)
             pipe_to_parent.send(None)
-        except Exception:  # noqa
+        except Exception:
             pipe_to_parent.send(traceback.format_exc())
 
-    def get_move(self, board: str, player: str, time_limit: int) -> Union[Tuple[int, str, int], Tuple[ServerError, str, int]]:
+    def get_move(
+        self, board: str, player: str, time_limit: int
+    ) -> tuple[int, str, int] | tuple[ServerError, str, int]:
         best_move, is_running = mp.Value("i", -1), mp.Value("i", 1)
 
         to_child, to_self = mp.Pipe()
         try:
             board = "".join(board)
             if self.board_10x10:
-                board = "?" * 11 + "??".join(board[i: i + 8] for i in range(0, 64, 8)) + "?" * 11
-            args = (board, player, best_move, is_running) if self.nargs == 4 else (board, player, best_move, is_running, time_limit)
+                board = "?" * 11 + "??".join(board[i : i + 8] for i in range(0, 64, 8)) + "?" * 11
+            args = (
+                (board, player, best_move, is_running)
+                if self.nargs == 4
+                else (board, player, best_move, is_running, time_limit)
+            )
             p = mp.Process(
                 target=self.play_wrapper,
                 args=args,
@@ -64,7 +70,9 @@ class LocalRunner:  # Called from JailedRunner, inherits accessibility restricti
             return ServerError.UNEXPECTED, "Server Error", -1
 
 
-class JailedRunner(LocalRunner):  # Called from subprocess, no access to django channels/main application
+class JailedRunner(
+    LocalRunner
+):  # Called from subprocess, no access to django channels/main application
     def run(self):
         while True:
             self.handle(sys.stdin, sys.stdout, sys.stderr)

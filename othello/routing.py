@@ -1,7 +1,6 @@
 from channels.auth import AuthMiddlewareStack
 from channels.generic.websocket import WebsocketConsumer
 from channels.routing import ProtocolTypeRouter, URLRouter
-
 from django.core.asgi import get_asgi_application
 from django.urls import path
 
@@ -31,6 +30,6 @@ application = ProtocolTypeRouter(
                     path("<path:path>", WebsocketCloseConsumer.as_asgi()),
                 ]
             )
-        )
+        ),
     }
 )

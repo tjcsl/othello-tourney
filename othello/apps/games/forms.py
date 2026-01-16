@@ -1,6 +1,6 @@
 import os
 from tempfile import NamedTemporaryFile
-from typing import Any, Dict
+from typing import Any
 
 from django import forms
 from django.conf import settings
@@ -25,7 +25,7 @@ class SubmissionForm(forms.ModelForm):
         super(SubmissionForm, self).__init__(*args, **kwargs)
         self.user = user
 
-    def clean(self) -> Dict[str, Any]:
+    def clean(self) -> dict[str, Any]:
         cd = self.cleaned_data
         if "code" not in cd:
             raise ValidationError("Please upload a non-empty Python file!")
@@ -33,7 +33,9 @@ class SubmissionForm(forms.ModelForm):
             cd["name"] = cd["code"].name
         if not os.path.exists(os.path.join(settings.MEDIA_ROOT, self.user.username)):
             os.mkdir(os.path.join(settings.MEDIA_ROOT, self.user.username))
-        with NamedTemporaryFile("wb+", dir=os.path.join(settings.MEDIA_ROOT, self.user.username)) as f:
+        with NamedTemporaryFile(
+            "wb+", dir=os.path.join(settings.MEDIA_ROOT, self.user.username)
+        ) as f:
             for chunk in cd["code"].chunks():
                 f.write(chunk)
             f.seek(0)
@@ -59,7 +61,9 @@ class GameForm(forms.Form):
     choices = Submission.objects.latest()
     black = forms.ModelChoiceField(label="Black:", queryset=choices, initial="Yourself")
     white = forms.ModelChoiceField(label="White:", queryset=choices, initial="Yourself")
-    time_limit = forms.IntegerField(label="Time Limit (secs):", initial=5, min_value=1, max_value=settings.MAX_TIME_LIMIT)
+    time_limit = forms.IntegerField(
+        label="Time Limit (secs):", initial=5, min_value=1, max_value=settings.MAX_TIME_LIMIT
+    )
     runoff = forms.BooleanField(initial=False, required=False)
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:

@@ -50,7 +50,10 @@ class Tournament(models.Model):
         default="swiss",
         max_length=20,
     )
-    round_robin_matches = models.IntegerField(default=2, help_text="How many matches to play between two players in a round robin tournament")
+    round_robin_matches = models.IntegerField(
+        default=2,
+        help_text="How many matches to play between two players in a round robin tournament",
+    )
 
     finished = models.BooleanField(default=False)
     terminated = models.BooleanField(default=False)
@@ -60,11 +63,12 @@ class Tournament(models.Model):
         return "Tournament at {}".format(self.start_time.strftime("%Y-%m-%d %H:%M:%S"))
 
     def __repr__(self) -> str:
-        return "<Tournament @ {}, {}>".format(self.start_time.strftime("%Y-%m-%d %H:%M:%S"), self.finished)
+        return "<Tournament @ {}, {}>".format(
+            self.start_time.strftime("%Y-%m-%d %H:%M:%S"), self.finished
+        )
 
 
 class TournamentPlayer(models.Model):
-
     tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, related_name="players")
     submission = models.ForeignKey(Submission, on_delete=models.CASCADE)
     ranking = models.FloatField(default=0)
@@ -79,10 +83,11 @@ class TournamentPlayer(models.Model):
 
 
 class TournamentGame(models.Model):
-
-    tournament = models.ForeignKey(Tournament, on_delete=models.CASCADE, null=False, blank=False, related_name="games")
+    tournament = models.ForeignKey(
+        Tournament, on_delete=models.CASCADE, null=False, blank=False, related_name="games"
+    )
 
     game = models.ForeignKey(Game, on_delete=models.CASCADE, null=False, blank=False)
 
     def __str__(self) -> str:
-        return f"{str(self.tournament)} - {self.game.black.get_user_name()} v. {self.game.white.get_user_name()}"
+        return f"{self.tournament!s} - {self.game.black.get_user_name()} v. {self.game.white.get_user_name()}"

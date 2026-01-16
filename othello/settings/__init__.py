@@ -2,10 +2,9 @@ import os
 
 import sentry_sdk
 from celery.schedules import crontab
+from django.urls import reverse_lazy
 from sentry_sdk.integrations.celery import CeleryIntegration
 from sentry_sdk.integrations.django import DjangoIntegration
-
-from django.urls import reverse_lazy
 
 DEBUG = True
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
