@@ -19,6 +19,7 @@ dependencies = [
     "psutil>=7.2.1",
     "psycopg[binary]>=3.3.2",
     "redis>=7.1.0",
+    "sentry-sdk>=2.49.0",
     "social-auth-app-django>=5.7.0",
 ]
 

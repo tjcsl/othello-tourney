@@ -1,4 +1,3 @@
-version: '3'
 services:
   othello_postgres:
     image: postgres:latest

@@ -48,6 +48,7 @@ def detail(request: HttpRequest, tournament_id: Optional[int] = None) -> HttpRes
 
 @management_only
 def create(request: HttpRequest) -> HttpResponse:
+    form = TournamentCreateForm()
     if request.method == "POST":
         form = TournamentCreateForm(request.POST)
         if form.is_valid():
@@ -85,7 +86,7 @@ def create(request: HttpRequest) -> HttpResponse:
         request,
         "tournaments/create.html",
         {
-            "form": TournamentCreateForm(),
+            "form": form,
             "in_progress": Tournament.objects.filter_in_progress().filter(terminated=False),
             "future": Tournament.objects.filter_future(),
         },
