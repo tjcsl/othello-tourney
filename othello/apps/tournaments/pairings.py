@@ -39,11 +39,11 @@ def swiss_pairing(players: Players, bye_player: TournamentPlayer, **kwargs) -> P
 
     logger.info(players)
 
-    played_games = set(
+    played_games = {
         game
         for tgame in tournament.games.all()
         if bye_player.submission.id not in (game := (tgame.game.black.id, tgame.game.white.id))
-    )
+    }
     players_this_round = set()
 
     for i in range(0, len(players)):

@@ -22,7 +22,7 @@ class SubmissionForm(forms.ModelForm):
         )
 
     def __init__(self, user, *args: Any, **kwargs: Any) -> None:
-        super(SubmissionForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.user = user
 
     def clean(self) -> dict[str, Any]:
@@ -50,7 +50,7 @@ class DownloadSubmissionForm(forms.Form):
     script = forms.ModelChoiceField(label="Previous Submissions:", queryset=None)
 
     def __init__(self, user, *args: Any, **kwargs: Any) -> None:
-        super(DownloadSubmissionForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         choices = Submission.objects.filter(user=user).order_by("-created_at")
         self.fields["script"].queryset = choices
         self.fields["script"].initial = choices.first()

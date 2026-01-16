@@ -82,7 +82,7 @@ class GameConsumer(JsonWebsocketConsumer):
 
 class GamePlayingConsumer(GameConsumer):
     def connect(self) -> None:
-        super(GamePlayingConsumer, self).connect()
+        super().connect()
         run_game.delay(self.game.id)
 
     def disconnect(self, code: int) -> None:
