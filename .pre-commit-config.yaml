@@ -18,6 +18,7 @@ repos:
     hooks:
       - id: codespell
         files: ^.*\.(py|md|rst)$
+        args: ["--ignore-words=.codespell-ignore.txt"]
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.13
     hooks:
