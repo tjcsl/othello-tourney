@@ -60,7 +60,7 @@ class PlayerRunner:
             stderr=subprocess.PIPE,
             bufsize=0,
             cwd=os.path.dirname(self.path),
-            preexec_fn=os.setpgrp,
+            start_new_session=True,
         )
 
     def stop(self):
