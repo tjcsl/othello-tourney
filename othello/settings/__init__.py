@@ -29,6 +29,7 @@ CHANNEL_LAYERS = {
 }
 
 INSTALLED_APPS = [
+    "daphne",
     "othello.apps.OthelloAdminConfig",
     "django.contrib.auth",
     "django.contrib.contenttypes",
