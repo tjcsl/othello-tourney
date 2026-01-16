@@ -1,22 +1,21 @@
 import enum
 import importlib.machinery
 import operator
+from collections.abc import Callable, Generator, Iterable
 from functools import partial, reduce, wraps
 from inspect import signature
-from typing import Any, Callable, Generator, Iterable
+from typing import Any
 
 from . import constants
 
 
 class UserError(enum.Enum):
-
     NO_MOVE_ERROR = (-1, "No move submitted")
     READ_INVALID = (-2, "Submitted move is not an integer or within range")
     INVALID_MOVE = (-3, "{move} is invalid for {player} on {board}")
 
 
 class ServerError(enum.Enum):
-
     TIMEOUT = (-4, "Timed out reading from subprocess")
     UNEXPECTED = (-5, "Unexpected error")
     PROCESS_EXITED = (-6, "Process exited unexpectedly")
@@ -25,8 +24,7 @@ class ServerError(enum.Enum):
 
 
 class CaptureGenerator:
-    """
-    Wrapper class that saves the return value of a generator function to <generator>.return_value
+    """Wrapper class that saves the return value of a generator function to <generator>.return_value
     https://stackoverflow.com/a/34073559 explains how this class works
 
     """
@@ -40,9 +38,7 @@ class CaptureGenerator:
 
 
 def capture_generator_value(f: callable) -> callable:
-    """
-    Convenience decorator function that wraps a generator function into the CaptureGenerator class above
-    """
+    """Convenience decorator function that wraps a generator function into the CaptureGenerator class above"""
 
     @wraps(f)
     def g(*args: Any, **kwargs: Any) -> CaptureGenerator:
@@ -59,12 +55,13 @@ def import_strategy(path: str):
     )
 
 
-bit_or: Callable[[Iterable[int]], int] = partial(reduce, operator.__or__)  # mimics builtin "sum" function except with bitwise OR
+bit_or: Callable[[Iterable[int]], int] = partial(
+    reduce, operator.__or__
+)  # mimics builtin "sum" function except with bitwise OR
 
 
 def is_on(x: int, pos: int) -> int:
-    """
-    Checks if an index on a 8x8 bitboard is "on"(1)
+    """Checks if an index on a 8x8 bitboard is "on"(1)
 
     @param x 8x8 bitboard
     @param pos index on bitboard
@@ -73,15 +70,12 @@ def is_on(x: int, pos: int) -> int:
 
 
 def bit_not(x: int) -> int:
-    """
-    Returns the bitwise NOT value of a 8x8 bitboard
-    """
+    """Returns the bitwise NOT value of a 8x8 bitboard"""
     return constants.FULL_BOARD ^ x
 
 
 def binary_to_string(board: str) -> str:
-    """
-    Converts a 8x8 othello bitboard to its string representation
+    """Converts a 8x8 othello bitboard to its string representation
 
     @param board 8x8 othello bitboard
     """
@@ -98,8 +92,7 @@ def binary_to_string(board: str) -> str:
 
 
 def hamming_weight(n: int) -> int:
-    """
-    Calculates the hamming weight of a binary number (number of "on"(1) bits)
+    """Calculates the hamming weight of a binary number (number of "on"(1) bits)
     "n ^= n & -n" cuts off all the "off" bits until the next "on" bit.
     Ex. "0b11000 ^= 0b11000 & -0b11000" => n = 0b11
     This works because of the way Python handles binary numbers.
@@ -115,8 +108,7 @@ def hamming_weight(n: int) -> int:
 
 
 def fill(current: int, opponent: int, direction: int) -> int:
-    """
-    Does a binary dumb7fill in one cardinal direction (N, E, S, W, NE, NW, SE, SW)
+    """Does a binary dumb7fill in one cardinal direction (N, E, S, W, NE, NW, SE, SW)
     Read https://www.chessprogramming.org/Dumb7Fill for the strategy and how it relates to Chess.
     Understanding dumb7fill is crucial to understanding how this method works
 
@@ -153,8 +145,7 @@ def fill(current: int, opponent: int, direction: int) -> int:
 
 
 def isolate_bits(x: int) -> Generator[int, None, None]:
-    """
-    Generator that returns the indices of all the "on"(1) bits in a 8x8 bitboard
+    """Generator that returns the indices of all the "on"(1) bits in a 8x8 bitboard
     This is different from hamming_weight since it yields the specific indices of each "on" bit
 
     @param x 8x8 bitboard

@@ -1,4 +1,4 @@
-from django.contrib.auth.models import AbstractBaseUser, AbstractUser
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
@@ -13,7 +13,11 @@ class User(AbstractUser):
 
     @property
     def short_name(self):
-        return f"{self.first_name} {self.last_name} ({self.username})" if self.first_name or self.last_name else self.username
+        return (
+            f"{self.first_name} {self.last_name} ({self.username})"
+            if self.first_name or self.last_name
+            else self.username
+        )
 
     def get_social_auth(self):
         return self.social_auth.get(provider="ion")
@@ -21,7 +25,9 @@ class User(AbstractUser):
     def save(self, *args, **kwargs):
         existing_user = User.objects.filter(username=self.username, is_imported=True).first()
         if existing_user:
-            from ..games.models import Submission  # cannot import at top of file b/c Submission references User (circular import)
+            from ..games.models import (
+                Submission,  # cannot import at top of file b/c Submission references User (circular import)
+            )
 
             Submission.objects.filter(user=existing_user).update(user=self)
             existing_user.delete()

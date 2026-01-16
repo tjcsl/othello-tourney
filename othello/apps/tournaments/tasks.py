@@ -2,10 +2,8 @@ import logging
 import random
 from collections import deque
 from time import sleep
-from typing import List, Tuple
 
 from celery import shared_task
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db.models import Q
@@ -16,7 +14,7 @@ from ..games.tasks import Player, run_game
 from .emails import email_send
 from .models import Tournament, TournamentGame, TournamentPlayer
 from .pairings import pair
-from .utils import chunks, get_updated_ranking
+from .utils import get_updated_ranking
 
 logger = logging.getLogger("othello")
 
@@ -50,7 +48,9 @@ def tournament_start_email(tournament_id: int):
     except Tournament.DoesNotExist as e:
         logger.error(f"Trying to access tournament that does not exist {tournament_id}")
         raise e
-    admins = get_user_model().objects.filter(Q(is_teacher=True) | Q(is_staff=True) | Q(is_superuser=True))
+    admins = get_user_model().objects.filter(
+        Q(is_teacher=True) | Q(is_staff=True) | Q(is_superuser=True)
+    )
     email_send(
         "emails/tournament_started.txt",
         "emails/tournament_started.html",
@@ -96,19 +96,23 @@ def run_tournament(tournament_id: int) -> None:
 
     include_users = list(t.include_users.all())
     random.shuffle(include_users)
-    submissions: List[TournamentPlayer] = TournamentPlayer.objects.bulk_create([TournamentPlayer(tournament=t, submission=s) for s in include_users])
+    submissions: list[TournamentPlayer] = TournamentPlayer.objects.bulk_create(
+        [TournamentPlayer(tournament=t, submission=s) for s in include_users]
+    )
     bye_player = TournamentPlayer.objects.create(tournament=t, submission=t.bye_player)
 
     for round_num in range(t.num_rounds):
         try:
-            matches: List[Tuple[TournamentPlayer, ...]] = pair(
+            matches: list[tuple[TournamentPlayer, ...]] = pair(
                 submissions,
                 bye_player,
                 t,
                 round_robin_matches=t.round_robin_matches,
             )
         except Exception as e:
-            logger.error(f"Error in pairing for tournament {tournament_id}, round {round_num + 1}: {e}")
+            logger.error(
+                f"Error in pairing for tournament {tournament_id}, round {round_num + 1}: {e}"
+            )
             raise
         t.refresh_from_db()
         if t.terminated:
@@ -117,7 +121,7 @@ def run_tournament(tournament_id: int) -> None:
             return
         t.played = round_num + 1
         t.save(update_fields=["played"])
-        logger.warning(f"Tournament {tournament_id} Round {round_num+1} start")
+        logger.warning(f"Tournament {tournament_id} Round {round_num + 1} start")
         for match in matches:
             logger.warning(f"{match[0]}({match[0].ranking}) v. {match[1]}({match[1].ranking})")
         logger.info("\n")
@@ -177,20 +181,28 @@ def run_tournament(tournament_id: int) -> None:
                     w.cumulative += get_updated_ranking(w)
                     b.save(update_fields=["cumulative"])
                     w.save(update_fields=["cumulative"])
-                    logger.warning(f"Tournament {tournament_id}, Round {round_num + 1}, {tmp}: {game.game.black} v. {game.game.white}")
-                    finished_games.append(game)  # keep track of all finished games in auxiliary list
+                    logger.warning(
+                        f"Tournament {tournament_id}, Round {round_num + 1}, {tmp}: {game.game.black} v. {game.game.white}"
+                    )
+                    finished_games.append(
+                        game
+                    )  # keep track of all finished games in auxiliary list
 
-            for game in finished_games:  # need to use list to delete after iterating through dictionary
-                del running_games[game]  # cannot delete during dictionary iteration (edit while access error)
+            for (
+                game
+            ) in finished_games:  # need to use list to delete after iterating through dictionary
+                del running_games[
+                    game
+                ]  # cannot delete during dictionary iteration (edit while access error)
             sleep(1)
 
-        logger.warning(f"Tournament {tournament_id}, Round {round_num+1} complete")
+        logger.warning(f"Tournament {tournament_id}, Round {round_num + 1} complete")
 
     t.finished = True
     t.save(update_fields=["finished"])
     logger.info(f"Tournament {tournament_id} has now finished, sending emails")
 
-    winners: List[TournamentPlayer] = t.players.all().order_by("-ranking", "-cumulative")[:3]
+    winners: list[TournamentPlayer] = t.players.all().order_by("-ranking", "-cumulative")[:3]
     tournament_winner: TournamentPlayer = winners[0]
     for pos, winner in enumerate(winners):
         email_send(
@@ -200,7 +212,9 @@ def run_tournament(tournament_id: int) -> None:
                 "name": winner.user.short_name,
                 "rank": pos + 1,
                 "base_url": "https://othello.tjhsst.edu",
-                "ranking_url": reverse_lazy("tournaments:detail", kwargs={"tournament_id": tournament_id}),
+                "ranking_url": reverse_lazy(
+                    "tournaments:detail", kwargs={"tournament_id": tournament_id}
+                ),
                 "dev_email": settings.DEVELOPER_EMAIL,
             },
             " Congratulations!",
@@ -214,11 +228,18 @@ def run_tournament(tournament_id: int) -> None:
             "start_time": t.start_time,
             "winners": [f"{x.user.get_full_name()} ({x.user.short_name})" for x in winners],
             "base_url": "https://othello.tjhsst.edu",
-            "ranking_url": reverse_lazy("tournaments:detail", kwargs={"tournament_id": tournament_id}),
+            "ranking_url": reverse_lazy(
+                "tournaments:detail", kwargs={"tournament_id": tournament_id}
+            ),
             "dev_email": settings.DEVELOPER_EMAIL,
         },
         " Tournament Completed",
-        [x.email for x in get_user_model().objects.filter(Q(is_teacher=True) | Q(is_staff=True) | Q(is_superuser=True))],
+        [
+            x.email
+            for x in get_user_model().objects.filter(
+                Q(is_teacher=True) | Q(is_staff=True) | Q(is_superuser=True)
+            )
+        ],
     )
     tournament_winner.submission.tournament_win_year = t.start_time.year
     tournament_winner.submission.save(update_fields=["tournament_win_year"])

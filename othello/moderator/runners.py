@@ -3,10 +3,9 @@ import select
 import signal
 import subprocess
 import time
-from typing import Generator, Tuple, Union
+from collections.abc import Generator
 
 import psutil
-
 from django.conf import settings
 
 from ..apps.games.models import Move, Submission
@@ -19,7 +18,7 @@ MOVES_10x10 = {(i + 11 + 2 * (i // 8)): i for i in range(64)}
 
 
 def convert_to_10x10(board: str) -> str:
-    return "?" * 11 + "??".join(board[i: i + 8] for i in range(0, 64, 8)) + "?" * 11
+    return "?" * 11 + "??".join(board[i : i + 8] for i in range(0, 64, 8)) + "?" * 11
 
 
 def convert_to_legacy(board: str) -> str:
@@ -61,7 +60,7 @@ class PlayerRunner:
             stderr=subprocess.PIPE,
             bufsize=0,
             cwd=os.path.dirname(self.path),
-            preexec_fn=os.setpgrp,
+            start_new_session=True,
         )
 
     def stop(self):
@@ -84,7 +83,11 @@ class PlayerRunner:
     @capture_generator_value
     def get_move(
         self, board: str, player: Player, time_limit: int, last_move: Move
-    ) -> Generator[str, None, Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]], ]:
+    ) -> Generator[
+        str,
+        None,
+        tuple[int, int, int] | tuple[int, ServerError, int] | tuple[int, UserError, int],
+    ]:
         if self.process.poll():
             print(self.process.communicate())
             return -1, ServerError.PROCESS_EXITED, -1
@@ -95,7 +98,7 @@ class PlayerRunner:
         else:
             player = player.value
 
-        self.process.stdin.write(f"{str(time_limit)}\n{player}\n{''.join(board)}\n".encode("latin-1"))
+        self.process.stdin.write(f"{time_limit!s}\n{player}\n{''.join(board)}\n".encode("latin-1"))
         self.process.stdin.flush()
         move, extra_time = -1, 0
 
@@ -107,7 +110,9 @@ class PlayerRunner:
             if (timeout := total_timeout - (time.time() - start)) <= 0:
                 return -1, ServerError.TIMEOUT, -1
 
-            files_ready = select.select([self.process.stdout, self.process.stderr], [], [], timeout)[0]
+            files_ready = select.select(
+                [self.process.stdout, self.process.stderr], [], [], timeout
+            )[0]
             if self.process.stderr in files_ready:
                 yield self.process.stderr.read(8192).decode("latin-1")
             if self.process.stdout in files_ready:
@@ -119,9 +124,8 @@ class PlayerRunner:
                     if self.is_legacy:
                         if move not in MOVES_10x10:
                             return -1, UserError.READ_INVALID, -1
-                    else:
-                        if move < 0 or move >= 64:
-                            return -1, UserError.READ_INVALID, -1
+                    elif move < 0 or move >= 64:
+                        return -1, UserError.READ_INVALID, -1
                 except (ValueError, IndexError):
                     return -1, UserError.READ_INVALID, -1
         return (move, 0, extra_time) if not self.is_legacy else (MOVES_10x10[move], 0, extra_time)
@@ -144,7 +148,11 @@ class YourselfRunner:
     @capture_generator_value
     def get_move(
         self, board: str, player: Player, time_limit: int, last_move: Move
-    ) -> Generator[str, None, Union[Tuple[int, int, int], Tuple[int, ServerError, int], Tuple[int, UserError, int]], ]:
+    ) -> Generator[
+        str,
+        None,
+        tuple[int, int, int] | tuple[int, ServerError, int] | tuple[int, UserError, int],
+    ]:
         yield "Choose your move!"
         start = time.time()
         while True:

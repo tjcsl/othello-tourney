@@ -1,6 +1,5 @@
 import json
 import logging
-from typing import Optional, Union
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -47,11 +46,15 @@ def upload(request: HttpRequest) -> HttpResponse:
             for error in errors:
                 messages.error(request, error["message"], extra_tags="danger")
 
-    return render(request, "games/upload.html", {"success": success}) if success else redirect("games:upload")
+    return (
+        render(request, "games/upload.html", {"success": success})
+        if success
+        else redirect("games:upload")
+    )
 
 
 @login_required
-def download(request: HttpRequest) -> Union[HttpResponse, FileResponse]:
+def download(request: HttpRequest) -> HttpResponse | FileResponse:
     form = DownloadSubmissionForm(user=request.user, data=request.GET)
     if form.is_valid():
         cd = form.cleaned_data
@@ -63,7 +66,9 @@ def download(request: HttpRequest) -> Union[HttpResponse, FileResponse]:
                 filename=f"{submission.get_submission_name()}.py",
             )
         except BaseException as e:
-            messages.error(request, "Unable to download script, try again later", extra_tags="danger")
+            messages.error(
+                request, "Unable to download script, try again later", extra_tags="danger"
+            )
             raise e
     else:
         for errors in form.errors.get_json_data().values():
@@ -104,7 +109,7 @@ def play(request: HttpRequest) -> HttpResponse:
     return render(request, "games/design.html", {"form": GameForm(initial=initial)})
 
 
-def watch(request: HttpRequest, game_id: Optional[int] = None) -> HttpResponse:
+def watch(request: HttpRequest, game_id: int | None = None) -> HttpResponse:
     if game_id is not None:
         return render(
             request,

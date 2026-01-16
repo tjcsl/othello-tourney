@@ -1,11 +1,10 @@
 import random
-from typing import List, Tuple
 
 from othello.apps.tournaments.models import Tournament, TournamentPlayer
 from othello.apps.tournaments.utils import chunks, get_updated_ranking, logger
 
-Players = List[TournamentPlayer]
-Pairings = List[Tuple[TournamentPlayer, ...]]
+Players = list[TournamentPlayer]
+Pairings = list[tuple[TournamentPlayer, ...]]
 
 
 def round_robin_pairing(players: Players, _bye_player: TournamentPlayer, **kwargs) -> Pairings:
@@ -40,7 +39,11 @@ def swiss_pairing(players: Players, bye_player: TournamentPlayer, **kwargs) -> P
 
     logger.info(players)
 
-    played_games = set(game for tgame in tournament.games.all() if bye_player.submission.id not in (game := (tgame.game.black.id, tgame.game.white.id)))
+    played_games = {
+        game
+        for tgame in tournament.games.all()
+        if bye_player.submission.id not in (game := (tgame.game.black.id, tgame.game.white.id))
+    }
     players_this_round = set()
 
     for i in range(0, len(players)):
@@ -49,7 +52,10 @@ def swiss_pairing(players: Players, bye_player: TournamentPlayer, **kwargs) -> P
         if i + 1 >= len(players):
             break
         for j in range(i + 1, len(players)):
-            if players[j] not in players_this_round and (players[i].submission.id, players[j].submission.id) not in played_games:
+            if (
+                players[j] not in players_this_round
+                and (players[i].submission.id, players[j].submission.id) not in played_games
+            ):
                 matches.append((players[i], players[j]))
                 matches.append((players[j], players[i]))
                 if players[i] != bye_player:
@@ -89,5 +95,7 @@ algorithms = {
 }
 
 
-def pair(players: Players, bye_player: TournamentPlayer, tournament: Tournament, **kwargs) -> Pairings:
+def pair(
+    players: Players, bye_player: TournamentPlayer, tournament: Tournament, **kwargs
+) -> Pairings:
     return algorithms[tournament.pairing_algorithm](players, bye_player, **kwargs)

@@ -1,8 +1,7 @@
-from typing import Any, Dict, Optional
+from typing import Any
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
-
 from django.utils import timezone
 
 from ...moderator.constants import Player
@@ -14,7 +13,7 @@ from .utils import serialize_game_error, serialize_game_info, serialize_game_log
 class GameConsumer(JsonWebsocketConsumer):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self.game: Optional[Game] = None
+        self.game: Game | None = None
         self.connected: bool = False
 
     def connect(self) -> None:
@@ -36,18 +35,20 @@ class GameConsumer(JsonWebsocketConsumer):
         self.connected = True
         self.accept()
 
-        async_to_sync(self.channel_layer.group_add)(self.game.channels_group_name, self.channel_name)
+        async_to_sync(self.channel_layer.group_add)(
+            self.game.channels_group_name, self.channel_name
+        )
 
     def disconnect(self, code: int) -> None:
         self.connected = False
 
-    def game_update(self, event: Dict[str, Any]) -> None:
+    def game_update(self, event: dict[str, Any]) -> None:
         self.update_game()
 
-    def game_log(self, event: Dict[str, Any]) -> None:
+    def game_log(self, event: dict[str, Any]) -> None:
         self.send_log(event["object_id"])
 
-    def game_error(self, event: Dict[str, Any]) -> None:
+    def game_error(self, event: dict[str, Any]) -> None:
         self.send_error(event["object_id"])
 
     def update_game(self) -> None:
@@ -62,8 +63,16 @@ class GameConsumer(JsonWebsocketConsumer):
         if self.connected:
             self.game.refresh_from_db()
             log: GameLog = self.game.logs.get(id=object_id)
-            has_access: bool = log.game.black.user == self.scope["user"] if log.player == Player.BLACK.value else log.game.white.user == self.scope["user"]
-            if has_access or (log.player == Player.BLACK.value and self.is_black_yourself) or (log.player == Player.WHITE.value and self.is_white_yourself):
+            has_access: bool = (
+                log.game.black.user == self.scope["user"]
+                if log.player == Player.BLACK.value
+                else log.game.white.user == self.scope["user"]
+            )
+            if (
+                has_access
+                or (log.player == Player.BLACK.value and self.is_black_yourself)
+                or (log.player == Player.WHITE.value and self.is_white_yourself)
+            ):
                 self.send_json(serialize_game_log(log))
 
     def send_error(self, object_id: int) -> None:
@@ -73,7 +82,7 @@ class GameConsumer(JsonWebsocketConsumer):
 
 class GamePlayingConsumer(GameConsumer):
     def connect(self) -> None:
-        super(GamePlayingConsumer, self).connect()
+        super().connect()
         run_game.delay(self.game.id)
 
     def disconnect(self, code: int) -> None:
@@ -81,7 +90,7 @@ class GamePlayingConsumer(GameConsumer):
         self.game.save(update_fields=["playing"])
         super().disconnect(code)
 
-    def receive_json(self, content: Dict[str, Any], **kwargs: Any) -> None:
+    def receive_json(self, content: dict[str, Any], **kwargs: Any) -> None:
         self.game.last_heartbeat = timezone.now()
         self.game.save()
 

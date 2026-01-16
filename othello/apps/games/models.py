@@ -6,7 +6,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.db.models import Q
-from django.db.models.functions import Coalesce
 from django.utils import timezone
 
 from ...moderator.constants import Player
@@ -19,22 +18,27 @@ PLAYER_CHOICES = (
 
 
 def _save_path(instance, filename: str) -> AnyStr:
-    return os.path.join(instance.user.username if instance.user else instance.name, f"{uuid.uuid4()}.py")
+    return os.path.join(
+        instance.user.username if instance.user else instance.name, f"{uuid.uuid4()}.py"
+    )
 
 
 class SubmissionQuerySet(models.QuerySet):
     def latest(self, **kwargs: Any) -> "models.query.QuerySet[Submission]":
-        """
-        Returns a set of all the latest submissions for all users
-        """
-        return self.filter(**kwargs).distinct("user").order_by("user", "-tournament_win_year", "-created_at")
+        """Returns a set of all the latest submissions for all users"""
+        return (
+            self.filter(**kwargs)
+            .distinct("user")
+            .order_by("user", "-tournament_win_year", "-created_at")
+        )
 
 
 class Submission(models.Model):
-
     objects: Any = SubmissionQuerySet.as_manager()
 
-    user = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name="submissions", null=True)
+    user = models.ForeignKey(
+        get_user_model(), on_delete=models.CASCADE, related_name="submissions", null=True
+    )
     name = models.CharField(max_length=500, null=True)
     created_at = models.DateTimeField(auto_now=True)
     code = models.FileField(upload_to=_save_path, default=None)
@@ -60,7 +64,9 @@ class Submission(models.Model):
         return (
             f"T-{self.tournament_win_year} {self.get_user_name()}"
             if self.tournament_win_year != -1
-            else self.get_user_name() if self.user is not None else self.name
+            else self.get_user_name()
+            if self.user is not None
+            else self.name
         )
 
     def get_submitted_time(self) -> str:
@@ -80,13 +86,15 @@ class GameQuerySet(models.QuerySet):
     def wins_for_user(self, submission: Submission) -> int:
         return (
             self.filter(playing=False, is_tournament=True)
-            .filter(Q(white=submission, outcome=Player.WHITE.value) | Q(black=submission, outcome=Player.BLACK.value))
+            .filter(
+                Q(white=submission, outcome=Player.WHITE.value)
+                | Q(black=submission, outcome=Player.BLACK.value)
+            )
             .count()
         )
 
 
 class Game(models.Model):
-
     OUTCOME_CHOICES = (
         (Player.BLACK.value, "black"),
         (Player.WHITE.value, "white"),
@@ -126,7 +134,6 @@ class MoveSet(models.QuerySet):
 
 
 class Move(models.Model):
-
     objects: Any = MoveSet.as_manager()
 
     id = models.BigAutoField(primary_key=True)
@@ -144,7 +151,6 @@ class Move(models.Model):
 
 
 class GameObject(models.Model):
-
     id = models.BigAutoField(primary_key=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -155,13 +161,11 @@ class GameObject(models.Model):
 
 
 class GameError(GameObject):
-
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="errors")
     error_code = models.IntegerField(default=0)
     error_msg = models.TextField(default="")
 
 
 class GameLog(GameObject):
-
     game = models.ForeignKey(Game, on_delete=models.CASCADE, related_name="logs")
     message = models.TextField(default="")

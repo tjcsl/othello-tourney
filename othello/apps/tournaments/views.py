@@ -1,7 +1,4 @@
-from typing import Optional
-
 from celery.result import AsyncResult
-
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.http import HttpRequest, HttpResponse
@@ -24,7 +21,7 @@ class TournamentListView(ListView):
         return Tournament.objects.filter_finished().order_by(*self.ordering)
 
 
-def detail(request: HttpRequest, tournament_id: Optional[int] = None) -> HttpResponse:
+def detail(request: HttpRequest, tournament_id: int | None = None) -> HttpResponse:
     if tournament_id is not None:
         t = get_object_or_404(Tournament, id=tournament_id)
     else:
@@ -94,7 +91,7 @@ def create(request: HttpRequest) -> HttpResponse:
 
 
 @management_only
-def management(request: HttpRequest, tournament_id: Optional[int] = None) -> HttpResponse:
+def management(request: HttpRequest, tournament_id: int | None = None) -> HttpResponse:
     tournament = get_object_or_404(Tournament, id=tournament_id)
     if request.method == "POST":
         form = TournamentManagementForm(tournament, request.POST)
@@ -132,7 +129,9 @@ def management(request: HttpRequest, tournament_id: Optional[int] = None) -> Htt
                 if tournament in Tournament.objects.filter_in_progress():
                     tournament.players.filter(id__in=removed_users).delete()
                 else:
-                    tournament.include_users.set(tournament.include_users.all().exclude(id__in=removed_users))
+                    tournament.include_users.set(
+                        tournament.include_users.all().exclude(id__in=removed_users)
+                    )
             tournament.save()
             if cd.get("reschedule", None):
                 tournament_notify_email(tournament.id)
@@ -144,7 +143,8 @@ def management(request: HttpRequest, tournament_id: Optional[int] = None) -> Htt
             if cd.get("using_legacy", False):
                 messages.warning(
                     request,
-                    "Warning: One of more participating users is using legacy code!" " If this was a mistake, you can delete the Tournament and recreate it.",
+                    "Warning: One of more participating users is using legacy code!"
+                    " If this was a mistake, you can delete the Tournament and recreate it.",
                     extra_tags="warning",
                 )
         else:
@@ -153,9 +153,13 @@ def management(request: HttpRequest, tournament_id: Optional[int] = None) -> Htt
                     messages.error(request, error["message"], extra_tags="danger")
 
     if tournament in Tournament.objects.filter_future():
-        page_obj = Paginator(tournament.include_users.all(), 10).get_page(request.GET.get("page", 1))
+        page_obj = Paginator(tournament.include_users.all(), 10).get_page(
+            request.GET.get("page", 1)
+        )
     else:
-        page_obj = Paginator(tournament.players.all().order_by("-ranking"), 10).get_page(request.GET.get("page", 1))
+        page_obj = Paginator(tournament.players.all().order_by("-ranking"), 10).get_page(
+            request.GET.get("page", 1)
+        )
 
     return render(
         request,

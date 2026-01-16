@@ -170,7 +170,7 @@ async function handleUpload(){
 
 window.onload = function () {
     $("#replayModal").modal('show');
-    
+
     rCanvas = init("", "");
     $(".canvasContainer").width($("#canvas").width());
     $(window).on('resize', function () {
