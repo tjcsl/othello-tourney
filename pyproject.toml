@@ -31,22 +31,61 @@ dev = [
 [tool.uv]
 required-version = ">=0.9.0"
 
-[tool.black]
-line-length = 160
-exclude = '''
-/(
-    \.eggs
-  | \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-  | media
-  | migrations
-  | secret.*
-)/
-'''
+[tool.ruff]
+extend-exclude = [
+  ".github",
+  ".env",
+  "env",
+  "secret",
+  "media",
+  "migrations",
+  "submissions",
+  "sandboxing",
+]
+
+show-fixes = false
+
+line-length = 100
+
+target-version = "py311"
+
+[tool.ruff.lint]
+select = [
+    # flake8-bugbear
+    "B",
+    # flake8-comprehensions
+    "C4",
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # isort
+    "I",
+    # Pylint
+    "PL",
+    # pygrep hooks
+    "PGH",
+    # ruff
+    "RUF",
+    # pyupgrade
+    "UP",
+]
+ignore = [
+  # mutable class attrs annotated as typing.ClassVar
+  "RUF012",
+  # as recommended by https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
+  "E111",
+  "E114",
+  "E117",
+  "E501",
+  # not worth the effort to fix
+  "PLR",
+  "PLC0415",
+]
+
+[tool.codespell]
+write-changes = true
+# this has to be a string of the form a,b,c
+# ignore-words-list = ""
+# ignore comments like: # codespell: ignore
+ignore-regex=".+# *codespell: *ignore.*"
