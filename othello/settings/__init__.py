@@ -78,7 +78,7 @@ TEMPLATES = [
     }
 ]
 
-ASGI_APPLICATION = "othello.routing.application"
+ASGI_APPLICATION = "othello.asgi.application"
 WSGI_APPLICATION = "othello.wsgi.application"
 
 DATABASES = {
