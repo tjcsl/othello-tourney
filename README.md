@@ -21,15 +21,11 @@ Start by cloning this repository:
 
 ### Docker
 
-To start the services(postgres, redis):
+To start all the services(postgres, redis):
   * `cd config/docker`
-  * `docker-compose up -d`
+  * `docker compose up --build`
 
-You can also run the services individually:
-  * `./config/docker/postgres.sh`
-  * `./config/docker/redis.sh`
-
-You only need to start the services once (either with `docker-compose` or the shell scripts) and both ways will handle all the necessary configuration(passwords, port forwarding, etc.)
+Once started, the docker configuration will handle everything from there, and there is no need to worry about configuration afterwards. Four services will be started up, namely the postgres, redis, django server, and celery worker containers. Once started, the django server will serve the website at [http://localhost:8000/](http://localhost:8000/).
 
 * Note: The postgres docker service will create a volume on the host machine so that data persists between runs
 
@@ -55,48 +51,9 @@ The Othello server uses Ion OAuth, you will need to register an application [her
   * Acceptable hosts can be found in the `ALLOWED_HOSTS` list in `othello/settings/__init__.py`
   * url must be inputted exactly or OAuth will fail
 
-If you are using `docker` to host the Othello services, you will have to manually copy `othello/settings/secret.py.sample` to `othello/settings/secret.py`. If you are using `vagrant`, this is automatically done for you.
+If you are using `docker` to host the Othello services, you will have to manually copy `othello/settings/secret.sample.docker.py` to `othello/settings/secret.py`. Note that the `secret.sample.docker.py` file is slightly different from the `secret.sample.py` file in the regards that it runs its services from the docker container names instead of localhost. If you are using `vagrant`, this is automatically done for you.
 
 After registering an OAuth application enter the key and secret in the `SOCIAL_AUTH_ION_KEY` and `SOCIAL_AUTH_ION_SECRET` variables in `secret.py`
-
-
-### Running the Othello server
-
-After you have setup your dev environment and configured Ion OAuth, you will need to install the project dependencies.
-
-This project uses [uv](https://docs.astral.sh/uv/) to manage dependencies, to install the dependencies run:
-  * `uv sync`
-
-After installing the dependencies, run the model migrations
-  * `uv run python3 manage.py migrate`
-
-Note: Failure to do this will cause the game code to fail.
-
-
-You can run the django server by running:
-  * `uv run python3 manage.py runserver <host>:<port>`
-
-Note: If you are using `vagrant`, host should be `0.0.0.0` and port should be `8000`. Vagrant on Linux has some issues forwarding traffic if the host is `127.0.0.1` or `localhost`, so `0.0.0.0` will have the most success. The only port forwarded from the vagrant VM is `8000` so no other port will work (unless you change the Vagrant config).
-
-Note: If you are using `docker`, you can use any host/port combination as long as :
-  1) You can access the host and port
-  2) The resultant url is registered in the Ion OAuth application
-
-Afterwards, open the resultant url in a browser and you should see the Othello site.
-
-
-### Running the celery worker
-
-The Othello server uses [celery](https://docs.celeryproject.org/en/stable/getting-started/introduction.html) to run games and tournaments. If you try to play a game without starting the celery worker, the game will just hang.
-
-
-Start the celery worker by running:
-
-  * `uv run celery --app=othello worker --loglevel=INFO -B`
-
-Note: You will need to keep this command running in the foreground until you need to restart it
-
-Note: If using `vagrant` this command must be run inside the Vagrant VM.
 
 
 

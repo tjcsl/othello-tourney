@@ -1,5 +1,6 @@
 services:
   othello_postgres:
+    container_name: othello_postgres
     image: postgres:latest
     ports:
     - "5432:5432"
@@ -8,10 +9,57 @@ services:
     - POSTGRES_USER=othello
     - POSTGRES_PASSWORD=pwd
     volumes:
-    - "othello_pgdata:/var/lib/postgresql/data"
+    - "othello_pgdata:/var/lib/postgresql"
+    networks:
+    - othello_network
   othello_redis:
+    container_name: othello_redis
     image: redis:latest
     expose:
     - "6379"
+    networks:
+    - othello_network
+  othello_django:
+    container_name: othello_django
+    image: othello_django
+    build:
+      context: ../../
+      dockerfile: config/docker/Dockerfile
+    ports:
+    - "8000:8000"
+    depends_on:
+    - othello_postgres
+    - othello_redis
+    volumes:
+    - ../../:/app
+    working_dir: /app
+    networks:
+    - othello_network
+    entrypoint:
+      [
+        "/bin/sh",
+        "-c",
+        "/app/config/docker/entrypoint.sh"
+      ]
+  othello_celery:
+    container_name: othello_celery
+    image: othello_django
+    depends_on:
+    - othello_postgres
+    - othello_redis
+    volumes:
+    - ../../:/app
+    working_dir: /app
+    networks:
+    - othello_network
+    entrypoint:
+      [
+          "/bin/sh",
+          "-c",
+          "uv run celery --app othello worker -l INFO -Ofair"
+      ]
 volumes:
   othello_pgdata:
+networks:
+  othello_network:
+    driver: bridge
