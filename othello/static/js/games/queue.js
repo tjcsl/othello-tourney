@@ -17,6 +17,11 @@ $(document).ready(function() {
     function updateMatch(data) {
         const matchRow = $(`.match[data-match-id="${data.match_id}"]`);
 
+        let statusHtml = data.status;
+        if (data.status === 'completed') {
+            statusHtml += ` <a href="/match_replay/${data.match_id}/">(Replay)</a>`;
+        }
+
         function applyWinLoseClasses(row) {
             row.find('td:nth-child(1), td:nth-child(3)')
                 .removeClass('win lose');
@@ -43,7 +48,7 @@ $(document).ready(function() {
 
         if (matchRow.length) {
             matchRow.find('td:nth-child(2)').text(data.score);
-            matchRow.find('td:nth-child(4)').text(data.status);
+            matchRow.find('td:nth-child(4)').html(statusHtml);
             applyWinLoseClasses(matchRow);
         } else {
             const newRow = $(`
@@ -51,7 +56,7 @@ $(document).ready(function() {
                     <td>${data.player1}</td>
                     <td>${data.score}</td>
                     <td>${data.player2}</td>
-                    <td>${data.status}</td>
+                    <td>${statusHtml}</td>
                     <td>${data.created_at}</td>
                 </tr>
             `);

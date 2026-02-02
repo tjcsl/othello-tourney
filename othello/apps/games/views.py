@@ -2,7 +2,6 @@ import json
 import logging
 
 from django.contrib import messages
-from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db import models
@@ -115,61 +114,49 @@ def play(request: HttpRequest) -> HttpResponse:
 
 @login_required
 def request_match(request: HttpRequest) -> HttpResponse:
-    if request.method == "POST":
-        form = MatchForm(request.user, request.POST)
-        if form.is_valid():
-            cd = form.cleaned_data
+    if request.method != "POST":
+        messages.error(request, "Method not allowed")
+        return redirect("games:queue")
 
-            one_hour_ago = timezone.now() - timezone.timedelta(hours=1)
-            recent_games = (
-                Match.objects.filter(
-                    models.Q(player1__user=request.user) | models.Q(player2__user=request.user),
-                    created_at__gte=one_hour_ago,
-                ).aggregate(total_games=models.Sum("num_games"))["total_games"]
-                or 0
-            )
-            if recent_games + cd["num_games"] > 100:
-                messages.error(
-                    request,
-                    "You have exceeded the limit of 100 games per hour.",
-                    extra_tags="danger",
-                )
-                return redirect("games:request_match")
+    form = MatchForm(request.user, request.POST)
+    if form.is_valid():
+        cd = form.cleaned_data
 
-            user_submission = Submission.objects.filter(user=request.user).latest(onesub=True)
-            if not user_submission:
-                messages.error(
-                    request, "Could not request match because you do not have a submission"
-                )
-                return redirect("games:queue")
-
-            match = Match.objects.create(
-                player1=user_submission,
-                player2=cd["opponent"],
-                num_games=cd["num_games"],
-            )
-            run_match.delay(match.id)
-            messages.success(request, f"Match requested against {cd['opponent'].get_game_name()}.")
-            return redirect("games:queue")
-        else:
-            for errors in form.errors.get_json_data().values():
-                for error in errors:
-                    messages.error(request, error["message"], extra_tags="danger")
-    else:
-        initial_opponent_user = None
-        opponent_username = request.GET.get("opponent")
-        if opponent_username:
-            try:
-                initial_opponent_user = get_user_model().objects.get(username=opponent_username)
-            except get_user_model().DoesNotExist:
-                pass
-
-        form = MatchForm(
-            request.user,
-            initial_opponent_user=initial_opponent_user,
+        one_hour_ago = timezone.now() - timezone.timedelta(hours=1)
+        recent_games = (
+            Match.objects.filter(
+                models.Q(player1__user=request.user) | models.Q(player2__user=request.user),
+                created_at__gte=one_hour_ago,
+            ).aggregate(total_games=models.Sum("num_games"))["total_games"]
+            or 0
         )
+        if recent_games + cd["num_games"] > 100:
+            messages.error(
+                request,
+                "You have exceeded the limit of 100 games per hour.",
+                extra_tags="danger",
+            )
+            return redirect("games:queue")
 
-    return render(request, "games/request_match.html", {"form": form})
+        user_submission = Submission.objects.filter(user=request.user).latest(onesub=True)
+        if not user_submission:
+            messages.error(request, "Could not request match because you do not have a submission")
+            return redirect("games:queue")
+
+        match = Match.objects.create(
+            player1=user_submission,
+            player2=cd["opponent"],
+            num_games=cd["num_games"],
+        )
+        run_match.delay(match.id)
+        messages.success(request, f"Match requested against {cd['opponent'].get_game_name()}.")
+        return redirect("games:queue")
+    else:
+        for errors in form.errors.get_json_data().values():
+            for error in errors:
+                messages.error(request, error["message"], extra_tags="danger")
+
+    return redirect("games:queue")
 
 
 @login_required
