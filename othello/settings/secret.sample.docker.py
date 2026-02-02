@@ -13,7 +13,7 @@ DATABASES = {
         "NAME": "othello",
         "USER": "othello",
         "PASSWORD": "pwd",
-        "HOST": "localhost",
+        "HOST": "othello_postgres",
         "PORT": "5432",
     }
 }
@@ -23,13 +23,13 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [("othello_redis", 6379)],
             "capacity": 1500,
             "expiry": 2,
         },
     },
 }
-CELERY_BROKER_URL = "redis://localhost/1"
+CELERY_BROKER_URL = "redis://othello_redis/1"
 
 SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
 SOCIAL_AUTH_ION_KEY = ""

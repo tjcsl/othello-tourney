@@ -23,7 +23,7 @@ Start by cloning this repository:
 
 To start all the services(postgres, redis):
   * `cd config/docker`
-  * `sudo docker compose up --build`
+  * `docker compose up --build`
 
 Once started, the docker configuration will handle everything from there, and there is no need to worry about configuration afterwards. Four services will be started up, namely the postgres, redis, django server, and celery worker containers. Once started, the django server will serve the website at [http://localhost:8000/](http://localhost:8000/).
 
@@ -51,7 +51,7 @@ The Othello server uses Ion OAuth, you will need to register an application [her
   * Acceptable hosts can be found in the `ALLOWED_HOSTS` list in `othello/settings/__init__.py`
   * url must be inputted exactly or OAuth will fail
 
-If you are using `docker` to host the Othello services, you will have to manually copy `othello/settings/secret.sample.py` to `othello/settings/secret.py`. If you are using `vagrant`, this is automatically done for you.
+If you are using `docker` to host the Othello services, you will have to manually copy `othello/settings/secret.sample.docker.py` to `othello/settings/secret.py`. Note that the `secret.sample.docker.py` file is slightly different from the `secret.sample.py` file in the regards that it runs its services from the docker container names instead of localhost. If you are using `vagrant`, this is automatically done for you.
 
 After registering an OAuth application enter the key and secret in the `SOCIAL_AUTH_ION_KEY` and `SOCIAL_AUTH_ION_SECRET` variables in `secret.py`
 
