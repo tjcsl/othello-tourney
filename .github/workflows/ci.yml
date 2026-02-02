@@ -66,9 +66,31 @@ jobs:
         with:
           parallel: true
 
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up repo
+        uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.14
+
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Build Documentation
+        run: uv run zensical build --strict
+
   finish_success:
     needs:
       - test
+      - docs
 
     runs-on: ubuntu-latest
 
