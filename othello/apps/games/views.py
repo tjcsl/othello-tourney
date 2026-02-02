@@ -2,6 +2,7 @@ import json
 import logging
 
 from django.contrib import messages
+from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db import models
@@ -155,7 +156,19 @@ def request_match(request: HttpRequest) -> HttpResponse:
                 for error in errors:
                     messages.error(request, error["message"], extra_tags="danger")
     else:
-        form = MatchForm(request.user)
+        initial_opponent_user = None
+        opponent_username = request.GET.get("opponent")
+        if opponent_username:
+            try:
+                initial_opponent_user = get_user_model().objects.get(username=opponent_username)
+            except get_user_model().DoesNotExist:
+                pass
+
+        form = MatchForm(
+            request.user,
+            initial_opponent_user=initial_opponent_user,
+        )
+
     return render(request, "games/request_match.html", {"form": form})
 
 

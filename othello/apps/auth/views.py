@@ -1,4 +1,5 @@
 import json
+import logging
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
@@ -6,7 +7,10 @@ from django.core.paginator import Paginator
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render
 
-from .models import RatingHistory
+from ..games.forms import MatchForm
+from ..games.models import RatingHistory, Submission
+
+logger = logging.getLogger("othello")
 
 
 def index(request: HttpRequest) -> HttpResponse:
@@ -44,7 +48,7 @@ def profile(request: HttpRequest, username: str) -> HttpResponse:
 
     history = RatingHistory.objects.filter(user=profile_user).order_by("changed_at")
 
-    ratings = list(float(i) for i in history.values_list("rating", flat=True))
+    ratings = [float(i) for i in history.values_list("rating", flat=True)]
     dates = [h.changed_at.strftime("%Y-%m-%d %H:%M") for h in history]
 
     return render(
@@ -65,10 +69,16 @@ def rankings(request: HttpRequest) -> HttpResponse:
     paginator = Paginator(users, 25)  # Show 25 users per page
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
+    form = MatchForm(request.user)
+    users_with_submissions = set(
+        Submission.objects.values_list("user__username", flat=True).distinct()
+    ) - {request.user.username, "Yourself"}
     return render(
         request,
         "auth/rankings.html",
         {
             "page_obj": page_obj,
+            "form": form,
+            "users_with_submissions": users_with_submissions,
         },
     )

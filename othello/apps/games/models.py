@@ -196,7 +196,6 @@ class Match(models.Model):
             ]
         )
 
-        # --- Elo update ---
         user1 = self.player1.user
         user2 = self.player2.user
 
@@ -209,7 +208,6 @@ class Match(models.Model):
             player1_wins=player1_wins,
             player2_wins=player2_wins,
             ties=ties,
-            k=32,  # tune this
         )
 
         user1.rating = rating1 + change1

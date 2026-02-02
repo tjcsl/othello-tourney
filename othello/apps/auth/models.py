@@ -6,7 +6,7 @@ class User(AbstractUser):
     is_teacher = models.BooleanField(default=False, null=False)
     is_student = models.BooleanField(default=True, null=False)
     is_imported = models.BooleanField(default=False, null=False)
-    rating = models.DecimalField(max_digits=6, decimal_places=2, default=0.00)
+    rating = models.DecimalField(max_digits=6, decimal_places=2, default=1000.00)
 
     @property
     def has_management_permission(self) -> bool:
