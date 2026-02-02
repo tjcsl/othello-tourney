@@ -10,4 +10,7 @@ urlpatterns = [
     path("", views.index, name="index"),
     path("login/", views.login, name="login"),
     path("logout/", LogoutView.as_view(), name="logout"),
+    path("rating/", views.rating, name="rating"),
+    path("profile/<str:username>/", views.profile, name="profile"),
+    path("rankings/", views.rankings, name="rankings"),
 ]

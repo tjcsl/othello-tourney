@@ -1,7 +1,9 @@
 import os
 import uuid
+from decimal import Decimal
 from typing import Any, AnyStr
 
+from celery.utils.log import get_task_logger
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -9,7 +11,11 @@ from django.db.models import Q
 from django.utils import timezone
 
 from ...moderator.constants import Player
+from ..auth.models import RatingHistory
+from .ratings import calculate_match_rating_change
 from .validators import validate_game_time_limit
+
+task_logger = get_task_logger(__name__)
 
 PLAYER_CHOICES = (
     (Player.BLACK.value, "Black"),
@@ -142,7 +148,8 @@ class Match(models.Model):
         return f"match-{self.id}"
 
     def calculate_results(self) -> None:
-        """Calculate wins, ties, and determine winner/loser."""
+        """Calculate wins, ties, winner, and update Elo ratings."""
+
         player1_wins = 0
         player2_wins = 0
         ties = 0
@@ -158,7 +165,7 @@ class Match(models.Model):
                     player1_wins += 1
                 else:
                     player2_wins += 1
-            else:  # Tie
+            else:
                 ties += 1
 
         self.player1_wins = player1_wins
@@ -179,8 +186,51 @@ class Match(models.Model):
             self.loser = None
 
         self.save(
-            update_fields=["player1_wins", "player2_wins", "ties", "winner", "loser", "is_tie"]
+            update_fields=[
+                "player1_wins",
+                "player2_wins",
+                "ties",
+                "winner",
+                "loser",
+                "is_tie",
+            ]
         )
+
+        # --- Elo update ---
+        user1 = self.player1.user
+        user2 = self.player2.user
+
+        rating1 = Decimal(str(user1.rating))
+        rating2 = Decimal(str(user2.rating))
+
+        change1, change2 = calculate_match_rating_change(
+            rating1=rating1,
+            rating2=rating2,
+            player1_wins=player1_wins,
+            player2_wins=player2_wins,
+            ties=ties,
+            k=32,  # tune this
+        )
+
+        user1.rating = rating1 + change1
+        user2.rating = rating2 + change2
+
+        user1.save(update_fields=["rating"])
+        user2.save(update_fields=["rating"])
+
+        RatingHistory.objects.create(
+            user=user1,
+            rating=user1.rating,
+            match=self,
+        )
+        RatingHistory.objects.create(
+            user=user2,
+            rating=user2.rating,
+            match=self,
+        )
+
+        task_logger.info(f"User {user1} new rating: {user1.rating}")
+        task_logger.info(f"User {user2} new rating: {user2.rating}")
 
     def __str__(self) -> str:
         return f"{self.player1.get_game_name()} vs {self.player2.get_game_name()} ({self.num_games} games)"

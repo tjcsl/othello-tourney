@@ -41,7 +41,7 @@
                                         {{ game.black.get_game_name }} (B) vs {{ game.white.get_game_name }} (W)
                                     </small>
                                     <br>
-                                    <small class="text-muted">Outcome: {{ game.outcome }}</small>
+                                    <small class="text-muted">Winner: {{ game.get_outcome_display }}</small>
                                 </div>
                             </a>
                         </div>
