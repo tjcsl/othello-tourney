@@ -259,6 +259,7 @@ class Game(models.Model):
     score = models.IntegerField(default=0)
 
     is_tournament = models.BooleanField(default=False)
+    is_scrimmage = models.BooleanField(default=False)
     playing = models.BooleanField(default=False)
     last_heartbeat = models.DateTimeField(default=timezone.now)
 

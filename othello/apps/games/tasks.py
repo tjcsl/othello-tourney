@@ -26,7 +26,7 @@ def send_through_game_channel(game: Game, event_type: str, object_id: int) -> in
 
 
 def check_heartbeat(game: Game) -> bool:
-    if game.is_tournament:
+    if game.is_tournament or game.is_scrimmage:
         return True
     game.refresh_from_db()
     return (timezone.now() - game.last_heartbeat).seconds < settings.CLIENT_HEARTBEAT_INTERVAL * 2
@@ -233,7 +233,7 @@ def run_match(match_id: int) -> str | None:
             match=match,
             time_limit=5,
             playing=True,
-            is_tournament=True,
+            is_scrimmage=True,
             last_heartbeat=timezone.now(),
         )
         games.append(game)
