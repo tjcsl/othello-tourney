@@ -29,7 +29,6 @@ CHANNEL_LAYERS = {
 
 INSTALLED_APPS = [
     "daphne",
-    "othello.apps.OthelloAdminConfig",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -41,6 +40,7 @@ INSTALLED_APPS = [
     "social_django",
     "django_celery_results",
     "othello.apps",
+    "othello.apps.OthelloAdminConfig",
     "othello.apps.auth.apps.AuthConfig",
     "othello.apps.games.apps.GamesConfig",
     "othello.apps.tournaments.apps.TournamentsConfig",

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% load js %}
+{% load static %}
+
+{% block title %}Match Replay{% endblock %}
+{% block head %}
+    <link rel="stylesheet" href="{% static 'css/games/base.css' %}">
+    <script type="text/javascript" src="{% static 'js/games/canvas.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/games/board.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/games/base.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/games/match_replay.js' %}"></script>
+    {{ game_data | json_script:"gameData" }}
+    <style>
+        .modal-dialog .modal-content {
+            height: fit-content;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-3">
+            <ul class="nav nav-tabs" id="sidebarTabs" role="tablist">
+                <li class="nav-item">
+                    <a class="nav-link active" id="games-tab" data-toggle="tab" href="#games" role="tab">Games</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="logs-tab" data-toggle="tab" href="#logs" role="tab">Logs</a>
+                </li>
+            </ul>
+            <div class="tab-content mt-4" id="sidebarTabsContent">
+                <div class="tab-pane fade show active" id="games" role="tabpanel">
+                    <div class="col">
+                        {% for game in games %}
+                        <div class="row-sm-4 mb-3"> <a href="?game_id={{ game.id }}" class="text-decoration-none text-dark">
+                                <div class="p-3 border rounded h-100 {% if game == selected_game %}bg-light border-primary{% endif %}">
+                                    <strong>Game {{ forloop.counter }}</strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        {{ game.black.get_game_name }} (B) vs {{ game.white.get_game_name }} (W)
+                                    </small>
+                                    <br>
+                                    <small class="text-muted">Outcome: {{ game.outcome }}</small>
+                                </div>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="logs" role="tabpanel">
+                    <ul class="nav nav-pills mb-4" id="logTabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="black-log-tab" data-toggle="pill" href="#black-logs-content">Black</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="white-log-tab" data-toggle="pill" href="#white-logs-content">White</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="black-logs-content">
+                            <div class="area-log-container" id="black-logs" data-toggle="tooltip" title="Double click to collapse">
+                                <div id="black-logs-area" class="area-log">
+                                    <h3 style="text-decoration: underline">Black Logs</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="white-logs-content">
+                            <div class="area-log-container" id="white-logs" data-toggle="tooltip" title="Double click to collapse">
+                                <div id="white-logs-area" class="area-log">
+                                    <h3 style="text-decoration: underline">White Logs</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7">
+            <h2 class="text-center">{{ match.player1.get_game_name }} vs {{ match.player2.get_game_name }}</h2>
+            <div class="gameContainer" id="gameContainer">
+                <div class="canvasContainer">
+                    <canvas id="canvas">
+                        This browser is incompatible
+                    </canvas>
+                </div>
+            </div>
+            <div class="container mt-4">
+                <div class="row justify-content-center">
+                    <button id="stepBack" class="mr-5 btn btn-sm" disabled>
+                        Step Backward
+                    </button>
+                    <div id="player-score-box" class="centered col-7">
+                        <p id="player-black" class="player-score"></p>
+                        <p style="visibility: hidden">WWW</p>
+                        <p id="player-white" class="player-score"></p>
+                    </div>
+                    <button id="stepForward" class="ml-5 btn btn-sm" disabled>
+                        Step Forward
+                    </button>
+                </div>
+            </div>
+            <p style="color: red">Time Hoarding {% if selected_game.runoff %}Enabled{% else %}Disabled{%endif%}</p>
+            <p>Time Limit: {{ selected_game.time_limit }}s</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

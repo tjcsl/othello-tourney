@@ -58,6 +58,23 @@ services:
           "-c",
           "uv run celery --app othello worker -l INFO -Ofair"
       ]
+  othello_gamequeue:
+    container_name: othello_gamequeue
+    image: othello_django
+    depends_on:
+    - othello_postgres
+    - othello_redis
+    volumes:
+    - ../../:/app
+    working_dir: /app
+    networks:
+    - othello_network
+    entrypoint:
+      [
+          "/bin/sh",
+          "-c",
+          "uv run celery --app othello worker -l INFO -Ofair --concurrency=2 -Q game_queue"
+      ]
 volumes:
   othello_pgdata:
 networks:

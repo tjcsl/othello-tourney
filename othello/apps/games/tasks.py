@@ -12,7 +12,7 @@ from django.utils import timezone
 from ...moderator import INITIAL_BOARD
 from ...moderator.moderator import InvalidMoveError, Moderator
 from ...moderator.runners import PlayerRunner, ServerError, UserError, YourselfRunner
-from ..games.models import Game, Player, Submission
+from ..games.models import Game, Match, Player, Submission
 
 logger = logging.getLogger("othello")
 task_logger = get_task_logger(__name__)
@@ -37,7 +37,7 @@ def delete_game(game: Game) -> None:
         game.delete()
 
 
-@shared_task
+@shared_task(queue="game_queue")
 def run_game(game_id: int) -> str | None:
     try:
         game = Game.objects.get(id=game_id)
@@ -187,6 +187,15 @@ def run_game(game_id: int) -> str | None:
     black_runner.stop()
     white_runner.stop()
 
+    if game.match and not game.match.games.filter(playing=True).exists():
+        task_logger.info(f"MATCH {game.match.id} OVER")
+        game.match.status = "completed"
+        game.match.save(update_fields=["status"])
+        game.match.calculate_results()
+        async_to_sync(get_channel_layer().group_send)(
+            "matches", {"type": "match.update", "object_id": game.match.id}
+        )
+
     if error != 0 and isinstance(error, ServerError):
         if error.value[0] != -8:
             raise RuntimeError(f"Game {game_id} encountered a ServerError of value {error.value}")
@@ -198,3 +207,41 @@ def delete_old_games() -> None:
     Game.objects.filter(is_tournament=False).filter(
         Q(playing=False) | Q(created_at__lt=datetime.now() - timedelta(hours=settings.STALE_GAME))
     ).delete()
+
+
+@shared_task
+def run_match(match_id: int) -> str | None:
+    try:
+        match = Match.objects.get(id=match_id)
+    except Match.DoesNotExist:
+        logger.error(f"Trying to run nonexistent match ({match_id})")
+        return "match not found"
+
+    match.status = "running"
+    match.save(update_fields=["status"])
+    send_through_match_channel(match, "match.update", match_id)
+
+    games = []
+    for i in range(match.num_games):
+        if i % 2 == 0:
+            black, white = match.player1, match.player2
+        else:
+            black, white = match.player2, match.player1
+        game = Game.objects.create(
+            black=black,
+            white=white,
+            match=match,
+            time_limit=5,
+            playing=True,
+            is_tournament=True,
+            last_heartbeat=timezone.now(),
+        )
+        games.append(game)
+        run_game.delay(game.id)
+
+
+def send_through_match_channel(match: Match, event_type: str, object_id: int) -> int:
+    task_logger.debug(f"sending {event_type}")
+    async_to_sync(get_channel_layer().group_send)(
+        match.channels_group_name, {"type": event_type, "object_id": object_id}
+    )

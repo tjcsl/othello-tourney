@@ -134,3 +134,17 @@ input, button{
         width: 100%;
     }
 }
+
+.win {
+    background-color: #d4edda;
+}
+
+.lose {
+    background-color: #f8d7da;
+}
+
+.nav-button {
+    background-color: transparent;
+    border: transparent;
+    color: white;
+}

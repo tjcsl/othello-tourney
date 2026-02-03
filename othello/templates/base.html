@@ -34,6 +34,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'games:help' %}">Help</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'games:queue' %}">Queue</a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
                             Games
@@ -41,6 +44,7 @@
                         <div class="dropdown-menu">
                             <a class="dropdown-item" href="{% url 'games:upload' %}">Upload</a>
                             <a class="dropdown-item" href="{% url 'games:play' %}">Play</a>
+                            <a class="dropdown-item" href="{% url 'games:request_match' %}">Request Match</a>
                             <a class="dropdown-item" href="{% url 'games:watch' %}">Watch</a>
                             <a class="dropdown-item" href="{% url 'games:replay' %}">Replay</a>
                         </div>
@@ -61,6 +65,16 @@
                     {% if user|has_management_permissions %}
                         <li class="nav-item">
                             <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
+                        </li>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <form method="post" action="{% url 'auth:logout' %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="nav-link nav-button">
+                                    Logout
+                                </button>
+                            </form>
                         </li>
                     {% endif %}
                 </ul>
@@ -88,9 +102,6 @@
             </div>
         {% block main %}{% endblock %}
         <br>
-        {% if user.is_authenticated %}
-            <p id="logout" class="logout">{{ user.short_name }} <a class="logout" href="{% url 'auth:logout' %}">Logout</a></p>
-        {% endif %}
         </div>
     </body>
     <script type="text/javascript" src="{% static 'js/base.js' %}"></script>

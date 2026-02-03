@@ -3,12 +3,15 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.db import models
 from django.http import FileResponse, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
-from .forms import DownloadSubmissionForm, GameForm, SubmissionForm
-from .models import Game
+from .forms import DownloadSubmissionForm, GameForm, MatchForm, SubmissionForm
+from .models import Game, Match, Submission
+from .tasks import run_match
 from .utils import serialize_game_info
 
 logger = logging.getLogger("othello")
@@ -109,6 +112,62 @@ def play(request: HttpRequest) -> HttpResponse:
     return render(request, "games/design.html", {"form": GameForm(initial=initial)})
 
 
+@login_required
+def request_match(request: HttpRequest) -> HttpResponse:
+    if request.method == "POST":
+        form = MatchForm(request.user, request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+
+            one_hour_ago = timezone.now() - timezone.timedelta(hours=1)
+            recent_games = (
+                Match.objects.filter(
+                    models.Q(player1__user=request.user) | models.Q(player2__user=request.user),
+                    created_at__gte=one_hour_ago,
+                ).aggregate(total_games=models.Sum("num_games"))["total_games"]
+                or 0
+            )
+            if recent_games + cd["num_games"] > 100:
+                messages.error(
+                    request,
+                    "You have exceeded the limit of 100 games per hour.",
+                    extra_tags="danger",
+                )
+                return redirect("games:request_match")
+
+            user_submission = Submission.objects.filter(user=request.user).latest(onesub=True)
+            if not user_submission:
+                messages.error(
+                    request, "Could not request match because you do not have a submission"
+                )
+                return redirect("games:queue")
+
+            match = Match.objects.create(
+                player1=user_submission,
+                player2=cd["opponent"],
+                num_games=cd["num_games"],
+            )
+            run_match.delay(match.id)
+            messages.success(request, f"Match requested against {cd['opponent'].get_game_name()}.")
+            return redirect("games:queue")
+        else:
+            for errors in form.errors.get_json_data().values():
+                for error in errors:
+                    messages.error(request, error["message"], extra_tags="danger")
+    else:
+        form = MatchForm(request.user)
+    return render(request, "games/request_match.html", {"form": form})
+
+
+@login_required
+def queue(request: HttpRequest) -> HttpResponse:
+    matches = Match.objects.all().order_by("-created_at")
+    paginator = Paginator(matches, 10)  # 10 per page
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    return render(request, "games/queue.html", {"page_obj": page_obj})
+
+
 def watch(request: HttpRequest, game_id: int | None = None) -> HttpResponse:
     if game_id is not None:
         return render(
@@ -119,11 +178,37 @@ def watch(request: HttpRequest, game_id: int | None = None) -> HttpResponse:
                 "is_watching": True,
             },
         )
-    return render(request, "games/watch_list.html", {"games": Game.objects.running()})
+    return render(request, "games/watch_list.html", {"games": Game.objects.all()})
 
 
 def replay(request: HttpRequest) -> HttpResponse:
     return render(request, "games/replay.html")
+
+
+@login_required
+def match_replay(request: HttpRequest, match_id: int) -> HttpResponse:
+    match = get_object_or_404(Match, id=match_id)
+    games = list(match.games.order_by("created_at"))
+    selected_game_id = request.GET.get("game_id")
+    if selected_game_id:
+        selected_game = get_object_or_404(Game, id=selected_game_id, match=match)
+    elif games:
+        selected_game = games[0]
+    else:
+        selected_game = None
+
+    game_data = serialize_game_info(selected_game) if selected_game else None
+
+    return render(
+        request,
+        "games/match_replay.html",
+        {
+            "match": match,
+            "games": games,
+            "selected_game": selected_game,
+            "game_data": game_data,
+        },
+    )
 
 
 def about(request: HttpRequest) -> HttpResponse:

@@ -73,3 +73,16 @@ class GameForm(forms.Form):
 
     class Meta:
         ordering = ["black", "white"]
+
+
+class MatchForm(forms.Form):
+    opponent = forms.ModelChoiceField(label="Opponent:", queryset=Submission.objects.none())
+    num_games = forms.IntegerField(label="Number of Games:", initial=3, min_value=1, max_value=10)
+
+    def __init__(self, user, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        opponents = (
+            Submission.objects.latest().exclude(user=user).exclude(user__username="Yourself")
+        )
+        self.fields["opponent"].queryset = opponents
+        self.fields["opponent"].label_from_instance = Submission.get_game_name

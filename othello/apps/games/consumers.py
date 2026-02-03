@@ -5,7 +5,7 @@ from channels.generic.websocket import JsonWebsocketConsumer
 from django.utils import timezone
 
 from ...moderator.constants import Player
-from .models import Game, GameLog, Submission
+from .models import Game, GameLog, Match, Submission
 from .tasks import run_game
 from .utils import serialize_game_error, serialize_game_info, serialize_game_log
 
@@ -25,10 +25,6 @@ class GameConsumer(JsonWebsocketConsumer):
 
         yourself: Submission = Submission.objects.get(user__username="Yourself")
 
-        if not self.game.playing:
-            self.close()
-            return
-
         self.is_black_yourself: bool = self.game.black.id == yourself.id
         self.is_white_yourself: bool = self.game.white.id == yourself.id
 
@@ -38,6 +34,8 @@ class GameConsumer(JsonWebsocketConsumer):
         async_to_sync(self.channel_layer.group_add)(
             self.game.channels_group_name, self.channel_name
         )
+
+        self.update_game()
 
     def disconnect(self, code: int) -> None:
         self.connected = False
@@ -78,6 +76,42 @@ class GameConsumer(JsonWebsocketConsumer):
     def send_error(self, object_id: int) -> None:
         if self.connected:
             self.send_json(serialize_game_error(self.game.errors.get(id=object_id)))
+
+
+class MatchConsumer(JsonWebsocketConsumer):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self.connected: bool = False
+
+    def connect(self) -> None:
+        self.connected = True
+        self.accept()
+        async_to_sync(self.channel_layer.group_add)("matches", self.channel_name)
+
+    def disconnect(self, code: int) -> None:
+        self.connected = False
+
+    def match_update(self, event: dict[str, Any]) -> None:
+        self.send_match_update(event["object_id"])
+
+    def send_match_update(self, object_id: int) -> None:
+        if self.connected:
+            match = Match.objects.get(id=object_id)
+            score = "-"
+            if match.status == "completed":
+                score = f"{match.player1_wins}-{match.ties}-{match.player2_wins}"
+            self.send_json(
+                {
+                    "type": "match_update",
+                    "match_id": match.id,
+                    "status": match.status,
+                    "player1": match.player1.get_game_name(),
+                    "player2": match.player2.get_game_name(),
+                    "num_games": match.num_games,
+                    "score": score,
+                    "created_at": match.created_at.isoformat(),
+                }
+            )
 
 
 class GamePlayingConsumer(GameConsumer):

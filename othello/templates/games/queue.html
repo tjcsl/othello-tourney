@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Queue{% endblock %}
+
+{% block head %}
+<script type="text/javascript" src="{% static 'js/games/queue.js' %}"></script>
+{% endblock %}
+
+{% block main %}
+<h1>Running Matches</h1>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Player 1</th>
+            <th>Score</th>
+            <th>Player 2</th>
+            <th>Status</th>
+            <th>Timestamp</th>
+        </tr>
+    </thead>
+    <tbody id="matches">
+        {% for match in page_obj %}
+        <tr class="match" data-match-id="{{ match.id }}">
+            <td
+                {% if match.status == 'completed' %}
+                    class="{% if match.player1_wins > match.player2_wins %}win{% elif match.player1_wins < match.player2_wins %}lose{% endif %}"
+                {% endif %}
+            >
+                {{ match.player1.get_game_name }}
+            </td>
+            <td>
+                {% if match.status == 'completed' %}
+                    {{ match.player1_wins }}-{{ match.ties }}-{{ match.player2_wins }}
+                {% else %}
+                    -
+                {% endif %}
+            </td>
+            <td
+                {% if match.status == 'completed' %}
+                    class="{% if match.player2_wins > match.player1_wins %}win{% elif match.player2_wins < match.player1_wins %}lose{% endif %}"
+                {% endif %}
+            >
+                {{ match.player2.get_game_name }}
+            </td>
+            <td>{{ match.status }}{% if match.status == 'completed' %} <a href="{% url 'games:match_replay' match.id %}">(Replay)</a>{% endif %}</td>
+            <td>{{ match.created_at }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+<div class="pagination">
+    <span class="step-links">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">&laquo; first</a>
+            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+        {% endif %}
+
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+        </span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}">next</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>
+{% endblock %}
