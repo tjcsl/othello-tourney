@@ -143,8 +143,25 @@ input, button{
     background-color: #f8d7da;
 }
 
+.accept {
+    background-color: #60cc7d;
+}
+
+.reject {
+    background-color: #f04646;
+}
+
 .nav-button {
     background-color: transparent;
     border: transparent;
     color: white;
+}
+
+.status-btn:hover {
+  cursor: default !important;
+}
+
+.status-btn:focus {
+    outline: none !important;
+    box-shadow: none !important;
 }

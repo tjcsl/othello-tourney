@@ -6,14 +6,15 @@
 {% block main %}
 <div class="container">
     <h1>User Rankings</h1>
-    <table class="table table-striped">
+    <table class="table">
         <thead>
             <tr>
                 <th>Rank</th>
                 <th>Username</th>
                 <th>Rating</th>
-                <th>Request Unranked</th>
-                <th>Request Ranked</th>
+                <th>Unranked</th>
+                <th>Ranked</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -22,8 +23,18 @@
                 <td>{{ page_obj.start_index|add:forloop.counter|add:-1 }}</td>
                 <td><a href="{% url 'auth:profile' user.username %}">{{ user.username }}</a></td>
                 <td>{{ user.rating }}</td>
-                <td>{% if user.username in users_with_submissions and user.accept_unranked_matches %}<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#requestMatchModal" data-username="{{ user.username }}" data-type="unranked">Request Unranked</button>{% endif %}</td>
-                <td>{% if user.username in users_with_submissions and user.accept_ranked_matches %}<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#requestMatchModal" data-username="{{ user.username }}" data-type="ranked">Request Ranked</button>{% endif %}</td>
+                <td>{% if user.accept_unranked_matches %}
+                    <button class="btn btn-sm win status-btn">Auto-Accept</button>
+                    {% else %}
+                    <button class="btn btn-sm lose status-btn">Auto-Reject</button>
+                    {% endif %}
+                </td>
+                <td>{% if user.accept_ranked_matches %}
+                    <button class="btn btn-sm win status-btn">Auto-Accept</button>
+                    {% else %}
+                    <button class="btn btn-sm lose status-btn">Auto-Reject</button>
+                    {% endif %}</td>
+                <td>{% if user.username in users_with_submissions %}<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#requestMatchModal" data-username="{{ user.username }}">Request Match</button>{% endif %}</td>
             </tr>
             {% endfor %}
         </tbody>
@@ -73,7 +84,6 @@
 $('#requestMatchModal').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
     var username = button.data('username');
-    var type = button.data('type');
     var form = $('#requestMatchForm');
     var action = form.attr('action');
     if (action.indexOf('?') > -1) {
@@ -90,28 +100,16 @@ $('#requestMatchModal').on('show.bs.modal', function (event) {
     });
 
     select.prop('disabled', true);
-
-    var isRankedCheckbox = form.find('input[name="is_ranked"]');
-    if (type === 'ranked') {
-        isRankedCheckbox.prop('checked', true);
-    } else {
-        isRankedCheckbox.prop('checked', false);
-    }
-    isRankedCheckbox.prop('disabled', true);
 });
 
 $('#requestMatchForm').on('submit', function() {
     $(this).find('select[name="opponent"]').prop('disabled', false);
-    $(this).find('input[name="is_ranked"]').prop('disabled', false);
 });
 
 $('#requestMatchModal').on('hidden.bs.modal', function () {
     var form = $('#requestMatchForm');
     var select = form.find('select[name="opponent"]');
     select.prop('disabled', false);
-    var isRankedCheckbox = form.find('input[name="is_ranked"]');
-    isRankedCheckbox.prop('disabled', false);
 });
-
 </script>
 {% endblock %}
