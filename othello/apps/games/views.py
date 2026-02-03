@@ -201,6 +201,13 @@ def replay(request: HttpRequest) -> HttpResponse:
 @login_required
 def match_replay(request: HttpRequest, match_id: int) -> HttpResponse:
     match = get_object_or_404(Match, id=match_id)
+    if request.user not in [match.player1.user, match.player2.user]:
+        messages.error(
+            request,
+            "You can only view replays of matches you participated in.",
+            extra_tags="danger",
+        )
+        return redirect("games:queue")
     games = list(match.games.order_by("created_at"))
     selected_game_id = request.GET.get("game_id")
     if selected_game_id:
