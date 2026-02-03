@@ -9,6 +9,15 @@
 
 {% block main %}
 <h1>Running Matches</h1>
+{% with query_params=request.GET.urlencode %}
+<div class="mb-3">
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="myMatchesCheckbox" {% if my_matches_only %}checked{% endif %}>
+        <label class="form-check-label" for="myMatchesCheckbox">
+            Show only my matches
+        </label>
+    </div>
+</div>
 <table class="table table-striped">
     <thead>
         <tr>
@@ -75,4 +84,5 @@
         {% endif %}
     </span>
 </div>
+{% endwith %}
 {% endblock %}

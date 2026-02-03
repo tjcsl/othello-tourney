@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db import models
-from django.http import FileResponse, HttpRequest, HttpResponse
+from django.http import FileResponse, HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
@@ -173,12 +173,59 @@ def request_match(request: HttpRequest) -> HttpResponse:
 
 
 @login_required
-def queue(request: HttpRequest) -> HttpResponse:
+def queue_json(request: HttpRequest) -> HttpResponse:
     matches = Match.objects.all().order_by("-created_at")
-    paginator = Paginator(matches, 10)  # 10 per page
+    my_matches_only = request.GET.get("my_matches") == "1"
+    if my_matches_only:
+        matches = matches.filter(
+            models.Q(player1__user=request.user) | models.Q(player2__user=request.user)
+        )
+    paginator = Paginator(matches, 10)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
-    return render(request, "games/queue.html", {"page_obj": page_obj})
+
+    matches_data = []
+    for match in page_obj:
+        matches_data.append(
+            {
+                "id": match.id,
+                "player1_name": match.player1.get_game_name(),
+                "player2_name": match.player2.get_game_name(),
+                "score": f"{match.player1_wins}-{match.ties}-{match.player2_wins}"
+                if match.status == "completed"
+                else "-",
+                "is_ranked": "Yes" if match.is_ranked else "No",
+                "status": match.status,
+                "created_at": match.created_at.isoformat(),
+                "can_view_replay": request.user in [match.player1.user, match.player2.user],
+            }
+        )
+
+    return JsonResponse(
+        {
+            "matches": matches_data,
+            "has_next": page_obj.has_next(),
+            "has_previous": page_obj.has_previous(),
+            "page_number": page_obj.number,
+        }
+    )
+
+
+def queue(request: HttpRequest) -> HttpResponse:
+    matches = Match.objects.all().order_by("-created_at")
+    my_matches_only = request.GET.get("my_matches") == "1"
+    if my_matches_only and request.user.is_authenticated:
+        matches = matches.filter(
+            models.Q(player1__user=request.user) | models.Q(player2__user=request.user)
+        )
+    paginator = Paginator(matches, 10)
+    page_number = request.GET.get("page")
+    page_obj = paginator.get_page(page_number)
+    return render(
+        request,
+        "games/queue.html",
+        {"page_obj": page_obj, "my_matches_only": my_matches_only, "request": request},
+    )
 
 
 def watch(request: HttpRequest, game_id: int | None = None) -> HttpResponse:

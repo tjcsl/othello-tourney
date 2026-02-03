@@ -144,7 +144,7 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 # Celery
 CELERY_RESULT_BACKEND = "django-db"
-CELERY_BROKER_URL = "redis://localhost:6379/1"
+CELERY_BROKER_URL = "redis://othello_redis:6379/1"
 CELERY_TIMEZONE = "America/New_York"
 CELERY_BEAT_SCHEDULE = {
     "delete-old-games": {
