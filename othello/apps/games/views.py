@@ -143,10 +143,23 @@ def request_match(request: HttpRequest) -> HttpResponse:
             messages.error(request, "Could not request match because you do not have a submission")
             return redirect("games:queue")
 
+        opponent_user = cd["opponent"].user
+        if cd["is_ranked"] and not opponent_user.accept_ranked_matches:
+            messages.error(
+                request, f"{opponent_user.username} does not accept ranked match requests."
+            )
+            return redirect("games:queue")
+        elif not cd["is_ranked"] and not opponent_user.accept_unranked_matches:
+            messages.error(
+                request, f"{opponent_user.username} does not accept unranked match requests."
+            )
+            return redirect("games:queue")
+
         match = Match.objects.create(
             player1=user_submission,
             player2=cd["opponent"],
             num_games=cd["num_games"],
+            is_ranked=cd["is_ranked"],
         )
         run_match.delay(match.id)
         messages.success(request, f"Match requested against {cd['opponent'].get_game_name()}.")

@@ -15,6 +15,7 @@
             <th>Player 1</th>
             <th>Score</th>
             <th>Player 2</th>
+            <th>Ranked?</th>
             <th>Status</th>
             <th>Timestamp</th>
         </tr>
@@ -43,6 +44,7 @@
             >
                 {{ match.player2.get_game_name }}
             </td>
+            <td>{% if match.is_ranked %}Yes{% else %}No{% endif %}</td>
             <td>{{ match.status }}{% if match.status == 'completed' %} <a href="{% url 'games:match_replay' match.id %}">(Replay)</a>{% endif %}</td>
             <td>{{ match.created_at }}</td>
         </tr>

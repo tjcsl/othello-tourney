@@ -1,6 +1,15 @@
 {% extends "base.html" %}
+{% load static %}
+
 {% block title %}Othello: Home{% endblock %}
 {% block header %} Home {% endblock %}
+
+{% block head %}
+{% if user.is_authenticated %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endif %}
+{% endblock %}
+
 {% block main %}
     <div class="messages">
         {# Front page message #}
@@ -13,6 +22,46 @@
             </div>
         {% endif %}
     </div>
+    {% if user.is_authenticated %}
+        <h1>Hello, {{ user.username }}!</h1>
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col">
+                    <h3>My Rating</h3>
+                    <p>Current Rating: <strong>{{ current_rating }}</strong></p>
+
+                    {% if ratings_json %}
+                        <div style="max-width: 700px; height: 350px;">
+                            <canvas id="ratingChart"></canvas>
+                        </div>
+                    {% else %}
+                        <p>No rating history yet.</p>
+                    {% endif %}
+                </div>
+                <div class="col">
+                <h2>Match Preferences</h2>
+                <form method="post" action="{% url 'auth:update_preferences' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="accept_ranked_matches">Accept Ranked Matches:</label>
+                        <select name="accept_ranked_matches" id="accept_ranked_matches" class="form-control">
+                            <option value="true" {% if accept_ranked_matches %}selected{% endif %}>Accept All</option>
+                            <option value="false" {% if not accept_ranked_matches %}selected{% endif %}>Reject All</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="accept_unranked_matches">Accept Unranked Matches:</label>
+                        <select name="accept_unranked_matches" id="accept_unranked_matches" class="form-control">
+                            <option value="true" {% if accept_unranked_matches %}selected{% endif %}>Accept All</option>
+                            <option value="false" {% if not accept_unranked_matches %}selected{% endif %}>Reject All</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Update Preferences</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% else %}
     <p>
         Welcome to the TJ AI Othello tournament home page! Click on any of the links above to navigate.
     </p>
@@ -39,4 +88,37 @@
         <li>Anup Bagali (2021)</li>
     </ul>
     <br>
-    {% endblock %}
+    {% endif %}
+
+{% if user.is_authenticated and ratings_json %}
+<script>
+const labels = {{ dates_json|safe }};
+const ratings = {{ ratings_json|safe }};
+
+const ctx = document.getElementById("ratingChart");
+
+new Chart(ctx, {
+    type: "line",
+    data: {
+        labels: labels,
+        datasets: [{
+            label: "Rating",
+            data: ratings,
+            borderWidth: 2,
+            tension: 0.25,
+            fill: false,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: false
+            }
+        }
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

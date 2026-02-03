@@ -7,6 +7,12 @@ class User(AbstractUser):
     is_student = models.BooleanField(default=True, null=False)
     is_imported = models.BooleanField(default=False, null=False)
     rating = models.DecimalField(max_digits=6, decimal_places=2, default=1200.00)
+    accept_ranked_matches = models.BooleanField(
+        default=True, help_text="Allow any user to request ranked matches against you"
+    )
+    accept_unranked_matches = models.BooleanField(
+        default=True, help_text="Allow any user to request unranked matches against you"
+    )
 
     @property
     def has_management_permission(self) -> bool:

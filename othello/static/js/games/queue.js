@@ -48,7 +48,7 @@ $(document).ready(function() {
 
         if (matchRow.length) {
             matchRow.find('td:nth-child(2)').text(data.score);
-            matchRow.find('td:nth-child(4)').html(statusHtml);
+            matchRow.find('td:nth-child(5)').html(statusHtml);
             applyWinLoseClasses(matchRow);
         } else {
             const newRow = $(`
@@ -56,6 +56,7 @@ $(document).ready(function() {
                     <td>${data.player1}</td>
                     <td>${data.score}</td>
                     <td>${data.player2}</td>
+                    <td>${data.ranked}</td>
                     <td>${statusHtml}</td>
                     <td>${data.created_at}</td>
                 </tr>

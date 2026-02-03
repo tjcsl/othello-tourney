@@ -128,6 +128,7 @@ class Match(models.Model):
         Submission, on_delete=models.CASCADE, related_name="matches_as_player2"
     )
     num_games = models.IntegerField(default=5)
+    is_ranked = models.BooleanField(default=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -199,36 +200,37 @@ class Match(models.Model):
         user1 = self.player1.user
         user2 = self.player2.user
 
-        rating1 = Decimal(str(user1.rating))
-        rating2 = Decimal(str(user2.rating))
+        if self.is_ranked:
+            rating1 = Decimal(str(user1.rating))
+            rating2 = Decimal(str(user2.rating))
 
-        change1, change2 = calculate_match_rating_change(
-            rating1=rating1,
-            rating2=rating2,
-            player1_wins=player1_wins,
-            player2_wins=player2_wins,
-            ties=ties,
-        )
+            change1, change2 = calculate_match_rating_change(
+                rating1=rating1,
+                rating2=rating2,
+                player1_wins=player1_wins,
+                player2_wins=player2_wins,
+                ties=ties,
+            )
 
-        user1.rating = rating1 + change1
-        user2.rating = rating2 + change2
+            user1.rating = rating1 + change1
+            user2.rating = rating2 + change2
 
-        user1.save(update_fields=["rating"])
-        user2.save(update_fields=["rating"])
+            user1.save(update_fields=["rating"])
+            user2.save(update_fields=["rating"])
 
-        RatingHistory.objects.create(
-            user=user1,
-            rating=user1.rating,
-            match=self,
-        )
-        RatingHistory.objects.create(
-            user=user2,
-            rating=user2.rating,
-            match=self,
-        )
+            RatingHistory.objects.create(
+                user=user1,
+                rating=user1.rating,
+                match=self,
+            )
+            RatingHistory.objects.create(
+                user=user2,
+                rating=user2.rating,
+                match=self,
+            )
 
-        task_logger.info(f"User {user1} new rating: {user1.rating}")
-        task_logger.info(f"User {user2} new rating: {user2.rating}")
+            task_logger.info(f"User {user1} new rating: {user1.rating}")
+            task_logger.info(f"User {user2} new rating: {user2.rating}")
 
     def __str__(self) -> str:
         return f"{self.player1.get_game_name()} vs {self.player2.get_game_name()} ({self.num_games} games)"

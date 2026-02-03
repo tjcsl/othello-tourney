@@ -107,6 +107,7 @@ class MatchConsumer(JsonWebsocketConsumer):
                     "status": match.status,
                     "player1": match.player1.get_game_name(),
                     "player2": match.player2.get_game_name(),
+                    "ranked": "Yes" if match.is_ranked else "No",
                     "num_games": match.num_games,
                     "score": score,
                     "created_at": match.created_at.isoformat(),

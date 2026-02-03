@@ -13,4 +13,5 @@ urlpatterns = [
     path("rating/", views.rating, name="rating"),
     path("profile/<str:username>/", views.profile, name="profile"),
     path("rankings/", views.rankings, name="rankings"),
+    path("update_preferences/", views.update_preferences, name="update_preferences"),
 ]

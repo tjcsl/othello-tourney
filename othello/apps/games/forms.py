@@ -86,6 +86,11 @@ class MatchForm(forms.Form):
         min_value=1,
         max_value=10,
     )
+    is_ranked = forms.BooleanField(
+        label="Ranked Match:",
+        initial=True,
+        required=False,
+    )
 
     def __init__(self, user, *args, initial_opponent_user=None, **kwargs):
         super().__init__(*args, **kwargs)
