@@ -7,7 +7,7 @@ from django.core.paginator import Paginator
 from django.db import models
 from django.http import FileResponse, HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
+from django.utils import formats, timezone
 
 from .forms import DownloadSubmissionForm, GameForm, MatchForm, SubmissionForm
 from .models import Game, Match, Submission
@@ -189,15 +189,25 @@ def queue_json(request: HttpRequest) -> HttpResponse:
         matches_data.append(
             {
                 "id": match.id,
-                "player1_name": match.player1.get_game_name(),
-                "player2_name": match.player2.get_game_name(),
-                "score": f"{match.player1_wins}-{match.ties}-{match.player2_wins}"
+                "player1_name": match.player1.user.username,
+                "player2_name": match.player2.user.username,
+                "score": f"{match.player1_wins} - {match.ties} - {match.player2_wins}"
                 if match.status == "completed"
                 else "-",
                 "is_ranked": "Yes" if match.is_ranked else "No",
                 "status": match.status,
-                "created_at": match.created_at.isoformat(),
+                "status_display": match.get_status_display(),
+                "created_at": formats.date_format(
+                    timezone.localtime(match.created_at),
+                    "DATETIME_FORMAT",
+                ),
                 "can_view_replay": request.user in [match.player1.user, match.player2.user],
+                "player1_rating_delta": match.player1_rating_delta
+                if match.player1_rating_delta
+                else None,
+                "player2_rating_delta": match.player2_rating_delta
+                if match.player2_rating_delta
+                else None,
             }
         )
 
@@ -211,6 +221,7 @@ def queue_json(request: HttpRequest) -> HttpResponse:
     )
 
 
+@login_required
 def queue(request: HttpRequest) -> HttpResponse:
     matches = Match.objects.all().order_by("-created_at")
     my_matches_only = request.GET.get("my_matches") == "1"

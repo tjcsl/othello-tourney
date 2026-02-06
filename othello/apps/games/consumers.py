@@ -97,20 +97,27 @@ class MatchConsumer(JsonWebsocketConsumer):
     def send_match_update(self, object_id: int) -> None:
         if self.connected:
             match = Match.objects.get(id=object_id)
-            score = "-"
+            score = "? - ? - ?"
             if match.status == "completed":
-                score = f"{match.player1_wins}-{match.ties}-{match.player2_wins}"
+                score = f"{match.player1_wins} - {match.ties} - {match.player2_wins}"
             self.send_json(
                 {
                     "type": "match_update",
                     "match_id": match.id,
                     "status": match.status,
-                    "player1": match.player1.get_game_name(),
-                    "player2": match.player2.get_game_name(),
+                    "status_display": match.get_status_display(),
+                    "player1": match.player1.user.username,
+                    "player2": match.player2.user.username,
                     "ranked": "Yes" if match.is_ranked else "No",
                     "num_games": match.num_games,
                     "score": score,
                     "created_at": match.created_at.isoformat(),
+                    "player1_rating_delta": match.player1_rating_delta
+                    if match.player1_rating_delta
+                    else None,
+                    "player2_rating_delta": match.player2_rating_delta
+                    if match.player2_rating_delta
+                    else None,
                 }
             )
 

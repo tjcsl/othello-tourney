@@ -143,6 +143,8 @@ class Match(models.Model):
     player1_wins = models.IntegerField(default=0)
     player2_wins = models.IntegerField(default=0)
     ties = models.IntegerField(default=0)
+    player1_rating_delta = models.IntegerField(null=True, blank=True)
+    player2_rating_delta = models.IntegerField(null=True, blank=True)
 
     @property
     def channels_group_name(self) -> str:
@@ -212,6 +214,9 @@ class Match(models.Model):
                 ties=ties,
             )
 
+            self.player1_rating_delta = int(change1)
+            self.player2_rating_delta = int(change2)
+
             user1.rating = rating1 + change1
             user2.rating = rating2 + change2
 
@@ -231,6 +236,22 @@ class Match(models.Model):
 
             task_logger.info(f"User {user1} new rating: {user1.rating}")
             task_logger.info(f"User {user2} new rating: {user2.rating}")
+
+            self.save(
+                update_fields=[
+                    "player1_rating_delta",
+                    "player2_rating_delta",
+                ]
+            )
+        else:
+            self.player1_rating_delta = None
+            self.player2_rating_delta = None
+            self.save(
+                update_fields=[
+                    "player1_rating_delta",
+                    "player2_rating_delta",
+                ]
+            )
 
     def __str__(self) -> str:
         return f"{self.player1.get_game_name()} vs {self.player2.get_game_name()} ({self.num_games} games)"

@@ -21,48 +21,62 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Player 1</th>
+            <th>Player 1 (Δ)</th>
             <th>Score</th>
-            <th>Player 2</th>
+            <th>Player 2 (Δ)</th>
             <th>Ranked?</th>
             <th>Status</th>
             <th>Timestamp</th>
         </tr>
     </thead>
-    <tbody id="matches">
+    <tbody id="matches" class="small">
         {% for match in page_obj %}
         <tr class="match" data-match-id="{{ match.id }}">
-            <td
-                {% if match.status == 'completed' %}
-                    class="{% if match.player1_wins > match.player2_wins %}win{% elif match.player1_wins < match.player2_wins %}lose{% endif %}"
-                {% endif %}
-            >
-                {{ match.player1.get_game_name }}
-            </td>
-            <td>
-                {% if match.status == 'completed' %}
-                    {{ match.player1_wins }}-{{ match.ties }}-{{ match.player2_wins }}
-                {% else %}
-                    -
+            <td class="align-middle">
+                {{ match.player1.user.username }}
+                {% if match.status == 'completed' and match.player1_rating_delta %}
+                    <span class="rating-delta {% if match.player1_rating_delta > 0 %}delta-win{% elif match.player1_rating_delta < 0 %}delta-loss{% else %}delta-tie{% endif %}">({% if match.player1_rating_delta > 0 %}+{% endif %}{{ match.player1_rating_delta }})</span>
                 {% endif %}
             </td>
-            <td
+            <td class="align-middle score-column">
                 {% if match.status == 'completed' %}
-                    class="{% if match.player2_wins > match.player1_wins %}win{% elif match.player2_wins < match.player1_wins %}lose{% endif %}"
-                {% endif %}
-            >
-                {{ match.player2.get_game_name }}
-            </td>
-            <td>{% if match.is_ranked %}Yes{% else %}No{% endif %}</td>
-            <td>
-                {{ match.status }}
-                {% if match.status == 'completed' %}
-                    {% if user == match.player1.user or user == match.player2.user %}
-                        <a href="{% url 'games:match_replay' match.id %}">(Replay)</a>
+                    {% if match.player1_wins > match.player2_wins %}
+                        <span class="result-circle result-win">W</span>
+                    {% elif match.player1_wins < match.player2_wins %}
+                        <span class="result-circle result-loss">L</span>
+                    {% else %}
+                        <span class="result-circle result-tie">T</span>
                     {% endif %}
+                    <span class="score">{{ match.player1_wins }} - {{ match.ties }} - {{ match.player2_wins }}</span>
+                    {% if match.player2_wins > match.player1_wins %}
+                        <span class="result-circle result-win">W</span>
+                    {% elif match.player2_wins < match.player1_wins %}
+                        <span class="result-circle result-loss">L</span>
+                    {% else %}
+                        <span class="result-circle result-tie">T</span>
+                    {% endif %}
+                {% else %}
+                    <span class="result-circle result-tie">-</span>
+                    <span class="score">? - ? - ?</span>
+                    <span class="result-circle result-tie">-</span>
                 {% endif %}
             </td>
-            <td>{{ match.created_at }}</td>
+            <td class="align-middle">
+                {{ match.player2.user.username }}
+                {% if match.status == 'completed' and match.player2_rating_delta %}
+                    <span class="rating-delta {% if match.player2_rating_delta > 0 %}delta-win{% elif match.player2_rating_delta < 0 %}delta-loss{% else %}delta-tie{% endif %}">({% if match.player2_rating_delta > 0 %}+{% endif %}{{ match.player2_rating_delta }})</span>
+                {% endif %}
+            </td>
+            <td class="align-middle">{% if match.is_ranked %}Yes{% else %}No{% endif %}</td>
+            <td class="align-middle">
+                {{ match.get_status_display }}
+                {% if match.status == 'completed' %}
+                    {% comment %} {% if user == match.player1.user or user == match.player2.user %}
+                        <a href="{% url 'games:match_replay' match.id %}">(Replay)</a>
+                    {% endif %} {% endcomment %}
+                {% endif %}
+            </td>
+            <td class="align-middle">{{ match.created_at }}</td>
         </tr>
         {% endfor %}
     </tbody>

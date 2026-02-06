@@ -245,3 +245,6 @@ if not DEBUG:
         integrations=[DjangoIntegration(), CeleryIntegration()],
         send_default_pii=True,
     )
+
+
+DATETIME_FORMAT = "F d, Y, h:i a"

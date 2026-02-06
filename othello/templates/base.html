@@ -70,7 +70,7 @@
                         </li>
                     {% endif %}
                     {% if user.is_authenticated %}
-                        <li class="nav-item">
+                        <li class="nav-item d-flex align-items-center">
                             <form method="post" action="{% url 'auth:logout' %}" style="display: inline;">
                                 {% csrf_token %}
                                 <button type="submit" class="nav-link nav-button">
