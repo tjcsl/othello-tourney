@@ -73,3 +73,39 @@ class GameForm(forms.Form):
 
     class Meta:
         ordering = ["black", "white"]
+
+
+class MatchForm(forms.Form):
+    opponent = forms.ModelChoiceField(
+        label="Opponent:",
+        queryset=Submission.objects.none(),
+    )
+    num_games = forms.IntegerField(
+        label="Number of Games:",
+        initial=3,
+        min_value=1,
+        max_value=10,
+    )
+    is_ranked = forms.BooleanField(
+        label="Ranked Match:",
+        initial=True,
+        required=False,
+    )
+
+    def __init__(self, user, *args, initial_opponent_user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        opponents = (
+            Submission.objects.latest().exclude(user=user).exclude(user__username="Yourself")
+        )
+        self.fields["opponent"].queryset = opponents
+        self.fields["opponent"].label_from_instance = Submission.get_game_name
+
+        if initial_opponent_user:
+            try:
+                opponent_submission = Submission.objects.filter(user=initial_opponent_user).latest(
+                    onesub=True
+                )
+                self.fields["opponent"].initial = opponent_submission
+            except Submission.DoesNotExist:
+                pass
