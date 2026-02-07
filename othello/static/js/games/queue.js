@@ -96,7 +96,10 @@ $(document).ready(function () {
 
         row.find('td:nth-child(4)').text(data.is_ranked);
 
-        row.find('td:nth-child(5)').text(data.status_display);
+        if (data.status === 'completed')
+        row.find('td:nth-child(5)').html(
+            `${data.status_display}${data.status === 'completed' ? ' <a href="/match_replay/' + data.match_id + '">(Replay)</a>' : ''}`
+        );
     }
 
     $('#myMatchesCheckbox').change(function () {
@@ -144,8 +147,8 @@ $(document).ready(function () {
                     <td class="align-middle">
                         ${match.is_ranked ? 'Yes' : 'No'}
                     </td>
-                    <td class="align-middle">
-                        ${match.status_display}
+                    <td class="align-middle">   
+                        ${match.status_display}${match.status === 'completed' ? ' <a href="/match_replay/' + match.id + '">(Replay)</a>' : ''}
                     </td>
                     <td class="align-middle">
                         ${match.created_at}

@@ -64,16 +64,14 @@
             <td class="align-middle">
                 {{ match.player2.user.username }}
                 {% if match.status == 'completed' and match.player2_rating_delta %}
-                    <span class="rating-delta {% if match.player2_rating_delta > 0 %}delta-win{% elif match.player2_rating_delta < 0 %}delta-loss{% else %}delta-tie{% endif %}">({% if match.player2_rating_delta > 0 %}+{% endif %}{{ match.player2_rating_delta }})</span>
+                    <span class="rating-delta {% if match.player2_rating_delta > 0 %}delta-win{% elif match.player2_rating_delta < 0 %}delta-loss{% else %}delta-tie{% endif %}">({% if match.player2_rating_delta > 0 %}+{% endif %}{{ match.player2_rating_delta}})</span>
                 {% endif %}
             </td>
             <td class="align-middle">{% if match.is_ranked %}Yes{% else %}No{% endif %}</td>
             <td class="align-middle">
                 {{ match.get_status_display }}
                 {% if match.status == 'completed' %}
-                    {% comment %} {% if user == match.player1.user or user == match.player2.user %}
-                        <a href="{% url 'games:match_replay' match.id %}">(Replay)</a>
-                    {% endif %} {% endcomment %}
+                    <a href="{% url 'games:match_replay' match.id %}">(Replay)</a>
                 {% endif %}
             </td>
             <td class="align-middle">{{ match.created_at }}</td>
