@@ -147,7 +147,7 @@ $(document).ready(function () {
                     <td class="align-middle">
                         ${match.is_ranked ? 'Yes' : 'No'}
                     </td>
-                    <td class="align-middle">   
+                    <td class="align-middle">
                         ${match.status_display}${match.status === 'completed' ? ' <a href="/match_replay/' + match.id + '">(Replay)</a>' : ''}
                     </td>
                     <td class="align-middle">
