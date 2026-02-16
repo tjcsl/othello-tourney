@@ -20,7 +20,7 @@ repos:
         files: ^.*\.(py|md|rst)$
         args: ["--ignore-words=.codespell-ignore.txt"]
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.14.13
+    rev: v0.15.1
     hooks:
       - id: ruff
         args: [ "--fix", "--exit-non-zero-on-fix" ]
