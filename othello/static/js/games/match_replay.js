@@ -159,10 +159,10 @@ function generateMoveList() {
 function highlightMove(index) {
     $(".move-item").removeClass("active bg-primary text-white");
     const activeElem = $(`.move-item[data-index='${index}']`);
-    
+
     if (activeElem.length) {
         activeElem.addClass("active bg-primary text-white");
-        
+
         const container = $("#moveList").parent();
         const scrollPos = container.scrollTop();
         const containerHeight = container.height();
