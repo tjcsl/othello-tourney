@@ -10,4 +10,6 @@ RUN apt-get update && apt-get install -y \
     firejail \
     && rm -rf /var/lib/apt/lists/*
 
+ENV UV_LINK_MODE copy
+
 EXPOSE 8000

@@ -4,7 +4,7 @@ from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application
 from django.urls import path
 
-from .apps.games.consumers import GameConsumer, GamePlayingConsumer
+from .apps.games.consumers import GameConsumer, GamePlayingConsumer, MatchConsumer
 
 
 class WebsocketCloseConsumer(WebsocketConsumer):
@@ -27,6 +27,7 @@ application = ProtocolTypeRouter(
                 [
                     path("play/<int:game_id>", GamePlayingConsumer.as_asgi()),
                     path("watch/<int:game_id>", GameConsumer.as_asgi()),
+                    path("queue/", MatchConsumer.as_asgi()),
                     path("<path:path>", WebsocketCloseConsumer.as_asgi()),
                 ]
             )

@@ -2,16 +2,21 @@ services:
   othello_postgres:
     container_name: othello_postgres
     image: postgres:latest
-    ports:
-    - "5432:5432"
     environment:
     - POSTGRES_DB=othello
     - POSTGRES_USER=othello
     - POSTGRES_PASSWORD=pwd
     volumes:
-    - "othello_pgdata:/var/lib/postgresql"
+    - othello_pgdata:/var/lib/postgresql
+    ports:
+    - "5432:5432"
     networks:
     - othello_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U othello -d othello"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   othello_redis:
     container_name: othello_redis
     image: redis:latest
@@ -28,8 +33,10 @@ services:
     ports:
     - "8000:8000"
     depends_on:
-    - othello_postgres
-    - othello_redis
+      othello_postgres:
+        condition: service_healthy
+      othello_redis:
+        condition: service_started
     volumes:
     - ../../:/app
     working_dir: /app
@@ -45,8 +52,10 @@ services:
     container_name: othello_celery
     image: othello_django
     depends_on:
-    - othello_postgres
-    - othello_redis
+      othello_postgres:
+        condition: service_healthy
+      othello_redis:
+        condition: service_started
     volumes:
     - ../../:/app
     working_dir: /app
@@ -57,6 +66,25 @@ services:
           "/bin/sh",
           "-c",
           "uv run celery --app othello worker -l INFO -Ofair"
+      ]
+  othello_gamequeue:
+    container_name: othello_gamequeue
+    image: othello_django
+    depends_on:
+      othello_postgres:
+        condition: service_healthy
+      othello_redis:
+        condition: service_started
+    volumes:
+    - ../../:/app
+    working_dir: /app
+    networks:
+    - othello_network
+    entrypoint:
+      [
+          "/bin/sh",
+          "-c",
+          "uv run celery --app othello worker -l INFO -Ofair --concurrency=2 -Q game_queue"
       ]
 volumes:
   othello_pgdata:

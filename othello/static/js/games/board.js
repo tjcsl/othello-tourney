@@ -60,8 +60,8 @@ function init(black, white) {
 
 
     rCanvas.fullbg = new RImg(0, 0, rCanvas.rWidth, rCanvas.rHeight, BORDER_IMG);
-    rCanvas.black = document.getElementById("player-black");
-    rCanvas.white = document.getElementById("player-white");
+    // rCanvas.black = document.getElementById("player-black");
+    // rCanvas.white = document.getElementById("player-white");
 
     rCanvas.select = new RRect(0,0,1,1, HIGHLIGHT_CO, 0.4);
     rCanvas.lastmove = new RRect(0,0, 1,1, LASTMOVE_CO, 0.4);
@@ -129,14 +129,14 @@ function drawBoard(rCanvas, board_array, possible, tomove, anim_array, move,) {
     rCanvas.add(rCanvas.select);
 
     let counts = countPieces(DIMENSION, board_array);
-    rCanvas.black.innerHTML = `${rCanvas.black_name}: ${counts[BLACK_NM].toString()}`;
-    rCanvas.white.innerHTML = `${rCanvas.white_name}: ${counts[WHITE_NM].toString()}`;
+    // rCanvas.black.innerHTML = `${rCanvas.black_name}: ${counts[BLACK_NM].toString()}`;
+    // rCanvas.white.innerHTML = `${rCanvas.white_name}: ${counts[WHITE_NM].toString()}`;
     if(tomove === BLACK_NM){
-        rCanvas.black.innerHTML = ` (*) ${rCanvas.black.innerHTML}`;
+        // rCanvas.black.innerHTML = ` (*) ${rCanvas.black.innerHTML}`;
         rCanvas.tomove = 1;
     }
     else if(tomove === WHITE_NM){
-        rCanvas.white.innerHTML = `${rCanvas.white.innerHTML} (*) `;
+        // rCanvas.white.innerHTML = `${rCanvas.white.innerHTML} (*) `;
         rCanvas.tomove = 0 ;
     }
     rCanvas.draw();

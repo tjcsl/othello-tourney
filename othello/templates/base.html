@@ -34,6 +34,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'games:help' %}">Help</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'games:queue' %}">Queue</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'auth:rankings' %}">Rankings</a>
+                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown">
                             Games
@@ -63,13 +69,24 @@
                             <a class="nav-link" href="{% url 'admin:index' %}">Admin</a>
                         </li>
                     {% endif %}
+                    {% if user.is_authenticated %}
+                        <li class="nav-item d-flex align-items-center">
+                            <form method="post" action="{% url 'auth:logout' %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="nav-link nav-button">
+                                    Logout
+                                </button>
+                            </form>
+                        </li>
+                    {% endif %}
                 </ul>
             </div>
         </nav>
         <div class="main" id="main">
             <div id="messages" class="messages">
                 {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show my-2" role="alert">
+                    <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}success{% elif message.tags == 'warning' %}warning{% endif %} alert-dismissible fade show my-2"
+                        role="alert">
                         {{ message }}
                         <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                             <span aria-hidden="true">&times;</span>
@@ -88,9 +105,6 @@
             </div>
         {% block main %}{% endblock %}
         <br>
-        {% if user.is_authenticated %}
-            <p id="logout" class="logout">{{ user.short_name }} <a class="logout" href="{% url 'auth:logout' %}">Logout</a></p>
-        {% endif %}
         </div>
     </body>
     <script type="text/javascript" src="{% static 'js/base.js' %}"></script>

@@ -20,7 +20,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("localhost", 6379)],
+            "hosts": [("othello_redis", 6379)],
             "capacity": 1500,
             "expiry": 2,
         },
@@ -29,7 +29,6 @@ CHANNEL_LAYERS = {
 
 INSTALLED_APPS = [
     "daphne",
-    "othello.apps.OthelloAdminConfig",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
@@ -41,6 +40,7 @@ INSTALLED_APPS = [
     "social_django",
     "django_celery_results",
     "othello.apps",
+    "othello.apps.OthelloAdminConfig",
     "othello.apps.auth.apps.AuthConfig",
     "othello.apps.games.apps.GamesConfig",
     "othello.apps.tournaments.apps.TournamentsConfig",
@@ -144,7 +144,7 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 # Celery
 CELERY_RESULT_BACKEND = "django-db"
-CELERY_BROKER_URL = "redis://localhost:6379/1"
+CELERY_BROKER_URL = "redis://othello_redis:6379/1"
 CELERY_TIMEZONE = "America/New_York"
 CELERY_BEAT_SCHEDULE = {
     "delete-old-games": {
@@ -245,3 +245,6 @@ if not DEBUG:
         integrations=[DjangoIntegration(), CeleryIntegration()],
         send_default_pii=True,
     )
+
+
+DATETIME_FORMAT = "F d, Y, h:i a"
