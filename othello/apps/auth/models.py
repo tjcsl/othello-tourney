@@ -6,6 +6,13 @@ class User(AbstractUser):
     is_teacher = models.BooleanField(default=False, null=False)
     is_student = models.BooleanField(default=True, null=False)
     is_imported = models.BooleanField(default=False, null=False)
+    rating = models.DecimalField(max_digits=6, decimal_places=2, default=1200.00)
+    accept_ranked_matches = models.BooleanField(
+        default=True, help_text="Allow any user to request ranked matches against you"
+    )
+    accept_unranked_matches = models.BooleanField(
+        default=True, help_text="Allow any user to request unranked matches against you"
+    )
 
     @property
     def has_management_permission(self) -> bool:
@@ -35,3 +42,13 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+
+class RatingHistory(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="rating_history")
+    rating = models.DecimalField(max_digits=6, decimal_places=2)
+    changed_at = models.DateTimeField(auto_now_add=True)
+    match = models.ForeignKey("games.Match", null=True, on_delete=models.SET_NULL)
+
+    class Meta:
+        ordering = ["changed_at"]

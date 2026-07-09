@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Rankings{% endblock %}
+
+{% block main %}
+<div class="container">
+    <h1>User Rankings</h1>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Username</th>
+                <th>Rating</th>
+                <th>Unranked</th>
+                <th>Ranked</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in page_obj %}
+            <tr>
+                <td>{{ page_obj.start_index|add:forloop.counter|add:-1 }}</td>
+                <td><a href="{% url 'auth:profile' user.username %}">{{ user.username }}</a></td>
+                <td>{{ user.rating }}</td>
+                <td>{% if user.accept_unranked_matches %}
+                    <button class="btn btn-sm win status-btn">Auto-Accept</button>
+                    {% else %}
+                    <button class="btn btn-sm lose status-btn">Auto-Reject</button>
+                    {% endif %}
+                </td>
+                <td>{% if user.accept_ranked_matches %}
+                    <button class="btn btn-sm win status-btn">Auto-Accept</button>
+                    {% else %}
+                    <button class="btn btn-sm lose status-btn">Auto-Reject</button>
+                    {% endif %}</td>
+                <td>{% if user.username in users_with_submissions %}<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#requestMatchModal" data-username="{{ user.username }}">Request Match</button>{% endif %}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page=1">&laquo; First</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+            {% endif %}
+
+            <li class="page-item disabled"><span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span></li>
+
+            {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Last &raquo;</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</div>
+
+<div class="modal fade" id="requestMatchModal" tabindex="-1" role="dialog" aria-labelledby="requestMatchModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="requestMatchModalLabel">Request a Match</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="requestMatchForm" method="post" action="{% url 'games:request_match' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    {{ form.as_p }}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Request Match</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+$('#requestMatchModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var username = button.data('username');
+    var form = $('#requestMatchForm');
+    var action = form.attr('action');
+    if (action.indexOf('?') > -1) {
+        action = action.split('?')[0];
+    }
+    form.attr('action', action + '?opponent=' + encodeURIComponent(username));
+
+    var select = form.find('select[name="opponent"]');
+    select.find('option').each(function() {
+        if ($(this).text().indexOf(username) !== -1) {
+            select.val($(this).val());
+            return false;
+        }
+    });
+
+    select.prop('disabled', true);
+});
+
+$('#requestMatchForm').on('submit', function() {
+    $(this).find('select[name="opponent"]').prop('disabled', false);
+});
+
+$('#requestMatchModal').on('hidden.bs.modal', function () {
+    var form = $('#requestMatchForm');
+    var select = form.find('select[name="opponent"]');
+    select.prop('disabled', false);
+});
+</script>
+{% endblock %}

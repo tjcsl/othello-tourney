@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}{{ profile_user.username }}'s Profile{% endblock %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block main %}
+<div class="container">
+    <h1>{{ profile_user.username }}'s Profile</h1>
+    <p>Current Rating: <strong>{{ current_rating }}</strong></p>
+
+    {% if ratings_json %}
+        <div style="max-width: 700px; height: 350px;">
+            <canvas id="ratingChart"></canvas>
+        </div>
+    {% else %}
+        <p>No rating history yet.</p>
+    {% endif %}
+</div>
+
+{% if ratings_json %}
+<script>
+const labels = {{ dates_json|safe }};
+const ratings = {{ ratings_json|safe }};
+
+const ctx = document.getElementById("ratingChart");
+
+new Chart(ctx, {
+    type: "line",
+    data: {
+        labels: labels,
+        datasets: [{
+            label: "Rating",
+            data: ratings,
+            borderWidth: 2,
+            tension: 0.25,
+            fill: false,
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+            y: {
+                beginAtZero: false
+            }
+        }
+    }
+});
+</script>
+{% endif %}
+{% endblock %}

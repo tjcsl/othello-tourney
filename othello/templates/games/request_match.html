@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Request Match{% endblock %}
+
+{% block main %}
+<h1>Request a Match</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Request Match</button>
+</form>
+{% endblock %}

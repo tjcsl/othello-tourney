@@ -19,13 +19,13 @@ function logDisabled(){
 }
 
 function enableButtons(){
-    $("#stepForward").prop("disabled", false);
-    $("#stepBack").prop("disabled", false);
+    // $("#stepForward").prop("disabled", false);
+    // $("#stepBack").prop("disabled", false);
 }
 
 function disableButtons(){
-    $("#stepForward").prop("disabled", true);
-    $("#stepBack").prop("disabled", true);
+    // $("#stepForward").prop("disabled", true);
+    // $("#stepBack").prop("disabled", true);
 }
 
 function clearErrors(){
@@ -137,14 +137,14 @@ function startReplay(){
     drawBoard(rCanvas, gameReplay.game[0].board, gameReplay.game[0].possible, BLACK_NM, rCanvas.animArray, 36);
 
     let gameIndex = 0;
-    $("#stepForward").click(function (){
-        gameIndex = Math.min(++gameIndex, gameReplay.game.length-1);
-        drawBoardAtState(gameIndex);
-    })
-    $("#stepBack").click(function (){
-        gameIndex = Math.max(--gameIndex, 0);
-        drawBoardAtState(gameIndex);
-    })
+    // $("#stepForward").click(function (){
+    //     gameIndex = Math.min(++gameIndex, gameReplay.game.length-1);
+    //     drawBoardAtState(gameIndex);
+    // })
+    // $("#stepBack").click(function (){
+    //     gameIndex = Math.max(--gameIndex, 0);
+    //     drawBoardAtState(gameIndex);
+    // })
 
 }
 
