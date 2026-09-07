@@ -18,7 +18,6 @@ class Strategy:
     def best_strategy(self, board: str, player: str, best_move, still_running, time_limit: float):
         move = choose_move(board, player, still_running, time_limit)
         best_move.value = move
-
 ```
 
 ## Method Specification
