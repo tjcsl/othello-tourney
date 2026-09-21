@@ -92,7 +92,15 @@ def run_tournament(tournament_id: int) -> None:
         logger.info(f"Tournament {tournament_id} has been terminated")
         return
 
-    tournament_start_email(tournament_id)
+    logger.warning("Tournament %s: task entered", tournament_id)
+
+    logger.warning("Tournament %s: sending start email", tournament_id)
+    try:
+        tournament_start_email(tournament_id)
+    except Exception:
+        logger.exception("Tournament %s: start email failed", tournament_id)
+        
+    logger.warning("Tournament %s: start email completed", tournament_id)
 
     include_users = list(t.include_users.all())
     random.shuffle(include_users)
