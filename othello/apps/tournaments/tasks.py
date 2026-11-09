@@ -99,7 +99,7 @@ def run_tournament(tournament_id: int) -> None:
         tournament_start_email(tournament_id)
     except Exception:
         logger.exception("Tournament %s: start email failed", tournament_id)
-        
+
     logger.warning("Tournament %s: start email completed", tournament_id)
 
     include_users = list(t.include_users.all())
